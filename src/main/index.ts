@@ -1,10 +1,11 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { kioskWindowOptions, adminWindowOptions } from './windows/kioskWindow'
 import { getDb } from './db/client'
 import { ModuleHandlers } from './ipc/handlers/modules'
-import { IPC_CHANNELS } from './ipc/channels'
+import { ProjectHandlers } from './ipc/handlers/projects'
+import { UnitHandlers } from './ipc/handlers/units'
 
 const isProd = !is.dev
 
@@ -43,22 +44,15 @@ app.whenReady().then(async () => {
   try {
     const db = await getDb()
 
-    // Module handlers
+    // Instantiate and register handler namespaces
     const moduleHandlers = new ModuleHandlers(db)
     moduleHandlers.registerIpc()
 
-    // Baseline Project listing IPC handlers
-    ipcMain.handle(IPC_CHANNELS.PROJECT_LIST, async () => {
-      return db.project.findMany({
-        orderBy: [{ isFeatured: 'desc' }, { sortOrder: 'asc' }],
-      })
-    })
+    const projectHandlers = new ProjectHandlers(db)
+    projectHandlers.registerIpc()
 
-    ipcMain.handle(IPC_CHANNELS.PROJECT_GET, async (_, id: string) => {
-      return db.project.findUnique({
-        where: { id },
-      })
-    })
+    const unitHandlers = new UnitHandlers(db)
+    unitHandlers.registerIpc()
 
   } catch (error) {
     console.error('Failed to initialize database and IPC handlers:', error)
