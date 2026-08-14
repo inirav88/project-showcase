@@ -16,9 +16,6 @@ export function getDb(): PrismaClient {
     const libsql = createClient({
       url: `file:${dbPath}`,
     })
-    console.log('--- SHOWCASEOS DATABASE CONNECTION ---')
-    console.log('Database Path:', dbPath)
-    console.log('--- SHOWCASEOS DATABASE CONNECTION ---')
     const adapter = new PrismaLibSQL(libsql)
     _client = new PrismaClient({ adapter })
   }

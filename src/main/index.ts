@@ -15,23 +15,11 @@ let kioskWin: BrowserWindow | null = null
 let adminWin: BrowserWindow | null = null
 
 function createWindows(): void {
-  const preloadKioskPath = join(__dirname, '../preload/index.js')
-  console.log('--- SHOWCASEOS PRELOAD PATHS ---')
-  console.log('Preload Kiosk Path:', preloadKioskPath)
-  console.log('Preload exists:', require('fs').existsSync(preloadKioskPath))
-  console.log('--- SHOWCASEOS PRELOAD PATHS ---')
-
   kioskWin = new BrowserWindow(kioskWindowOptions(isProd))
   adminWin = new BrowserWindow(adminWindowOptions())
 
-  kioskWin.on('ready-to-show', () => {
-    kioskWin?.show()
-    kioskWin?.webContents.openDevTools()
-  })
-  adminWin.on('ready-to-show', () => {
-    adminWin?.show()
-    adminWin?.webContents.openDevTools()
-  })
+  kioskWin.on('ready-to-show', () => kioskWin?.show())
+  adminWin.on('ready-to-show', () => adminWin?.show())
 
   kioskWin.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
