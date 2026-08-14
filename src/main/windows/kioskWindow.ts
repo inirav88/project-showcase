@@ -11,8 +11,8 @@ export function kioskWindowOptions(isProduction: boolean): BrowserWindowConstruc
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: true,
-      preload: join(__dirname, '../../preload/index.js'),
+      sandbox: false,
+      preload: join(__dirname, '../preload/index.js'),
     },
   }
 }
@@ -28,7 +28,8 @@ export function adminWindowOptions(): BrowserWindowConstructorOptions {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: join(__dirname, '../../preload/index.js'),
+      sandbox: false,
+      preload: join(__dirname, '../preload/index.js'),
     },
   }
 }

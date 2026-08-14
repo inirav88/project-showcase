@@ -117,6 +117,11 @@ export default function AdminRoute(): JSX.Element {
       padding: '24px'
     }}>
       {/* Header */}
+      {!(window as any).api && (
+        <div style={{ padding: '12px', backgroundColor: '#EF4444', color: '#FFF', fontWeight: 600, borderRadius: '6px', marginBottom: '16px', textAlign: 'center' }}>
+          CRITICAL ERROR: Electron Preload Bridge (window.api) is not defined! Context isolation or preload configuration is failing.
+        </div>
+      )}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
