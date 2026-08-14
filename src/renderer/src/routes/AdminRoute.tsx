@@ -19,14 +19,19 @@ const browseBtn: React.CSSProperties = {
 type FileFilter = { name: string; extensions: string[] }
 
 function FilePicker({
-  value, onChange, placeholder, accept, label
+  value, onChange, placeholder, accept, label, projectId
 }: {
   value: string
   onChange: (path: string) => void
   placeholder?: string
   accept?: 'image' | 'video' | 'audio' | 'pdf' | 'any'
   label?: string
+  projectId?: string
 }) {
+  const [uploading, setUploading] = React.useState(false)
+  const [progressText, setProgressText] = React.useState('')
+  const [showSuccess, setShowSuccess] = React.useState(false)
+
   const filterMap: Record<string, FileFilter[]> = {
     image: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'] }],
     video: [{ name: 'Videos', extensions: ['mp4', 'mov', 'avi', 'mkv', 'webm'] }],
@@ -37,28 +42,129 @@ function FilePicker({
   const iconMap: Record<string, string> = { image: '🖼️', video: '🎥', audio: '🎵', pdf: '📄', any: '📁' }
 
   const browse = async () => {
+    if (!projectId) {
+      alert('Please select a project context at the top of the admin panel first!')
+      return
+    }
     const path = await (window as any).api.invoke(IPC_CHANNELS.DIALOG_OPEN_FILE, {
       title: label ? `Select ${label}` : 'Select File',
       filters: filterMap[accept ?? 'any']
     }) as string | null
-    if (path) onChange(path)
+
+    if (path) {
+      setUploading(true)
+      setProgressText('Copying file to project storage...')
+      try {
+        let category = 'GALLERY'
+        if (accept === 'video') category = 'VIDEO'
+        if (accept === 'audio') category = 'AUDIO'
+        if (accept === 'pdf') category = 'DOCUMENT'
+
+        // 1. Trigger the background upload/optimization handler
+        setProgressText('Optimizing and registering media element...')
+        const mediaRecord = await (window as any).api.invoke(IPC_CHANNELS.MEDIA_UPLOAD, {
+          projectId,
+          category,
+          filePath: path
+        }) as any
+
+        // 2. Set the resulting appData/media path
+        onChange(mediaRecord.filePath)
+        
+        // 3. Show a brief success pulse
+        setShowSuccess(true)
+        setTimeout(() => setShowSuccess(false), 3000)
+      } catch (err: any) {
+        alert(`Failed to import media element: ${err.message}`)
+      } finally {
+        setUploading(false)
+        setProgressText('')
+      }
+    }
   }
 
+  const isImage = value && (
+    value.toLowerCase().endsWith('.png') ||
+    value.toLowerCase().endsWith('.jpg') ||
+    value.toLowerCase().endsWith('.jpeg') ||
+    value.toLowerCase().endsWith('.webp') ||
+    value.toLowerCase().endsWith('.svg') ||
+    value.toLowerCase().includes('_thumb')
+  )
+
   return (
-    <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
-      <input
-        style={{
-          flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '6px',
-          border: '1px solid #334155', backgroundColor: '#09090e',
-          color: '#F8FAFC', fontSize: '13px', boxSizing: 'border-box' as const
-        }}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder ?? 'Select a file or type a path…'}
-      />
-      <button type="button" onClick={browse} title="Browse for file" style={browseBtn}>
-        {iconMap[accept ?? 'any']} Browse
-      </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+        {/* Render a nice thumbnail preview for images if available */}
+        {isImage && (
+          <div style={{
+            width: '38px', height: '38px', borderRadius: '6px', overflow: 'hidden',
+            border: '1px solid #334155', backgroundColor: '#09090e', flexShrink: 0,
+            position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <img
+              src={`file://${value}`}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => { (e.target as HTMLElement).style.display = 'none' }}
+            />
+            <span style={{ position: 'absolute', bottom: '-2px', right: '-2px', fontSize: '10px' }}>✅</span>
+          </div>
+        )}
+
+        <input
+          style={{
+            flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '6px',
+            border: uploading ? '1px solid #3B82F6' : showSuccess ? '1px solid #10B981' : '1px solid #334155',
+            backgroundColor: '#09090e',
+            color: '#F8FAFC', fontSize: '13px', boxSizing: 'border-box' as const
+          }}
+          disabled={uploading}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder={placeholder ?? 'Select a file or type a path…'}
+        />
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={browse}
+          title="Browse for file"
+          style={{
+            ...browseBtn,
+            opacity: uploading ? 0.5 : 1,
+            backgroundColor: showSuccess ? '#10B981' : '#334155',
+            color: '#fff'
+          }}
+        >
+          {uploading ? '⏳ Processing' : showSuccess ? '✅ Done' : `${iconMap[accept ?? 'any']} Browse`}
+        </button>
+      </div>
+
+      {/* Progress feedback bar */}
+      {uploading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 2px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#3B82F6' }}>
+            <span>⚡ {progressText}</span>
+            <span style={{ animation: 'pulse 1.5s infinite' }}>Importing...</span>
+          </div>
+          {/* Animated loading bar */}
+          <div style={{ width: '100%', height: '4px', backgroundColor: '#1E293B', borderRadius: '2px', overflow: 'hidden' }}>
+            <div style={{
+              width: '40%', height: '100%',
+              backgroundColor: '#3B82F6',
+              borderRadius: '2px',
+              animation: 'loadingProgress 1.5s infinite ease-in-out'
+            }} />
+          </div>
+        </div>
+      )}
+
+      {/* Inject custom keyframe styles if not present */}
+      <style>{`
+        @keyframes loadingProgress {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(250%); }
+        }
+      `}</style>
     </div>
   )
 }
@@ -87,8 +193,8 @@ const addBtn: React.CSSProperties = {
 }
 
 function ModuleConfigEditor({
-  moduleType, configJson, onChange
-}: { moduleType: string; configJson: string; onChange: (newJson: string) => void }) {
+  moduleType, configJson, onChange, projectId
+}: { moduleType: string; configJson: string; onChange: (newJson: string) => void; projectId: string }) {
   const [cfg, setCfg] = useState<Record<string, any>>(() => parseConfig(configJson))
 
   useEffect(() => {
@@ -116,7 +222,7 @@ function ModuleConfigEditor({
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Hero Background Image (optional)</label>
-          <FilePicker value={cfg.heroImage || ''} onChange={v => set('heroImage', v)} accept="image" label="Hero Background Image" placeholder="Select a hero background image…" />
+          <FilePicker projectId={projectId} value={cfg.heroImage || ''} onChange={v => set('heroImage', v)} accept="image" label="Hero Background Image" placeholder="Select a hero background image…" />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Call-to-action Button Label</label>
@@ -136,7 +242,7 @@ function ModuleConfigEditor({
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
               <label style={labelStyle}>Image File</label>
-              <FilePicker value={img.path} onChange={v => { const a = [...images]; a[i] = { ...a[i], path: v }; setArr('images', a) }} accept="image" label="Gallery Image" placeholder="Select an image file…" />
+              <FilePicker projectId={projectId} value={img.path} onChange={v => { const a = [...images]; a[i] = { ...a[i], path: v }; setArr('images', a) }} accept="image" label="Gallery Image" placeholder="Select an image file…" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div style={fieldStyle}>
@@ -185,7 +291,7 @@ function ModuleConfigEditor({
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Amenity Image (optional)</label>
-              <FilePicker value={item.imagePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], imagePath: v }; setArr('amenities', a) }} accept="image" label="Amenity Image" placeholder="Select an image for this amenity…" />
+              <FilePicker projectId={projectId} value={item.imagePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], imagePath: v }; setArr('amenities', a) }} accept="image" label="Amenity Image" placeholder="Select an image for this amenity…" />
             </div>
             <button style={removeBtn} onClick={() => setArr('amenities', items.filter((_, j) => j !== i))}>Remove</button>
           </div>
@@ -205,7 +311,7 @@ function ModuleConfigEditor({
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
               <label style={labelStyle}>Video File (.mp4 / .mov)</label>
-              <FilePicker value={v.path} onChange={p => { const a = [...videos]; a[i] = { ...a[i], path: p }; setArr('videos', a) }} accept="video" label="Walkthrough Video" placeholder="Select a video file…" />
+              <FilePicker projectId={projectId} value={v.path} onChange={p => { const a = [...videos]; a[i] = { ...a[i], path: p }; setArr('videos', a) }} accept="video" label="Walkthrough Video" placeholder="Select a video file…" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div style={fieldStyle}>
@@ -214,7 +320,7 @@ function ModuleConfigEditor({
               </div>
               <div style={fieldStyle}>
                 <label style={labelStyle}>Thumbnail Image (optional)</label>
-                <FilePicker value={v.thumbnailPath || ''} onChange={p => { const a = [...videos]; a[i] = { ...a[i], thumbnailPath: p }; setArr('videos', a) }} accept="image" label="Video Thumbnail" placeholder="Select thumbnail image…" />
+                <FilePicker projectId={projectId} value={v.thumbnailPath || ''} onChange={p => { const a = [...videos]; a[i] = { ...a[i], thumbnailPath: p }; setArr('videos', a) }} accept="image" label="Video Thumbnail" placeholder="Select thumbnail image…" />
               </div>
             </div>
             <button style={removeBtn} onClick={() => setArr('videos', videos.filter((_, j) => j !== i))}>Remove</button>
@@ -248,7 +354,7 @@ function ModuleConfigEditor({
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Highlight Image (optional)</label>
-              <FilePicker value={c.imagePath || ''} onChange={v => { const a = [...cards]; a[i] = { ...a[i], imagePath: v }; setArr('highlights', a) }} accept="image" label="Highlight Image" placeholder="Select a highlight image…" />
+              <FilePicker projectId={projectId} value={c.imagePath || ''} onChange={v => { const a = [...cards]; a[i] = { ...a[i], imagePath: v }; setArr('highlights', a) }} accept="image" label="Highlight Image" placeholder="Select a highlight image…" />
             </div>
             <button style={removeBtn} onClick={() => setArr('highlights', cards.filter((_, j) => j !== i))}>Remove</button>
           </div>
@@ -273,7 +379,7 @@ function ModuleConfigEditor({
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Location Aerial / Map Image (optional)</label>
-          <FilePicker value={cfg.mapImagePath || ''} onChange={v => set('mapImagePath', v)} accept="image" label="Location Map Image" placeholder="Select a location map or aerial image…" />
+          <FilePicker projectId={projectId} value={cfg.mapImagePath || ''} onChange={v => set('mapImagePath', v)} accept="image" label="Location Map Image" placeholder="Select a location map or aerial image…" />
         </div>
         <hr style={{ border: 'none', borderTop: '1px solid #2d3f5e' }} />
         <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0, fontWeight: 600 }}>Nearby Connectivity Points</p>
@@ -378,7 +484,7 @@ function ModuleConfigEditor({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
           <label style={labelStyle}>Master Plan Image</label>
-          <FilePicker value={cfg.imagePath || ''} onChange={v => set('imagePath', v)} accept="image" label="Master Plan Image" placeholder="Select the master plan image…" />
+          <FilePicker projectId={projectId} value={cfg.imagePath || ''} onChange={v => set('imagePath', v)} accept="image" label="Master Plan Image" placeholder="Select the master plan image…" />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Description / Legend Text</label>
@@ -394,7 +500,7 @@ function ModuleConfigEditor({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
           <label style={labelStyle}>PDF Brochure File</label>
-          <FilePicker value={cfg.brochurePath || ''} onChange={v => set('brochurePath', v)} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file…" />
+          <FilePicker projectId={projectId} value={cfg.brochurePath || ''} onChange={v => set('brochurePath', v)} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file…" />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Download Button Label</label>
@@ -1264,6 +1370,7 @@ export default function AdminRoute(): JSX.Element {
                             moduleType={mod.moduleType}
                             configJson={moduleConfigInput}
                             onChange={setModuleConfigInput}
+                            projectId={selectedProjectId}
                           />
                           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '4px' }}>
                             <button
