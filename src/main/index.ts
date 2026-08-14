@@ -6,6 +6,7 @@ import { getDb } from './db/client'
 import { ModuleHandlers } from './ipc/handlers/modules'
 import { ProjectHandlers } from './ipc/handlers/projects'
 import { UnitHandlers } from './ipc/handlers/units'
+import { MediaHandlers } from './ipc/handlers/media'
 
 const isProd = !is.dev
 
@@ -43,6 +44,7 @@ app.whenReady().then(async () => {
   // Initialize DB and register IPC handlers
   try {
     const db = await getDb()
+    const appDataPath = app.getPath('userData')
 
     // Instantiate and register handler namespaces
     const moduleHandlers = new ModuleHandlers(db)
@@ -53,6 +55,9 @@ app.whenReady().then(async () => {
 
     const unitHandlers = new UnitHandlers(db)
     unitHandlers.registerIpc()
+
+    const mediaHandlers = new MediaHandlers(db, appDataPath)
+    mediaHandlers.registerIpc()
 
   } catch (error) {
     console.error('Failed to initialize database and IPC handlers:', error)
