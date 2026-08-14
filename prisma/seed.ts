@@ -127,6 +127,47 @@ async function main() {
     ],
   })
 
+  // Project 4 — The Stately (Mahadev Buildcon)
+  const p4 = await db.project.create({
+    data: {
+      name: 'The Stately',
+      developer: 'Mahadev Buildcon',
+      reraNumber: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14924/100325/311230',
+      location: 'Kudasan, Gandhinagar',
+      description: 'Roman-themed luxury mixed-development featuring flats, shops, and premium bungalows. Boasts 3-side open spacious homes with 55% green spaces, high-end clubhouse, swimming pool, and earthquake-resistant R.C.C. construction.',
+      type: 'MIXED_USE',
+      status: 'ACTIVE',
+      possessionStatus: 'UNDER_CONSTRUCTION',
+      possessionDate: 'December 2030',
+      priceRangeMin: 10400000,
+      priceRangeMax: 13900000,
+      themeAccentColor: '#D97706', // Roman Gold / Amber
+      themeFontPairing: 'Lora',
+      isFeatured: false,
+    },
+  })
+
+  await db.projectModule.createMany({
+    data: [
+      { projectId: p4.id, moduleType: 'OVERVIEW',       sortOrder: 0, config: '{"heroHeadline":"Roman-Themed Luxury Mixed Living"}' },
+      { projectId: p4.id, moduleType: 'USP_SPOTLIGHT',   sortOrder: 1, config: '{"headline":"3-Side Open Homes","body":"Roman arches, extensive gardens, and premium amenities"}' },
+      { projectId: p4.id, moduleType: 'GALLERY',          sortOrder: 2, config: '{}' },
+      { projectId: p4.id, moduleType: 'PRICING',          sortOrder: 3, config: '{}' },
+      { projectId: p4.id, moduleType: 'AMENITIES',        sortOrder: 4, config: '{}' },
+    ],
+  })
+
+  const tower4A = await db.tower.create({ data: { projectId: p4.id, name: 'Block A' } })
+  const tower4B = await db.tower.create({ data: { projectId: p4.id, name: 'Block B' } })
+
+  await db.unit.createMany({
+    data: [
+      { towerId: tower4A.id, floor: 3, unitNumber: 'A-302', configuration: '3BHK', carpetArea: 1550, builtUpArea: 2150, price: 10500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+      { towerId: tower4A.id, floor: 9, unitNumber: 'A-902', configuration: '4BHK', carpetArea: 1980, builtUpArea: 2750, price: 13500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+      { towerId: tower4B.id, floor: 4, unitNumber: 'B-401', configuration: '3BHK', carpetArea: 1550, builtUpArea: 2150, price: 10800000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+    ],
+  })
+
   // Settings singleton
   await db.settings.upsert({
     where: { id: 1 },
