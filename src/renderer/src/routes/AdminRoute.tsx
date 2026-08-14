@@ -7,6 +7,62 @@ function parseConfig(raw: string): Record<string, any> {
   try { return JSON.parse(raw || '{}') } catch { return {} }
 }
 
+// ─── Native File Picker ───────────────────────────────────────────────────────
+
+const browseBtn: React.CSSProperties = {
+  padding: '8px 14px', backgroundColor: '#334155', color: '#CBD5E1',
+  border: '1px solid #475569', borderRadius: '6px', cursor: 'pointer',
+  fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0,
+  display: 'flex', alignItems: 'center', gap: '4px'
+}
+
+type FileFilter = { name: string; extensions: string[] }
+
+function FilePicker({
+  value, onChange, placeholder, accept, label
+}: {
+  value: string
+  onChange: (path: string) => void
+  placeholder?: string
+  accept?: 'image' | 'video' | 'audio' | 'pdf' | 'any'
+  label?: string
+}) {
+  const filterMap: Record<string, FileFilter[]> = {
+    image: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'] }],
+    video: [{ name: 'Videos', extensions: ['mp4', 'mov', 'avi', 'mkv', 'webm'] }],
+    audio: [{ name: 'Audio', extensions: ['mp3', 'wav', 'aac', 'ogg', 'm4a'] }],
+    pdf:   [{ name: 'PDF Documents', extensions: ['pdf'] }],
+    any:   [{ name: 'All Files', extensions: ['*'] }],
+  }
+  const iconMap: Record<string, string> = { image: '🖼️', video: '🎥', audio: '🎵', pdf: '📄', any: '📁' }
+
+  const browse = async () => {
+    const path = await (window as any).api.invoke(IPC_CHANNELS.DIALOG_OPEN_FILE, {
+      title: label ? `Select ${label}` : 'Select File',
+      filters: filterMap[accept ?? 'any']
+    }) as string | null
+    if (path) onChange(path)
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+      <input
+        style={{
+          flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '6px',
+          border: '1px solid #334155', backgroundColor: '#09090e',
+          color: '#F8FAFC', fontSize: '13px', boxSizing: 'border-box' as const
+        }}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder ?? 'Select a file or type a path…'}
+      />
+      <button type="button" onClick={browse} title="Browse for file" style={browseBtn}>
+        {iconMap[accept ?? 'any']} Browse
+      </button>
+    </div>
+  )
+}
+
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '8px 10px', borderRadius: '6px',
   border: '1px solid #334155', backgroundColor: '#09090e',
@@ -59,6 +115,10 @@ function ModuleConfigEditor({
           <input style={inputStyle} value={(cfg.stats || []).join(', ')} onChange={e => set('stats', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} placeholder="2BHK-4BHK, 1200-3800 sqft, RERA Approved" />
         </div>
         <div style={fieldStyle}>
+          <label style={labelStyle}>Hero Background Image (optional)</label>
+          <FilePicker value={cfg.heroImage || ''} onChange={v => set('heroImage', v)} accept="image" label="Hero Background Image" placeholder="Select a hero background image…" />
+        </div>
+        <div style={fieldStyle}>
           <label style={labelStyle}>Call-to-action Button Label</label>
           <input style={inputStyle} value={cfg.ctaLabel || ''} onChange={e => set('ctaLabel', e.target.value)} placeholder="Explore Units" />
         </div>
@@ -71,12 +131,12 @@ function ModuleConfigEditor({
     const images: { path: string; caption: string; category: string }[] = cfg.images || []
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0 }}>Add image paths from the <strong>Media</strong> tab, then reference them here with captions.</p>
+        <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0 }}>Click <strong>🖼️ Browse</strong> to pick images from your computer for each gallery entry.</p>
         {images.map((img, i) => (
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
-              <label style={labelStyle}>Image File Path</label>
-              <input style={inputStyle} value={img.path} onChange={e => { const a = [...images]; a[i] = { ...a[i], path: e.target.value }; setArr('images', a) }} placeholder="C:\Media\project\gallery\image.jpg" />
+              <label style={labelStyle}>Image File</label>
+              <FilePicker value={img.path} onChange={v => { const a = [...images]; a[i] = { ...a[i], path: v }; setArr('images', a) }} accept="image" label="Gallery Image" placeholder="Select an image file…" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div style={fieldStyle}>
@@ -104,7 +164,7 @@ function ModuleConfigEditor({
 
   // ── AMENITIES ────────────────────────────────────────────────────────────
   if (moduleType === 'AMENITIES') {
-    const items: { name: string; icon: string; description: string }[] = cfg.amenities || []
+    const items: { name: string; icon: string; description: string; imagePath?: string }[] = cfg.amenities || []
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {items.map((item, i) => (
@@ -115,7 +175,7 @@ function ModuleConfigEditor({
                 <input style={inputStyle} value={item.name} onChange={e => { const a = [...items]; a[i] = { ...a[i], name: e.target.value }; setArr('amenities', a) }} placeholder="Infinity Pool" />
               </div>
               <div style={fieldStyle}>
-                <label style={labelStyle}>Icon (emoji)</label>
+                <label style={labelStyle}>Icon</label>
                 <input style={inputStyle} value={item.icon} onChange={e => { const a = [...items]; a[i] = { ...a[i], icon: e.target.value }; setArr('amenities', a) }} placeholder="🏊" />
               </div>
             </div>
@@ -123,10 +183,14 @@ function ModuleConfigEditor({
               <label style={labelStyle}>Description</label>
               <input style={inputStyle} value={item.description} onChange={e => { const a = [...items]; a[i] = { ...a[i], description: e.target.value }; setArr('amenities', a) }} placeholder="Olympic-size pool on the rooftop" />
             </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Amenity Image (optional)</label>
+              <FilePicker value={item.imagePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], imagePath: v }; setArr('amenities', a) }} accept="image" label="Amenity Image" placeholder="Select an image for this amenity…" />
+            </div>
             <button style={removeBtn} onClick={() => setArr('amenities', items.filter((_, j) => j !== i))}>Remove</button>
           </div>
         ))}
-        <button style={addBtn} onClick={() => setArr('amenities', [...items, { name: '', icon: '🏠', description: '' }])}>+ Add Amenity</button>
+        <button style={addBtn} onClick={() => setArr('amenities', [...items, { name: '', icon: '🏠', description: '', imagePath: '' }])}>+ Add Amenity</button>
       </div>
     )
   }
@@ -136,11 +200,12 @@ function ModuleConfigEditor({
     const videos: { path: string; title: string; thumbnailPath: string }[] = cfg.videos || []
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0 }}>Click <strong>🎥 Browse</strong> to select .mp4 video files from your computer.</p>
         {videos.map((v, i) => (
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
-              <label style={labelStyle}>Video File Path (.mp4)</label>
-              <input style={inputStyle} value={v.path} onChange={e => { const a = [...videos]; a[i] = { ...a[i], path: e.target.value }; setArr('videos', a) }} placeholder="C:\Media\project\walkthroughs\video.mp4" />
+              <label style={labelStyle}>Video File (.mp4 / .mov)</label>
+              <FilePicker value={v.path} onChange={p => { const a = [...videos]; a[i] = { ...a[i], path: p }; setArr('videos', a) }} accept="video" label="Walkthrough Video" placeholder="Select a video file…" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div style={fieldStyle}>
@@ -148,8 +213,8 @@ function ModuleConfigEditor({
                 <input style={inputStyle} value={v.title} onChange={e => { const a = [...videos]; a[i] = { ...a[i], title: e.target.value }; setArr('videos', a) }} placeholder="Grand Lobby Walkthrough" />
               </div>
               <div style={fieldStyle}>
-                <label style={labelStyle}>Thumbnail Path (optional)</label>
-                <input style={inputStyle} value={v.thumbnailPath || ''} onChange={e => { const a = [...videos]; a[i] = { ...a[i], thumbnailPath: e.target.value }; setArr('videos', a) }} placeholder="C:\Media\project\thumbnails\lobby.jpg" />
+                <label style={labelStyle}>Thumbnail Image (optional)</label>
+                <FilePicker value={v.thumbnailPath || ''} onChange={p => { const a = [...videos]; a[i] = { ...a[i], thumbnailPath: p }; setArr('videos', a) }} accept="image" label="Video Thumbnail" placeholder="Select thumbnail image…" />
               </div>
             </div>
             <button style={removeBtn} onClick={() => setArr('videos', videos.filter((_, j) => j !== i))}>Remove</button>
@@ -182,8 +247,8 @@ function ModuleConfigEditor({
               <input style={inputStyle} value={c.description} onChange={e => { const a = [...cards]; a[i] = { ...a[i], description: e.target.value }; setArr('highlights', a) }} placeholder="Panoramic 270° views across the city skyline" />
             </div>
             <div style={fieldStyle}>
-              <label style={labelStyle}>Image Path (optional)</label>
-              <input style={inputStyle} value={c.imagePath || ''} onChange={e => { const a = [...cards]; a[i] = { ...a[i], imagePath: e.target.value }; setArr('highlights', a) }} placeholder="C:\Media\project\highlights\views.jpg" />
+              <label style={labelStyle}>Highlight Image (optional)</label>
+              <FilePicker value={c.imagePath || ''} onChange={v => { const a = [...cards]; a[i] = { ...a[i], imagePath: v }; setArr('highlights', a) }} accept="image" label="Highlight Image" placeholder="Select a highlight image…" />
             </div>
             <button style={removeBtn} onClick={() => setArr('highlights', cards.filter((_, j) => j !== i))}>Remove</button>
           </div>
@@ -205,6 +270,10 @@ function ModuleConfigEditor({
         <div style={fieldStyle}>
           <label style={labelStyle}>Address Description</label>
           <input style={inputStyle} value={cfg.addressLine || ''} onChange={e => set('addressLine', e.target.value)} placeholder="Near Infocity, Gandhinagar, Gujarat – 382009" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Location Aerial / Map Image (optional)</label>
+          <FilePicker value={cfg.mapImagePath || ''} onChange={v => set('mapImagePath', v)} accept="image" label="Location Map Image" placeholder="Select a location map or aerial image…" />
         </div>
         <hr style={{ border: 'none', borderTop: '1px solid #2d3f5e' }} />
         <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0, fontWeight: 600 }}>Nearby Connectivity Points</p>
@@ -308,8 +377,8 @@ function ModuleConfigEditor({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Master Plan Image Path</label>
-          <input style={inputStyle} value={cfg.imagePath || ''} onChange={e => set('imagePath', e.target.value)} placeholder="C:\Media\project\masterplan.jpg" />
+          <label style={labelStyle}>Master Plan Image</label>
+          <FilePicker value={cfg.imagePath || ''} onChange={v => set('imagePath', v)} accept="image" label="Master Plan Image" placeholder="Select the master plan image…" />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Description / Legend Text</label>
@@ -324,8 +393,8 @@ function ModuleConfigEditor({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>PDF Brochure File Path</label>
-          <input style={inputStyle} value={cfg.brochurePath || ''} onChange={e => set('brochurePath', e.target.value)} placeholder="C:\Media\project\brochure.pdf" />
+          <label style={labelStyle}>PDF Brochure File</label>
+          <FilePicker value={cfg.brochurePath || ''} onChange={v => set('brochurePath', v)} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file…" />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Download Button Label</label>
@@ -1271,13 +1340,16 @@ export default function AdminRoute(): JSX.Element {
               <form onSubmit={handleUploadMedia} style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B', display: 'flex', flexDirection: 'column', gap: '16px', height: 'fit-content' }}>
                 <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Import New Media Element</h4>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Local File Path (Absolute)</label>
-                  <input
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Select File</label>
+                  <FilePicker
                     value={uploadFilePath}
-                    onChange={(e) => setUploadFilePath(e.target.value)}
-                    placeholder="C:\path\to\file.jpg"
-                    required
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }}
+                    onChange={setUploadFilePath}
+                    accept={
+                      uploadCategory === 'VIDEO' || uploadCategory === 'INTRO_VIDEO' ? 'video' :
+                      uploadCategory === 'AUDIO' ? 'audio' : 'image'
+                    }
+                    label="Media File"
+                    placeholder="Click Browse to select a file from your computer…"
                   />
                 </div>
                 <div>

@@ -42,6 +42,9 @@ export const IPC_CHANNELS = {
   // System
   EXIT_KIOSK:         'system:exitKiosk',
   SECOND_DISPLAY:     'system:secondDisplay',
+  // Dialog
+  DIALOG_OPEN_FILE:   'dialog:openFile',
+  DIALOG_OPEN_FOLDER: 'dialog:openFolder',
 } as const
 
 export type IpcChannel = typeof IPC_CHANNELS[keyof typeof IPC_CHANNELS]

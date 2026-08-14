@@ -11,6 +11,7 @@ import { PdfHandlers } from './ipc/handlers/pdf'
 import { SettingsHandlers } from './ipc/handlers/settings'
 import { SessionHandlers } from './ipc/handlers/sessions'
 import { LeadHandlers } from './ipc/handlers/leads'
+import { registerDialogHandlers } from './ipc/handlers/dialog'
 
 const isProd = !is.dev
 
@@ -74,6 +75,9 @@ app.whenReady().then(async () => {
 
     const leadHandlers = new LeadHandlers(db)
     leadHandlers.registerIpc()
+
+    // Register dialog (file picker) handlers — no DB dependency
+    registerDialogHandlers()
 
   } catch (error) {
     console.error('Failed to initialize database and IPC handlers:', error)
