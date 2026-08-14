@@ -86,6 +86,47 @@ async function main() {
     ],
   })
 
+  // Project 3 — Avyanna (Kumbh Infrastructure)
+  const p3 = await db.project.create({
+    data: {
+      name: 'Avyanna',
+      developer: 'Kumbh Infrastructure',
+      reraNumber: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/RAA13022/A1R/081024/311226',
+      location: 'Koba, Gandhinagar',
+      description: 'Luxury 4 BHK apartments strategically located near PDPU - K Raheja 80-meter road, opposite Koba Metro Station. Offers G+18 and G+19 residential towers with premium high-speed lifts and 3 allotted parkings per unit.',
+      type: 'RESIDENTIAL',
+      status: 'ACTIVE',
+      possessionStatus: 'UNDER_CONSTRUCTION',
+      possessionDate: 'December 2026',
+      priceRangeMin: 16200000,
+      priceRangeMax: 18200000,
+      themeAccentColor: '#8B5CF6',
+      themeFontPairing: 'Outfit',
+      isFeatured: true,
+    },
+  })
+
+  await db.projectModule.createMany({
+    data: [
+      { projectId: p3.id, moduleType: 'OVERVIEW',       sortOrder: 0, config: '{"heroHeadline":"Luxury 4 BHK Residences in Gandhinagar"}' },
+      { projectId: p3.id, moduleType: 'USP_SPOTLIGHT',   sortOrder: 1, config: '{"headline":"Super Premium 4 BHK Living","body":"Opposite Koba Metro Station, Koba Gandhinagar"}' },
+      { projectId: p3.id, moduleType: 'GALLERY',          sortOrder: 2, config: '{}' },
+      { projectId: p3.id, moduleType: 'AMENITIES',        sortOrder: 3, config: '{}' },
+      { projectId: p3.id, moduleType: 'PRICING',          sortOrder: 4, config: '{}' },
+    ],
+  })
+
+  const tower3A = await db.tower.create({ data: { projectId: p3.id, name: 'Tower A' } })
+  const tower3B = await db.tower.create({ data: { projectId: p3.id, name: 'Tower B' } })
+
+  await db.unit.createMany({
+    data: [
+      { towerId: tower3A.id, floor: 5, unitNumber: 'A-501', configuration: '4BHK', carpetArea: 2450, builtUpArea: 4050, price: 16500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+      { towerId: tower3A.id, floor: 12, unitNumber: 'A-1201', configuration: '4BHK', carpetArea: 2500, builtUpArea: 4100, price: 17200000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+      { towerId: tower3B.id, floor: 8, unitNumber: 'B-802', configuration: '4BHK', carpetArea: 2450, builtUpArea: 4050, price: 16800000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+    ],
+  })
+
   // Settings singleton
   await db.settings.upsert({
     where: { id: 1 },
