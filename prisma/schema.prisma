@@ -1,0 +1,208 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/main/db/generated"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Note: Runtime uses @libsql/client with PrismaLibSQL adapter
+// DATABASE_URL should be "file:./dev.db" for local dev
+// or "file:{absolutePath}" for production
+
+// ─── Enums (SQLite stores as strings) ────────────────────────────────────────
+
+// Note: Prisma with SQLite doesn't support native enums — values are
+// enforced via Zod validation in the IPC handlers layer.
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model Project {
+  id                  String   @id @default(cuid())
+  name                String
+  developer           String
+  reraNumber          String
+  location            String
+  description         String   @default("")
+  type                String   @default("RESIDENTIAL") // ProjectType
+  status              String   @default("ACTIVE")      // ProjectStatus
+  possessionStatus    String   @default("UNDER_CONSTRUCTION") // PossessionStatus
+  possessionDate      String   @default("")
+  priceRangeMin       Float    @default(0)
+  priceRangeMax       Float    @default(0)
+  isFeatured          Boolean  @default(false)
+  sortOrder           Int      @default(0)
+  themeAccentColor    String   @default("#1A73E8")
+  themeFontPairing    String   @default("Inter")
+  introVideoMediaId   String?
+  ambientAudioMediaId String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  modules        ProjectModule[]
+  highlightCards HighlightCard[]
+  media          Media[]
+  towers         Tower[]
+  amenities      Amenity[]
+  sessions       SessionLog[]
+  leads          Lead[]
+}
+
+model ProjectModule {
+  id         String   @id @default(cuid())
+  project    Project  @relation(fields: [projectId], references: [id])
+  projectId  String
+  moduleType String   // ModuleType enum value
+  config     String   @default("{}") // JSON blob
+  sortOrder  Int      @default(0)
+  isVisible  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([projectId, sortOrder])
+}
+
+model HighlightCard {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  icon      String
+  shortText String
+  sortOrder Int     @default(0)
+
+  @@index([projectId])
+}
+
+model Media {
+  id            String   @id @default(cuid())
+  project       Project  @relation(fields: [projectId], references: [id])
+  projectId     String
+  category      String   @default("EXTERIOR") // MediaCategory
+  originalName  String
+  filePath      String
+  thumbnailPath String   @default("")
+  tags          String   @default("")
+  sortOrder     Int      @default(0)
+  sizeBytes     Int      @default(0)
+  durationSecs  Float?
+  createdAt     DateTime @default(now())
+
+  @@index([projectId, category])
+}
+
+model Tower {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  name      String
+
+  units Unit[]
+
+  @@index([projectId])
+}
+
+model Unit {
+  id               String   @id @default(cuid())
+  tower            Tower    @relation(fields: [towerId], references: [id])
+  towerId          String
+  floor            Int
+  unitNumber       String
+  configuration    String
+  carpetArea       Float
+  builtUpArea      Float
+  superBuiltUpArea Float    @default(0)
+  facing           String   @default("")
+  price            Float
+  priceLabel       String   // OFFICIAL | ESTIMATED | INDICATIVE | SUBJECT_TO_CONFIRMATION
+  status           String   @default("AVAILABLE") // UnitStatus
+  floorPlanMediaId String?
+  notes            String   @default("")
+  updatedAt        DateTime @updatedAt
+
+  @@index([towerId, floor])
+}
+
+model Amenity {
+  id           String  @id @default(cuid())
+  project      Project @relation(fields: [projectId], references: [id])
+  projectId    String
+  name         String
+  description  String  @default("")
+  icon         String  @default("")
+  photoMediaId String?
+  sortOrder    Int     @default(0)
+
+  @@index([projectId])
+}
+
+model SessionLog {
+  id               String    @id @default(cuid())
+  project          Project   @relation(fields: [projectId], references: [id])
+  projectId        String
+  staff            StaffProfile? @relation(fields: [staffId], references: [id])
+  staffId          String?
+  personaMode      String?   // END_USE | INVESTMENT | NRI
+  sectionsViewed   String    @default("[]")
+  unitsShortlisted String    @default("[]")
+  startedAt        DateTime  @default(now())
+  endedAt          DateTime?
+
+  @@index([projectId])
+  @@index([staffId])
+}
+
+model Lead {
+  id                  String    @id @default(cuid())
+  project             Project?  @relation(fields: [interestedProjectId], references: [id])
+  interestedProjectId String?
+  name                String
+  phone               String
+  email               String    @default("")
+  budgetMin           Float?
+  budgetMax           Float?
+  notes               String    @default("")
+  capturedAt          DateTime  @default(now())
+  exported            Boolean   @default(false)
+}
+
+model StaffProfile {
+  id        String   @id @default(cuid())
+  name      String
+  pinHash   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  sessions SessionLog[]
+}
+
+model AppointmentSlot {
+  id          String   @id @default(cuid())
+  clientName  String
+  scheduledAt DateTime
+  projectId   String   @default("")
+  notes       String   @default("")
+}
+
+model Settings {
+  id                 Int      @id @default(1)
+  firmName           String   @default("")
+  firmLogoPath       String   @default("")
+  firmContactPhone   String   @default("")
+  firmContactEmail   String   @default("")
+  firmWebsite        String   @default("")
+  disclaimerText     String   @default("")
+  themeAccentColor   String   @default("#1A73E8")
+  adminPinHash       String   @default("")
+  exchangeRateUsd    Float    @default(83.5)
+  exchangeRateGbp    Float    @default(106.0)
+  exchangeRateAed    Float    @default(22.7)
+  idleTimeoutSeconds Int      @default(300)
+  lastBackupAt       DateTime?
+  lastSyncedAt       DateTime?
+  contentVersion     String   @default("0")
+  vpsBaseUrl         String   @default("")
+  vpsApiKey          String   @default("")
+}
