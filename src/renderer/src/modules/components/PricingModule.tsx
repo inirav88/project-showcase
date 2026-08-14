@@ -1,0 +1,1 @@
+export default function PricingModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-PRICING">PRICING</div> }

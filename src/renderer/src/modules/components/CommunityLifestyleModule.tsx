@@ -1,0 +1,1 @@
+export default function CommunityLifestyleModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-COMMUNITYLIFESTYLE">COMMUNITYLIFESTYLE</div> }

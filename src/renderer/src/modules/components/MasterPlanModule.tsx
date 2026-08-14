@@ -1,0 +1,1 @@
+export default function MasterPlanModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-MASTERPLAN">MASTERPLAN</div> }

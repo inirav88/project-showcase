@@ -2,6 +2,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useKioskExit } from '../../hooks/useKioskExit'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
+import ModuleRenderer from '../../modules/ModuleRenderer'
 
 interface Project {
   id: string
@@ -62,12 +63,7 @@ export default function ProjectShowcase(): JSX.Element {
       </header>
 
       <main className="showcase-content">
-        <Suspense fallback={<div className="loading">Loading modules…</div>}>
-          {/* ModuleRenderer wired in P3 */}
-          <p style={{ color: 'var(--color-text-muted)' }}>
-            Modules will render here — Module Registry Engine (P3)
-          </p>
-        </Suspense>
+        {projectId && <ModuleRenderer projectId={projectId} />}
       </main>
 
       {showPinModal && (
