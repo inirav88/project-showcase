@@ -94,13 +94,17 @@ app.whenReady().then(async () => {
     // Register dialog (file picker) handlers — no DB dependency
     registerDialogHandlers()
 
-    // Register file protocol handler for local media loading
+    // Register file protocol handler for local media loading.
+    // Renderer uses the triple-slash form:  media:///C:/path/to/file
+    // URL.pathname for  media:///C:/path  is  /C:/path
+    // On Windows we strip the leading / to recover the proper absolute path C:/path
     protocol.handle('media', (request) => {
-      // request.url is e.g. "media://c%3A/Users/dazed/AppData/Local/..." or "media://C:/..."
-      const urlPath = request.url.replace(/^\/?media:\/\//, '')
-      const decodedPath = decodeURIComponent(urlPath)
-      const fileUrl = pathToFileURL(decodedPath).toString()
-      return net.fetch(fileUrl)
+      const parsed = new URL(request.url)
+      let filePath = decodeURIComponent(parsed.pathname)
+      if (process.platform === 'win32' && /^\/[A-Za-z]:/.test(filePath)) {
+        filePath = filePath.slice(1) // remove leading /  →  C:/path/…
+      }
+      return net.fetch(pathToFileURL(filePath).toString())
     })
 
   } catch (error) {

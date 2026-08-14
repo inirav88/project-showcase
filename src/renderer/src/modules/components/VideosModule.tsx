@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
+import { toMediaUrl } from '../../utils/media'
 
 interface MediaItem {
   id: string
@@ -60,7 +61,7 @@ export default function VideosModule({ projectId }: { config: Record<string, any
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <video
                 key={activeVideo.id}
-                src={`media://${activeVideo.filePath}`}
+                src={toMediaUrl(activeVideo.filePath)}
                 controls
                 autoPlay={false}
                 style={{

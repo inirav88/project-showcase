@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
+import { toMediaUrl } from '../../utils/media'
 
 interface Unit {
   id: string
@@ -233,7 +234,7 @@ export default function ProjectLauncher(): JSX.Element {
               onClick={() => navigate(`project/${p.id}`)}
             >
               {p.thumbnailPath ? (
-                <img src={`media://${p.thumbnailPath}`} alt={p.name} />
+                <img src={toMediaUrl(p.thumbnailPath)} alt={p.name} />
               ) : (
                 <div style={{
                   width: '100%',
