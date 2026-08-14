@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell, protocol, net } from 'electron'
-import { join } from 'path'
+import path, { join } from 'path'
+import fs from 'fs'
 import { pathToFileURL } from 'url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { kioskWindowOptions, adminWindowOptions } from './windows/kioskWindow'
@@ -101,10 +102,24 @@ app.whenReady().then(async () => {
     protocol.handle('media', (request) => {
       const parsed = new URL(request.url)
       let filePath = decodeURIComponent(parsed.pathname)
-      if (process.platform === 'win32' && /^\/[A-Za-z]:/.test(filePath)) {
+      const host = decodeURIComponent(parsed.host)
+
+      // Support cases where browser URL parser treats Windows drive letters as host:
+      // media://C:/path -> host: 'C', pathname: '/path' -> 'C:/path'
+      // media://C%3A/path -> host: 'C:', pathname: '/path' -> 'C:/path'
+      if (host && /^[A-Za-z]:?$/.test(host)) {
+        const drive = host.endsWith(':') ? host : host + ':'
+        filePath = drive + filePath
+      } else if (process.platform === 'win32' && /^\/[A-Za-z]:/.test(filePath)) {
         filePath = filePath.slice(1) // remove leading /  →  C:/path/…
       }
-      return net.fetch(pathToFileURL(filePath).toString())
+
+      const normalizedPath = path.normalize(filePath)
+      console.log(`[Media Protocol] Request URL: ${request.url} -> Resolved FilePath: ${normalizedPath}`)
+      if (!fs.existsSync(normalizedPath)) {
+        console.warn(`[Media Protocol] WARNING: File does not exist at: ${normalizedPath}`)
+      }
+      return net.fetch(pathToFileURL(normalizedPath).toString())
     })
 
   } catch (error) {
