@@ -5,6 +5,11 @@ import { resolve } from 'path'
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        external: ['sharp']
+      }
+    },
     resolve: {
       alias: {
         '@main': resolve('src/main'),
