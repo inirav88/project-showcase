@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useShortlistStore } from '../store/useShortlistStore'
 
 interface Project {
   id: string
@@ -17,9 +16,12 @@ interface Project {
 }
 
 export default function AdminRoute(): JSX.Element {
-  const [activeTab, setActiveTab] = useState<'projects' | 'units' | 'media'>('projects')
+  const [activeTab, setActiveTab] = useState<'projects' | 'units'>('projects')
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string>('')
+  
+  // Edit mode tracking
+  const [isEditing, setIsEditing] = useState(false)
   
   // Project Form State
   const [name, setName] = useState('')
@@ -44,17 +46,42 @@ export default function AdminRoute(): JSX.Element {
       const list = await (window as any).api.invoke('project:list')
       setProjects(list || [])
       if (list && list.length > 0 && !selectedProjectId) {
-        setSelectedProjectId(list[0].id)
+        selectProject(list[0])
       }
     } catch (e) {
       console.error(e)
     }
   }
 
-  const handleCreateProject = async (e: React.FormEvent) => {
+  const selectProject = (project: Project) => {
+    setSelectedProjectId(project.id)
+    setIsEditing(true)
+    setName(project.name)
+    setDeveloper(project.developer)
+    setReraNumber(project.reraNumber)
+    setLocation(project.location)
+    setDescription(project.description || '')
+    setPriceMin(project.priceRangeMin)
+    setPriceMax(project.priceRangeMax)
+    setAccentColor(project.themeAccentColor)
+  }
+
+  const startNewProjectMode = () => {
+    setIsEditing(false)
+    setName('')
+    setDeveloper('')
+    setReraNumber('')
+    setLocation('')
+    setDescription('')
+    setPriceMin(0)
+    setPriceMax(0)
+    setAccentColor('#1A73E8')
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await (window as any).api.invoke('project:create', {
+      const payload = {
         name,
         developer,
         reraNumber,
@@ -66,16 +93,22 @@ export default function AdminRoute(): JSX.Element {
         type: 'RESIDENTIAL',
         status: 'ACTIVE',
         possessionStatus: 'UNDER_CONSTRUCTION'
-      })
+      }
+
+      if (isEditing) {
+        await (window as any).api.invoke('project:update', {
+          id: selectedProjectId,
+          data: payload
+        })
+        alert('Project details updated successfully!')
+      } else {
+        await (window as any).api.invoke('project:create', payload)
+        alert('New project created successfully!')
+        startNewProjectMode()
+      }
       loadProjects()
-      // reset form
-      setName('')
-      setDeveloper('')
-      setReraNumber('')
-      setLocation('')
-      setDescription('')
     } catch (err: any) {
-      alert(`Error creating project: ${err.message}`)
+      alert(`Error saving project: ${err.message}`)
     }
   }
 
@@ -171,16 +204,30 @@ export default function AdminRoute(): JSX.Element {
           display: 'flex',
           flexDirection: 'column'
         }}>
-          <h3 style={{ margin: '0 0 12px 0', fontSize: '16px' }}>Projects List</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <h3 style={{ margin: 0, fontSize: '16px' }}>Projects List</h3>
+            <button 
+              onClick={startNewProjectMode}
+              style={{
+                padding: '4px 10px',
+                backgroundColor: '#10B981',
+                color: '#FFF',
+                border: 'none',
+                borderRadius: '4px',
+                fontSize: '12px',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}>+ New</button>
+          </div>
           <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {projects.map(p => (
               <div 
                 key={p.id}
-                onClick={() => setSelectedProjectId(p.id)}
+                onClick={() => selectProject(p)}
                 style={{
                   padding: '12px',
                   borderRadius: '6px',
-                  backgroundColor: selectedProjectId === p.id ? '#3B82F6' : '#334155',
+                  backgroundColor: selectedProjectId === p.id && isEditing ? '#3B82F6' : '#334155',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s'
                 }}>
@@ -201,8 +248,10 @@ export default function AdminRoute(): JSX.Element {
         }}>
           {activeTab === 'projects' && (
             <div>
-              <h2 style={{ margin: '0 0 20px 0', fontSize: '20px' }}>Create New Showcase Project</h2>
-              <form onSubmit={handleCreateProject} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <h2 style={{ margin: '0 0 20px 0', fontSize: '20px' }}>
+                {isEditing ? `Edit Project: ${name}` : 'Create New Showcase Project'}
+              </h2>
+              <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#94A3B8' }}>Project Name</label>
                   <input value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#0F172A', color: '#FFF' }} />
@@ -232,11 +281,13 @@ export default function AdminRoute(): JSX.Element {
                   <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#0F172A', color: '#FFF', resize: 'vertical' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#94A3B8' }}>Accent Accent Color</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#94A3B8' }}>Accent Color</label>
                   <input type="color" value={accentColor} onChange={e => setAccentColor(e.target.value)} style={{ width: '60px', height: '40px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer', backgroundColor: 'transparent' }} />
                 </div>
                 <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                  <button type="submit" style={{ padding: '10px 24px', backgroundColor: '#2563EB', color: '#FFF', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>Create Project Record</button>
+                  <button type="submit" style={{ padding: '10px 24px', backgroundColor: '#2563EB', color: '#FFF', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                    {isEditing ? 'Update Project Details' : 'Create Project Record'}
+                  </button>
                 </div>
               </form>
             </div>
