@@ -7,6 +7,7 @@ import { ModuleHandlers } from './ipc/handlers/modules'
 import { ProjectHandlers } from './ipc/handlers/projects'
 import { UnitHandlers } from './ipc/handlers/units'
 import { MediaHandlers } from './ipc/handlers/media'
+import { PdfHandlers } from './ipc/handlers/pdf'
 
 const isProd = !is.dev
 
@@ -58,6 +59,9 @@ app.whenReady().then(async () => {
 
     const mediaHandlers = new MediaHandlers(db, appDataPath)
     mediaHandlers.registerIpc()
+
+    const pdfHandlers = new PdfHandlers(db)
+    pdfHandlers.registerIpc()
 
   } catch (error) {
     console.error('Failed to initialize database and IPC handlers:', error)
