@@ -22,7 +22,7 @@ vi.mock('fluent-ffmpeg', () => {
     run: vi.fn(),
   })
   ffMock.setFfmpegPath = vi.fn()
-  ffMock.ffprobe = vi.fn((path, cb) => {
+  ffMock.ffprobe = vi.fn((_path, cb) => {
     cb(null, { format: { duration: 120.5 } })
   })
   return { default: ffMock }

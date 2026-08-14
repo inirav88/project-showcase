@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '../../db/generated'
+import type { PrismaClient } from '@prisma/client'
 import { IPC_CHANNELS } from '../channels'
 
 export class ModuleHandlers {

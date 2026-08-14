@@ -29,7 +29,7 @@ beforeAll(() => {
   // Safe injection of window.api mock
   const w = window as any
   w.api = {
-    invoke: vi.fn((channel, ...args) => {
+    invoke: vi.fn((channel, ..._args) => {
       if (channel === 'project:get') return Promise.resolve(mockProject)
       if (channel === 'module:list') return Promise.resolve(mockProject.modules)
       return Promise.resolve([])

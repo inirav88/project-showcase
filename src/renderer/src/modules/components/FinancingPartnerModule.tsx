@@ -1,1 +1,1 @@
-export default function FinancingPartnerModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-FINANCINGPARTNER">FINANCINGPARTNER</div> }
+export default function FinancingPartnerModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-FINANCING_PARTNER">FINANCING_PARTNER</div> }

@@ -28,7 +28,7 @@ export function calculateEmi(principal: number, annualRate: number, tenureYears:
     monthlyPayment = principal / totalMonths
   }
 
-  const amortizationSchedule = []
+  const amortizationSchedule: EmiResult['amortizationSchedule'] = []
   let remainingBalance = principal
   let totalInterest = 0
 

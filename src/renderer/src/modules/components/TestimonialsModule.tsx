@@ -1,1 +1,1 @@
-export default function TestimonialsModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-TESTIMONIALS">TESTIMONIALS</div> }
+export default function TestimonialsModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-TESTIMONIALS">TESTIMONIALS</div> }

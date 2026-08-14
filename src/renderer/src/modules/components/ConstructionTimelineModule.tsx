@@ -1,1 +1,1 @@
-export default function ConstructionTimelineModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-CONSTRUCTIONTIMELINE">CONSTRUCTIONTIMELINE</div> }
+export default function ConstructionTimelineModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-CONSTRUCTION_TIMELINE">CONSTRUCTION_TIMELINE</div> }

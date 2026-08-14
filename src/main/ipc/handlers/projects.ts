@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '../../db/generated'
+import type { PrismaClient } from '@prisma/client'
 import { IPC_CHANNELS } from '../channels'
 import { z } from 'zod'
 
@@ -29,6 +29,13 @@ export class ProjectHandlers {
   async list() {
     return this.db.project.findMany({
       where: { status: 'ACTIVE' },
+      include: {
+        towers: {
+          include: {
+            units: true,
+          },
+        },
+      },
       orderBy: [{ isFeatured: 'desc' }, { sortOrder: 'asc' }],
     })
   }
@@ -39,6 +46,9 @@ export class ProjectHandlers {
       include: {
         modules: { orderBy: { sortOrder: 'asc' } },
         towers: { include: { units: true } },
+        amenities: { orderBy: { sortOrder: 'asc' } },
+        highlightCards: { orderBy: { sortOrder: 'asc' } },
+        media: { orderBy: { sortOrder: 'asc' } },
       },
     })
   }

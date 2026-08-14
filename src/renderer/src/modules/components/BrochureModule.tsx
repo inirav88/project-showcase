@@ -1,1 +1,1 @@
-export default function BrochureModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-BROCHURE">BROCHURE</div> }
+export default function BrochureModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-BROCHURE">BROCHURE</div> }

@@ -1,1 +1,1 @@
-export default function Tour360Module({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-TOUR360">TOUR360</div> }
+export default function Tour360Module({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-TOUR_360">TOUR_360</div> }

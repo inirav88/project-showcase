@@ -32,6 +32,13 @@ export const IPC_CHANNELS = {
   // Settings
   SETTINGS_GET:       'settings:get',
   SETTINGS_SET:       'settings:set',
+  SETTINGS_VERIFY_PIN:'settings:verifyPin',
+  // Lead
+  LEAD_CREATE:        'lead:create',
+  LEAD_LIST:          'lead:list',
+  // Highlights
+  HIGHLIGHT_UPSERT:   'highlight:upsert',
+  HIGHLIGHT_DELETE:   'highlight:delete',
   // System
   EXIT_KIOSK:         'system:exitKiosk',
   SECOND_DISPLAY:     'system:secondDisplay',

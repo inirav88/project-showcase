@@ -1,1 +1,1 @@
-export default function FoundersNoteModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-FOUNDERSNOTE">FOUNDERSNOTE</div> }
+export default function FoundersNoteModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-FOUNDERS_NOTE">FOUNDERS_NOTE</div> }

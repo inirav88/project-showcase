@@ -1,1 +1,1 @@
-export default function CompareUnitsModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-COMPAREUNITS">COMPAREUNITS</div> }
+export default function CompareUnitsModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-COMPARE_UNITS">COMPARE_UNITS</div> }

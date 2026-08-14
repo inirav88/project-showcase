@@ -51,9 +51,11 @@ export default function ModuleRenderer({ projectId }: Props): JSX.Element {
 
         const Component = moduleRegistry[mod.moduleType]
         return (
-          <Suspense key={mod.id} fallback={<div className="loading">Loading component…</div>}>
-            <Component config={config} projectId={projectId} />
-          </Suspense>
+          <div id={`module-${mod.moduleType}`} key={mod.id}>
+            <Suspense fallback={<div className="loading">Loading component…</div>}>
+              <Component config={config} projectId={projectId} />
+            </Suspense>
+          </div>
         )
       })}
     </div>

@@ -8,6 +8,9 @@ import { ProjectHandlers } from './ipc/handlers/projects'
 import { UnitHandlers } from './ipc/handlers/units'
 import { MediaHandlers } from './ipc/handlers/media'
 import { PdfHandlers } from './ipc/handlers/pdf'
+import { SettingsHandlers } from './ipc/handlers/settings'
+import { SessionHandlers } from './ipc/handlers/sessions'
+import { LeadHandlers } from './ipc/handlers/leads'
 
 const isProd = !is.dev
 
@@ -62,6 +65,15 @@ app.whenReady().then(async () => {
 
     const pdfHandlers = new PdfHandlers(db)
     pdfHandlers.registerIpc()
+
+    const settingsHandlers = new SettingsHandlers(db)
+    settingsHandlers.registerIpc()
+
+    const sessionHandlers = new SessionHandlers(db)
+    sessionHandlers.registerIpc()
+
+    const leadHandlers = new LeadHandlers(db)
+    leadHandlers.registerIpc()
 
   } catch (error) {
     console.error('Failed to initialize database and IPC handlers:', error)

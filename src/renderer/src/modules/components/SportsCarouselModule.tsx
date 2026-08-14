@@ -1,1 +1,1 @@
-export default function SportsCarouselModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-SPORTSCAROUSEL">SPORTSCAROUSEL</div> }
+export default function SportsCarouselModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-SPORTS_CAROUSEL">SPORTS_CAROUSEL</div> }

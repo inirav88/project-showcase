@@ -1,5 +1,5 @@
 import { ipcMain, dialog } from 'electron'
-import type { PrismaClient } from '../../db/generated'
+import type { PrismaClient } from '@prisma/client'
 import { IPC_CHANNELS } from '../channels'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import fs from 'fs'
@@ -81,7 +81,7 @@ export class PdfHandlers {
 
   registerIpc() {
     ipcMain.handle(
-      IPC_CHANNELS.PDF_EXPORT,
+      IPC_CHANNELS.EXPORT_PDF,
       (_, { projectId, customerName, selectedUnitIds }: any) =>
         this.exportBrochure(projectId, customerName, selectedUnitIds)
     )

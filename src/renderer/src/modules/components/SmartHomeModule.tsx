@@ -1,1 +1,1 @@
-export default function SmartHomeModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-SMARTHOME">SMARTHOME</div> }
+export default function SmartHomeModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-SMART_HOME">SMART_HOME</div> }

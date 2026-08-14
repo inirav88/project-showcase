@@ -1,1 +1,1 @@
-export default function ReraTrustModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-RERATRUST">RERATRUST</div> }
+export default function ReraTrustModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-RERA_TRUST">RERA_TRUST</div> }

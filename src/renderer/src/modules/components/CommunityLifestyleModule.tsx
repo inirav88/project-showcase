@@ -1,1 +1,1 @@
-export default function CommunityLifestyleModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-COMMUNITYLIFESTYLE">COMMUNITYLIFESTYLE</div> }
+export default function CommunityLifestyleModule({ config: _config, projectId: _projectId }: { config: Record<string, any>; projectId: string }): JSX.Element { return <div data-testid="module-COMMUNITY_LIFESTYLE">COMMUNITY_LIFESTYLE</div> }
