@@ -1,5 +1,6 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, protocol, net } from 'electron'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { kioskWindowOptions, adminWindowOptions } from './windows/kioskWindow'
 import { getDb } from './db/client'
@@ -12,6 +13,20 @@ import { SettingsHandlers } from './ipc/handlers/settings'
 import { SessionHandlers } from './ipc/handlers/sessions'
 import { LeadHandlers } from './ipc/handlers/leads'
 import { registerDialogHandlers } from './ipc/handlers/dialog'
+
+// Register privileged custom media scheme before app is ready
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'media',
+    privileges: {
+      secure: true,
+      bypassCSP: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      stream: true
+    }
+  }
+])
 
 const isProd = !is.dev
 
@@ -78,6 +93,15 @@ app.whenReady().then(async () => {
 
     // Register dialog (file picker) handlers — no DB dependency
     registerDialogHandlers()
+
+    // Register file protocol handler for local media loading
+    protocol.handle('media', (request) => {
+      // request.url is e.g. "media://c%3A/Users/dazed/AppData/Local/..." or "media://C:/..."
+      const urlPath = request.url.replace(/^\/?media:\/\//, '')
+      const decodedPath = decodeURIComponent(urlPath)
+      const fileUrl = pathToFileURL(decodedPath).toString()
+      return net.fetch(fileUrl)
+    })
 
   } catch (error) {
     console.error('Failed to initialize database and IPC handlers:', error)

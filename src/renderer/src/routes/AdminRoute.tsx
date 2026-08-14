@@ -103,7 +103,7 @@ function FilePicker({
             position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
             <img
-              src={`file://${value}`}
+              src={`media://${value}`}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => { (e.target as HTMLElement).style.display = 'none' }}
             />
@@ -1418,7 +1418,7 @@ export default function AdminRoute(): JSX.Element {
                         flexDirection: 'column'
                       }}>
                         {m.category !== 'VIDEO' && m.category !== 'AUDIO' && m.thumbnailPath ? (
-                          <img src={`file://${m.thumbnailPath}`} alt={m.originalName} style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
+                          <img src={`media://${m.thumbnailPath}`} alt={m.originalName} style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
                         ) : (
                           <div style={{ height: '100px', backgroundColor: '#09090e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
                             {m.category === 'VIDEO' ? '🎥' : '🎵'}

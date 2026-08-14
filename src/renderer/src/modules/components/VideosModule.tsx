@@ -60,7 +60,7 @@ export default function VideosModule({ projectId }: { config: Record<string, any
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <video
                 key={activeVideo.id}
-                src={`file://${activeVideo.filePath}`}
+                src={`media://${activeVideo.filePath}`}
                 controls
                 autoPlay={false}
                 style={{

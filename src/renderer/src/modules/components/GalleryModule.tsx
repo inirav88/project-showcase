@@ -110,7 +110,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
               onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             >
               <img
-                src={`file://${item.thumbnailPath || item.filePath}`}
+                src={`media://${item.thumbnailPath || item.filePath}`}
                 alt={item.originalName}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
@@ -192,7 +192,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
           </button>
 
           <img
-            src={`file://${filteredMedia[lightboxIndex].filePath}`}
+            src={`media://${filteredMedia[lightboxIndex].filePath}`}
             alt={filteredMedia[lightboxIndex].originalName}
             style={{
               maxWidth: '85vw',

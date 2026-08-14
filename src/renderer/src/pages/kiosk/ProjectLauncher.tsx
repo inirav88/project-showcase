@@ -233,7 +233,7 @@ export default function ProjectLauncher(): JSX.Element {
               onClick={() => navigate(`project/${p.id}`)}
             >
               {p.thumbnailPath ? (
-                <img src={`file://${p.thumbnailPath}`} alt={p.name} />
+                <img src={`media://${p.thumbnailPath}`} alt={p.name} />
               ) : (
                 <div style={{
                   width: '100%',
