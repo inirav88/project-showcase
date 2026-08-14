@@ -73,6 +73,9 @@
     "directories": {
       "output": "dist"
     },
+    "extraResources": [
+      "dev.db"
+    ],
     "win": {
       "target": "nsis"
     },
