@@ -8,9 +8,10 @@ let _client: PrismaClient | null = null
 
 export function getDb(): PrismaClient {
   if (!_client) {
-    const dbPath = app
-      ? path.join(app.getPath('userData'), 'showcaseos.db')
-      : path.join(process.cwd(), 'dev.db')
+    const isDev = app ? !app.isPackaged : true
+    const dbPath = isDev
+      ? path.join(process.cwd(), 'dev.db')
+      : path.join(app.getPath('userData'), 'showcaseos.db')
 
     const libsql = createClient({
       url: `file:${dbPath}`,
