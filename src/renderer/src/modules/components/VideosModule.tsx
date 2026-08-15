@@ -11,6 +11,13 @@ interface MediaItem {
   durationSecs?: number
 }
 
+function formatDuration(secs?: number): string {
+  if (!secs) return ''
+  const m = Math.floor(secs / 60)
+  const s = Math.floor(secs % 60)
+  return `${m}:${s < 10 ? '0' : ''}${s}`
+}
+
 export default function VideosModule({ projectId }: { config: Record<string, any>; projectId: string }): JSX.Element {
   const [videos, setVideos] = useState<MediaItem[]>([])
   const [activeVideo, setActiveVideo] = useState<MediaItem | null>(null)
@@ -20,45 +27,37 @@ export default function VideosModule({ projectId }: { config: Record<string, any
       .invoke(IPC_CHANNELS.MEDIA_LIST, { projectId })
       .then((data) => {
         const items = (data as MediaItem[]).filter((m) =>
-          ['VIDEO', 'INTRO_VIDEO'].includes(m.category.toUpperCase())
+          ['VIDEO', 'INTRO_VIDEO', 'WALKTHROUGH'].includes(m.category.toUpperCase())
         )
         setVideos(items)
-        if (items.length > 0) {
-          setActiveVideo(items[0])
-        }
+        if (items.length > 0) setActiveVideo(items[0])
       })
       .catch(console.error)
   }, [projectId])
 
-  const formatDuration = (secs?: number) => {
-    if (!secs) return '0:00'
-    const m = Math.floor(secs / 60)
-    const s = Math.floor(secs % 60)
-    return `${m}:${s < 10 ? '0' : ''}${s}`
-  }
-
   return (
-    <div className="videos-module-card" data-testid="module-VIDEOS" style={{
-      background: 'var(--color-surface)',
-      border: '1px solid var(--color-border)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-6)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 'var(--space-4)',
-      marginBottom: 'var(--space-4)'
-    }}>
-      <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600 }}>Project Videos</h3>
-
+    <div data-testid="module-VIDEOS" style={{ animation: 'fadeInUp 0.4s var(--ease-out)' }}>
       {videos.length === 0 ? (
-        <div style={{ padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          No video walkthroughs available
+        <div className="empty-state">
+          <span className="empty-state-icon">🎥</span>
+          <h3>No Videos Available</h3>
+          <p>Add video walkthroughs or project films from the Admin Panel Media Library.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: 'var(--space-4)', minHeight: '320px' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: videos.length > 1 ? '1fr 280px' : '1fr',
+          gap: 'var(--space-5)',
+          alignItems: 'start',
+        }}>
           {/* Main Video Player */}
           {activeVideo && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-lg)',
+              overflow: 'hidden',
+            }}>
               <video
                 key={activeVideo.id}
                 src={toMediaUrl(activeVideo.filePath)}
@@ -66,53 +65,113 @@ export default function VideosModule({ projectId }: { config: Record<string, any
                 autoPlay={false}
                 style={{
                   width: '100%',
-                  borderRadius: 'var(--radius-md)',
                   backgroundColor: '#000',
-                  aspectRatio: '16/9'
+                  aspectRatio: '16/9',
+                  display: 'block',
                 }}
               />
-              <div style={{ fontWeight: 600, fontSize: 'var(--font-size-base)' }}>{activeVideo.originalName}</div>
+              <div style={{ padding: 'var(--space-5)' }}>
+                <div style={{ fontWeight: 700, fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
+                  {activeVideo.originalName}
+                </div>
+                <div style={{ marginTop: 4, display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    padding: '2px 10px', borderRadius: 'var(--radius-full)',
+                    background: 'var(--color-accent-dim)', border: '1px solid var(--color-accent-border)',
+                    fontSize: 'var(--font-size-xs)', fontWeight: 600, color: 'var(--color-accent)',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}>
+                    {activeVideo.category.toLowerCase()}
+                  </span>
+                  {activeVideo.durationSecs && (
+                    <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatDuration(activeVideo.durationSecs)}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
           {/* Playlist Sidebar */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            overflowY: 'auto',
-            maxHeight: '360px',
-            paddingRight: '4px'
-          }}>
-            {videos.map((vid) => {
-              const isActive = activeVideo?.id === vid.id
-              return (
-                <button
-                  key={vid.id}
-                  onClick={() => setActiveVideo(vid)}
-                  style={{
-                    all: 'unset',
-                    cursor: 'pointer',
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: isActive ? 'var(--project-accent)' : 'var(--color-surface-raised)',
-                    border: '1px solid var(--color-border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                    transition: 'background-color var(--transition-fast)'
-                  }}
-                >
-                  <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: '#fff', wordBreak: 'break-word' }}>
-                    {vid.originalName}
-                  </span>
-                  <span style={{ fontSize: '11px', color: isActive ? 'rgba(255,255,255,0.7)' : 'var(--color-text-muted)' }}>
-                    Category: {vid.category.toLowerCase()} {vid.durationSecs ? `· ${formatDuration(vid.durationSecs)}` : ''}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+          {videos.length > 1 && (
+            <div style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-lg)',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+              <div style={{
+                padding: 'var(--space-4) var(--space-5)',
+                borderBottom: '1px solid var(--color-border)',
+                fontSize: 'var(--font-size-xs)', fontWeight: 700,
+                color: 'var(--color-text-muted)',
+                textTransform: 'uppercase', letterSpacing: '0.07em',
+              }}>
+                Up Next — {videos.length} Videos
+              </div>
+              <div style={{ overflowY: 'auto', maxHeight: 380 }}>
+                {videos.map((vid, idx) => {
+                  const isActive = activeVideo?.id === vid.id
+                  return (
+                    <button
+                      key={vid.id}
+                      onClick={() => setActiveVideo(vid)}
+                      style={{
+                        all: 'unset', cursor: 'pointer', display: 'flex',
+                        gap: 'var(--space-3)', alignItems: 'center',
+                        padding: 'var(--space-3) var(--space-4)',
+                        width: '100%', boxSizing: 'border-box',
+                        borderBottom: '1px solid var(--color-border-subtle)',
+                        background: isActive ? 'var(--color-accent-dim)' : 'transparent',
+                        borderLeft: `3px solid ${isActive ? 'var(--color-accent)' : 'transparent'}`,
+                        transition: 'all var(--transition-fast)',
+                      }}
+                      onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = 'var(--color-surface-raised)' }}
+                      onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
+                    >
+                      {/* Thumbnail */}
+                      <div style={{
+                        width: 60, height: 38, borderRadius: 6,
+                        background: vid.thumbnailPath ? 'transparent' : '#111',
+                        overflow: 'hidden', flexShrink: 0, position: 'relative',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {vid.thumbnailPath ? (
+                          <img src={toMediaUrl(vid.thumbnailPath)} alt={vid.originalName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span style={{ fontSize: 18, opacity: 0.4 }}>▶</span>
+                        )}
+                        {isActive && (
+                          <div style={{
+                            position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'var(--color-accent)', fontSize: 14,
+                          }}>▶</div>
+                        )}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          fontSize: 12, fontWeight: 600, color: isActive ? 'var(--color-accent)' : 'var(--color-text-primary)',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {idx + 1}. {vid.originalName}
+                        </div>
+                        {vid.durationSecs && (
+                          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+                            {formatDuration(vid.durationSecs)}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

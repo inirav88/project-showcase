@@ -3,16 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { toMediaUrl } from '../../utils/media'
 
-interface Unit {
-  id: string
-  status: string
-}
-
-interface Tower {
-  id: string
-  units: Unit[]
-}
-
+interface Unit { id: string; status: string }
+interface Tower { id: string; units: Unit[] }
 interface Project {
   id: string
   name: string
@@ -26,265 +18,214 @@ interface Project {
   thumbnailPath?: string
   towers?: Tower[]
 }
-
-interface Settings {
-  firmName: string
-  disclaimerText: string
-}
+interface Settings { firmName: string; firmLogoPath?: string; disclaimerText: string }
 
 function formatPrice(n: number): string {
+  if (!n) return 'N/A'
   if (n >= 10000000) return `₹${(n / 10000000).toFixed(1)} Cr`
   return `₹${(n / 100000).toFixed(0)} L`
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  ALL: 'All Types',
+  RESIDENTIAL: 'Residential',
+  COMMERCIAL: 'Commercial',
+  MIXED_USE: 'Mixed Use',
+  PLOTTED_DEVELOPMENT: 'Plotted',
+}
+
+const POSSESSION_LABELS: Record<string, string> = {
+  ALL: 'All Status',
+  READY: 'Ready to Move',
+  UNDER_CONSTRUCTION: 'Under Construction',
+}
+
+const BUDGET_OPTIONS = [
+  { label: 'Any Budget', value: 'ALL' },
+  { label: 'Under ₹50L', value: '5000000' },
+  { label: 'Under ₹1 Cr', value: '10000000' },
+  { label: 'Under ₹3 Cr', value: '30000000' },
+  { label: 'Under ₹5 Cr', value: '50000000' },
+]
+
+function FilterChipGroup({
+  options,
+  value,
+  onChange,
+}: {
+  options: { label: string; value: string }[]
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="filter-chip-group">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          className={`filter-chip${value === o.value ? ' active' : ''}`}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
 }
 
 export default function ProjectLauncher(): JSX.Element {
   const [projects, setProjects] = useState<Project[]>([])
   const [settings, setSettings] = useState<Settings | null>(null)
-  
-  // Filter States
   const [query, setQuery] = useState('')
   const [selectedType, setSelectedType] = useState('ALL')
   const [selectedPossession, setSelectedPossession] = useState('ALL')
   const [selectedBudgetMax, setSelectedBudgetMax] = useState('ALL')
-
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Load projects list
-    window.api
-      .invoke(IPC_CHANNELS.PROJECT_LIST)
+    window.api.invoke(IPC_CHANNELS.PROJECT_LIST)
       .then((data) => setProjects(data as Project[]))
       .catch(console.error)
 
-    // Load global configurations / firm branding
-    window.api
-      .invoke(IPC_CHANNELS.SETTINGS_GET)
+    window.api.invoke(IPC_CHANNELS.SETTINGS_GET)
       .then((data) => setSettings(data as Settings))
-      .catch(console.error)
+      .catch(() => {/* settings may not exist yet */})
   }, [])
 
-  // Filter application
   const filtered = projects.filter((p) => {
     const textMatch = [p.name, p.developer, p.location].some((s) =>
       s.toLowerCase().includes(query.toLowerCase())
     )
     const typeMatch = selectedType === 'ALL' || p.type.toUpperCase() === selectedType
     const possessionMatch = selectedPossession === 'ALL' || p.possessionStatus.toUpperCase() === selectedPossession
-    
     let budgetMatch = true
     if (selectedBudgetMax !== 'ALL') {
-      const maxVal = Number(selectedBudgetMax)
-      // Check if project price minimum is less than selected budget max limit
-      budgetMatch = p.priceRangeMin <= maxVal
+      budgetMatch = p.priceRangeMin <= Number(selectedBudgetMax)
     }
-
     return textMatch && typeMatch && possessionMatch && budgetMatch
   })
 
-  // Scarcity counter helper
-  const getAvailableUnitsCount = (p: Project) => {
+  const getAvailableCount = (p: Project) => {
     if (!p.towers) return 0
-    let count = 0
-    p.towers.forEach((t) => {
-      t.units.forEach((u) => {
-        if (u.status.toUpperCase() === 'AVAILABLE') {
-          count++
-        }
-      })
-    })
-    return count
+    return p.towers.flatMap((t) => t.units).filter((u) => u.status === 'AVAILABLE').length
   }
 
+  const typeOptions = Object.entries(TYPE_LABELS).map(([value, label]) => ({ value, label }))
+  const possessionOptions = Object.entries(POSSESSION_LABELS).map(([value, label]) => ({ value, label }))
+
   return (
-    <div className="launcher" style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      background: 'linear-gradient(135deg, #09090e 0%, #111119 100%)',
-      padding: 'var(--space-8)',
-      gap: 'var(--space-6)',
-      overflow: 'hidden'
-    }}>
-      {/* Branding Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px' }}>
-        <div>
-          <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>
-            {settings?.firmName || 'ShowcaseOS'}
-          </h1>
-          <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-            Interactive Offline Kiosk Portal
-          </p>
+    <div className="launcher">
+      {/* Header */}
+      <header className="launcher-header">
+        <div className="launcher-brand">
+          {settings?.firmLogoPath ? (
+            <img
+              src={toMediaUrl(settings.firmLogoPath)}
+              alt="Firm Logo"
+              style={{ height: 36, maxWidth: 180, objectFit: 'contain', marginBottom: 4 }}
+            />
+          ) : (
+            <h1>{settings?.firmName || 'ShowcaseOS'}</h1>
+          )}
+          <p>Offline Real Estate Presentation Kiosk</p>
         </div>
-        <div style={{
-          padding: '6px 14px',
-          borderRadius: '99px',
-          border: '1px solid var(--color-border)',
-          fontSize: 'var(--font-size-xs)',
-          backgroundColor: 'rgba(255,255,255,0.02)',
-          color: 'var(--color-text-secondary)'
-        }}>
-          🖥️ Offline Node Connected
+        <div className="launcher-status-pill">
+          <span className="status-dot" />
+          System Online
         </div>
       </header>
 
-      {/* Filters Bar */}
-      <div style={{
-        display: 'flex',
-        gap: 'var(--space-3)',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        backgroundColor: 'var(--color-surface)',
-        padding: '16px 20px',
-        borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--color-border)'
-      }}>
+      {/* Filters */}
+      <div className="filter-bar">
         <input
           role="searchbox"
           type="search"
-          placeholder="Search projects by name, developer, or location…"
+          className="filter-search"
+          placeholder="Search by name, developer, or location…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          style={{
-            flex: 2,
-            minWidth: '260px',
-            padding: '10px 16px',
-            background: 'var(--color-surface-raised)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-sm)',
-            color: '#fff',
-            outline: 'none',
-            fontSize: 'var(--font-size-sm)'
-          }}
         />
-
-        {/* Dropdowns */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', flex: 1, minWidth: '320px' }}>
-          <select
+        <div className="filter-chips">
+          <FilterChipGroup
+            options={typeOptions}
             value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '10px 12px',
-              backgroundColor: 'var(--color-surface-raised)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)',
-              color: '#fff',
-              fontSize: 'var(--font-size-xs)',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="ALL">All Types</option>
-            <option value="RESIDENTIAL">Residential</option>
-            <option value="COMMERCIAL">Commercial</option>
-            <option value="MIXED_USE">Mixed Use</option>
-            <option value="PLOTTED_DEVELOPMENT">Plotted Development</option>
-          </select>
-
-          <select
+            onChange={setSelectedType}
+          />
+          <FilterChipGroup
+            options={possessionOptions}
             value={selectedPossession}
-            onChange={(e) => setSelectedPossession(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '10px 12px',
-              backgroundColor: 'var(--color-surface-raised)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)',
-              color: '#fff',
-              fontSize: 'var(--font-size-xs)',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="ALL">All Possessions</option>
-            <option value="READY">Ready to Move</option>
-            <option value="UNDER_CONSTRUCTION">Under Construction</option>
-          </select>
-
-          <select
+            onChange={setSelectedPossession}
+          />
+          <FilterChipGroup
+            options={BUDGET_OPTIONS}
             value={selectedBudgetMax}
-            onChange={(e) => setSelectedBudgetMax(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '10px 12px',
-              backgroundColor: 'var(--color-surface-raised)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)',
-              color: '#fff',
-              fontSize: 'var(--font-size-xs)',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="ALL">Any Budget</option>
-            <option value="5000000">Under ₹50 L</option>
-            <option value="10000000">Under ₹1.0 Cr</option>
-            <option value="30000000">Under ₹3.0 Cr</option>
-            <option value="50000000">Under ₹5.0 Cr</option>
-          </select>
+            onChange={setSelectedBudgetMax}
+          />
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="project-grid" style={{ flex: 1, paddingBottom: 'var(--space-4)' }}>
-        {filtered.map((p) => {
-          const availCount = getAvailableUnitsCount(p)
-          return (
-            <button
-              key={p.id}
-              className="project-tile"
-              style={{ '--project-accent': p.themeAccentColor } as React.CSSProperties}
-              onClick={() => navigate(`project/${p.id}`)}
-            >
-              {p.thumbnailPath ? (
-                <img src={toMediaUrl(p.thumbnailPath)} alt={p.name} />
-              ) : (
-                <div style={{
-                  width: '100%',
-                  height: '200px',
-                  background: `linear-gradient(135deg, ${p.themeAccentColor}44, ${p.themeAccentColor}11)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '48px'
-                }}>
-                  🏢
-                </div>
-              )}
-              <div className="tile-body">
-                <h2>{p.name}</h2>
-                <p>{p.developer} · {p.location}</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
-                  <span className="price-badge" style={{ margin: 0 }}>
-                    {formatPrice(p.priceRangeMin)} – {formatPrice(p.priceRangeMax)}
-                  </span>
-                  <span className={`possession-badge ${p.possessionStatus}`}>
-                    {p.possessionStatus === 'READY' ? 'Ready' : 'Under Const.'}
-                  </span>
-                  
-                  {/* Live scarcity indicators */}
-                  {availCount > 0 && (
-                    <span style={{
-                      padding: '2px 8px',
-                      borderRadius: '99px',
-                      backgroundColor: 'rgba(52, 211, 153, 0.1)',
-                      color: 'var(--color-available)',
-                      border: '1px solid rgba(52, 211, 153, 0.2)',
-                      fontSize: '11px',
-                      fontWeight: 600
-                    }}>
-                      🔥 {availCount} Available
-                    </span>
+      {/* Project Grid */}
+      {filtered.length === 0 ? (
+        <div className="empty-state" style={{ flex: 1 }}>
+          <span className="empty-state-icon">🏙️</span>
+          <h3>No Projects Found</h3>
+          <p>Try adjusting your search or filter criteria, or add a new project from the Admin Panel.</p>
+        </div>
+      ) : (
+        <div className="project-grid">
+          {filtered.map((p) => {
+            const availCount = getAvailableCount(p)
+            return (
+              <button
+                key={p.id}
+                className="project-tile"
+                style={{ '--project-accent': p.themeAccentColor } as React.CSSProperties}
+                onClick={() => navigate(`project/${p.id}`)}
+              >
+                <div className="project-tile-image-wrap">
+                  {p.thumbnailPath ? (
+                    <img src={toMediaUrl(p.thumbnailPath)} alt={p.name} />
+                  ) : (
+                    <div
+                      className="project-tile-gradient-cover"
+                      style={{
+                        background: `linear-gradient(135deg, ${p.themeAccentColor}30 0%, ${p.themeAccentColor}08 100%)`,
+                      }}
+                    >
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={p.themeAccentColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity={0.6}>
+                        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                      </svg>
+                    </div>
                   )}
                 </div>
-              </div>
-            </button>
-          )}
-        )}
-      </div>
 
-      {/* Disclaimer Text Footer */}
+                <div className="tile-body">
+                  <div className="tile-name">{p.name}</div>
+                  <div className="tile-meta">{p.developer} · {p.location}</div>
+                  <div className="tile-badges">
+                    <span className="price-badge">
+                      {formatPrice(p.priceRangeMin)} – {formatPrice(p.priceRangeMax)}
+                    </span>
+                    <span className={`possession-badge ${p.possessionStatus}`}>
+                      {p.possessionStatus === 'READY' ? 'Ready' : 'Under Const.'}
+                    </span>
+                    {availCount > 0 && (
+                      <span className="scarcity-badge">
+                        <span className="dot" />
+                        {availCount} Available
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Footer Disclaimer */}
       {settings?.disclaimerText && (
-        <footer style={{ borderTop: '1px solid var(--color-border)', paddingTop: '12px', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-          {settings.disclaimerText}
-        </footer>
+        <footer className="launcher-footer">{settings.disclaimerText}</footer>
       )}
     </div>
   )

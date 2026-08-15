@@ -1,100 +1,61 @@
-import { useEffect, useState } from 'react'
-import { IPC_CHANNELS } from '../../../../main/ipc/channels'
+import { toMediaUrl } from '../../utils/media'
 
-interface HighlightCard {
-  id: string
-  icon: string
-  shortText: string
+interface Highlight {
+  title: string
+  description: string
+  imagePath: string
+  badge: string
 }
 
-interface Project {
-  name: string
-  highlightCards: HighlightCard[]
-}
-
-export default function UspSpotlightModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element {
-  const [project, setProject] = useState<Project | null>(null)
-
-  useEffect(() => {
-    window.api
-      .invoke(IPC_CHANNELS.PROJECT_GET, projectId)
-      .then((data) => setProject(data as Project))
-      .catch(console.error)
-  }, [projectId])
-
-  const headline = config.headline || 'Unique Selling Propositions'
-  const body = config.body || 'Distinctive features that set this development apart from others.'
-
-  const highlights = project?.highlightCards || []
+export default function UspSpotlightModule({ config }: { config: Record<string, any>; projectId: string }): JSX.Element {
+  const highlights: Highlight[] = config.highlights || []
+  const headline = config.headline || 'What Sets Us Apart'
+  const subtext = config.subtext || 'Signature features crafted for those who demand the extraordinary.'
 
   return (
-    <div className="usp-spotlight-module" data-testid="module-USP_SPOTLIGHT" style={{
-      background: 'var(--color-surface)',
-      border: '1px solid var(--color-border)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-6)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 'var(--space-5)',
-      marginBottom: 'var(--space-4)'
-    }}>
-      <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-        <h3 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700, color: 'var(--project-accent)' }}>
+    <div data-testid="module-USP_SPOTLIGHT" style={{ animation: 'fadeInUp 0.4s var(--ease-out)' }}>
+      {/* Section heading */}
+      <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+        <h2 style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
           {headline}
-        </h3>
-        <p style={{ fontSize: 'var(--font-size-base)', color: 'var(--color-text-secondary)', marginTop: '8px', lineHeight: 1.5 }}>
-          {body}
+        </h2>
+        <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-3)', maxWidth: 540, margin: '12px auto 0' }}>
+          {subtext}
         </p>
       </div>
 
-      {highlights.length > 0 && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: 'var(--space-4)',
-          marginTop: 'var(--space-3)'
-        }}>
-          {highlights.map((card) => (
+      {highlights.length === 0 ? (
+        <div className="empty-state">
+          <span className="empty-state-icon">✨</span>
+          <h3>No Highlights Added</h3>
+          <p>Add project highlights from the Admin Panel to showcase your USPs.</p>
+        </div>
+      ) : (
+        <div className="usp-grid">
+          {highlights.map((card, idx) => (
             <div
-              key={card.id}
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-md)',
-                padding: 'var(--space-5)',
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-                minHeight: '140px',
-                transition: 'all var(--transition-fast)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'
-                e.currentTarget.style.borderColor = 'var(--project-accent)'
-                e.currentTarget.style.transform = 'translateY(-2px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'
-                e.currentTarget.style.borderColor = 'var(--color-border)'
-                e.currentTarget.style.transform = 'none'
-              }}
+              key={idx}
+              className="usp-card"
+              style={{ animation: `tileEntrance 0.4s ${0.08 * idx}s var(--ease-out) both` }}
             >
-              <div style={{
-                fontSize: '36px',
-                color: 'var(--project-accent)',
-                filter: 'drop-shadow(0 2px 8px var(--color-accent-glow))'
-              }}>{card.icon || '✨'}</div>
-              <p style={{
-                fontWeight: 500,
-                fontSize: 'var(--font-size-base)',
-                color: '#fff',
-                lineHeight: 1.4
-              }}>
-                {card.shortText}
-              </p>
+              {card.imagePath ? (
+                <img className="usp-card-img" src={toMediaUrl(card.imagePath)} alt={card.title} />
+              ) : (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `linear-gradient(135deg, var(--color-surface-raised) 0%, var(--color-surface) 100%)`,
+                }} />
+              )}
+
+              <div className="usp-card-overlay">
+                {card.badge && (
+                  <span className="usp-badge">{card.badge}</span>
+                )}
+                <div className="usp-title">{card.title}</div>
+                {card.description && (
+                  <div className="usp-desc">{card.description}</div>
+                )}
+              </div>
             </div>
           ))}
         </div>

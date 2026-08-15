@@ -1032,49 +1032,61 @@ export default function AdminRoute(): JSX.Element {
       display: 'flex',
       flexDirection: 'row',
       height: '100vh',
-      backgroundColor: '#09090e',
-      color: '#F8FAFC',
-      fontFamily: 'Inter, system-ui, sans-serif',
+      backgroundColor: 'var(--color-bg)',
+      color: 'var(--color-text-primary)',
+      fontFamily: 'var(--font-sans)',
       overflow: 'hidden'
     }}>
       {/* SIDEBAR TABS SELECTOR */}
       <aside style={{
-        width: '260px',
-        borderRight: '1px solid #1E293B',
-        backgroundColor: '#111119',
+        width: '240px',
+        borderRight: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
         display: 'flex',
         flexDirection: 'column',
         padding: '24px 16px',
         gap: '24px',
-        flexShrink: 0
+        flexShrink: 0,
+        boxShadow: '2px 0 12px rgba(0,0,0,0.3)'
       }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: 'var(--project-accent)' }}>ShowcaseOS</h1>
-          <p style={{ margin: '4px 0 0 0', color: '#94A3B8', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Control Center
+          <h1 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--color-accent)', letterSpacing: '-0.02em' }}>ShowcaseOS</h1>
+          <p style={{ margin: '4px 0 0 0', color: 'var(--color-text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
+            Admin Control Center
           </p>
         </div>
 
         {/* Sidebar Nav Toggles */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-          {(['projects', 'modules', 'media', 'units', 'sessions', 'leads', 'settings'] as const).map((tab) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+          {([
+            { id: 'projects', label: 'Projects' },
+            { id: 'modules', label: 'Modules' },
+            { id: 'media', label: 'Media Library' },
+            { id: 'units', label: 'Units' },
+            { id: 'sessions', label: 'Sessions' },
+            { id: 'leads', label: 'Leads' },
+            { id: 'settings', label: 'Settings' },
+          ] as const).map(({ id, label }) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
+              key={id}
+              onClick={() => setActiveTab(id)}
               style={{
                 all: 'unset',
                 cursor: 'pointer',
-                padding: '12px 16px',
+                padding: '10px 14px',
                 borderRadius: '8px',
-                backgroundColor: activeTab === tab ? '#3B82F6' : 'transparent',
-                color: '#fff',
-                fontSize: '14px',
-                fontWeight: 500,
-                textTransform: 'capitalize',
-                transition: 'background-color 0.2s'
+                backgroundColor: activeTab === id ? 'var(--color-accent-dim)' : 'transparent',
+                color: activeTab === id ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                borderLeft: activeTab === id ? '2px solid var(--color-accent)' : '2px solid transparent',
+                fontSize: '13px',
+                fontWeight: activeTab === id ? 600 : 400,
+                transition: 'all 0.18s ease',
+                fontFamily: 'var(--font-sans)',
               }}
+              onMouseEnter={(e) => { if (activeTab !== id) { e.currentTarget.style.backgroundColor = 'var(--color-surface-raised)'; e.currentTarget.style.color = 'var(--color-text-primary)' } }}
+              onMouseLeave={(e) => { if (activeTab !== id) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-muted)' } }}
             >
-              {tab}
+              {label}
             </button>
           ))}
         </div>
@@ -1082,16 +1094,17 @@ export default function AdminRoute(): JSX.Element {
         {/* Selected Project Quick Display */}
         {selectedProjectId && (
           <div style={{
-            backgroundColor: '#1E293B',
+            background: 'var(--color-surface-raised)',
+            border: '1px solid var(--color-border)',
             padding: '12px',
-            borderRadius: '6px',
+            borderRadius: '8px',
             fontSize: '12px',
             display: 'flex',
             flexDirection: 'column',
             gap: '4px'
           }}>
-            <span style={{ color: '#94A3B8', fontSize: '10px', textTransform: 'uppercase' }}>Active Project</span>
-            <span style={{ fontWeight: 600, color: '#fff' }}>{name || 'Loading...'}</span>
+            <span style={{ color: 'var(--color-text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active Project</span>
+            <span style={{ fontWeight: 700, color: 'var(--color-text-primary)', fontSize: '13px' }}>{name || 'Loading...'}</span>
           </div>
         )}
       </aside>
@@ -1101,26 +1114,27 @@ export default function AdminRoute(): JSX.Element {
         
         {/* TOP BAR / PROJECT selector */}
         <header style={{
-          padding: '20px 24px',
-          borderBottom: '1px solid #1E293B',
+          padding: '18px 28px',
+          borderBottom: '1px solid var(--color-border)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#111119'
+          backgroundColor: 'var(--color-surface)',
+          flexShrink: 0,
         }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 600, textTransform: 'capitalize' }}>
-              {activeTab} Management
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, textTransform: 'capitalize', letterSpacing: '-0.01em' }}>
+              {activeTab.replace('_', ' ')} Management
             </h2>
-            <p style={{ margin: '2px 0 0 0', color: '#94A3B8', fontSize: '13px' }}>
-              Configure property databases and parameters
+            <p style={{ margin: '2px 0 0 0', color: 'var(--color-text-muted)', fontSize: '12px' }}>
+              Configure property databases and kiosk parameters
             </p>
           </div>
 
           {/* Project Selector (only for tabs that need a project context) */}
           {['projects', 'modules', 'media', 'units'].includes(activeTab) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '13px', color: '#94A3B8' }}>Select Project:</span>
+              <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Project Context:</span>
               <select
                 value={selectedProjectId}
                 onChange={(e) => {
@@ -1129,11 +1143,12 @@ export default function AdminRoute(): JSX.Element {
                 }}
                 style={{
                   padding: '8px 16px',
-                  borderRadius: '6px',
-                  backgroundColor: '#1E293B',
-                  border: '1px solid #334155',
-                  color: '#fff',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--color-surface-raised)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text-primary)',
                   fontSize: '13px',
+                  fontFamily: 'var(--font-sans)',
                   outline: 'none',
                   cursor: 'pointer'
                 }}
@@ -1149,7 +1164,7 @@ export default function AdminRoute(): JSX.Element {
         </header>
 
         {/* CONTENT CONTAINER */}
-        <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+        <div style={{ flex: 1, padding: '28px', overflowY: 'auto' }}>
           
           {/* TAB 1: PROJECTS */}
           {activeTab === 'projects' && (
