@@ -83,7 +83,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
                   all: 'unset', cursor: 'pointer', padding: '7px 14px',
                   borderRadius: 8,
                   background: activeTab === cat ? 'var(--color-accent)' : 'transparent',
-                  color: activeTab === cat ? '#000' : 'var(--color-text-muted)',
+                  color: activeTab === cat ? 'var(--color-bg)' : 'var(--color-text-muted)',
                   fontSize: 'var(--font-size-xs)', fontWeight: 600,
                   transition: 'all var(--transition-fast)',
                   whiteSpace: 'nowrap' as const,
@@ -179,7 +179,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
           onClick={() => setLightboxIndex(null)}
           style={{
             position: 'fixed', inset: 0,
-            background: 'rgba(0,0,0,0.97)',
+            background: 'var(--backdrop-modal)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             zIndex: 'var(--z-supreme)' as any,
             animation: 'fadeIn 0.2s ease',
@@ -195,7 +195,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
               background: 'rgba(255,255,255,0.1)',
               border: '1px solid rgba(255,255,255,0.15)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 22, transition: 'all var(--transition-fast)',
+              color: 'var(--color-text-primary)', fontSize: 22, transition: 'all var(--transition-fast)',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
@@ -212,7 +212,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
               width: 56, height: 56, borderRadius: '50%',
               background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 28, transition: 'all var(--transition-fast)',
+              color: 'var(--color-text-primary)', fontSize: 28, transition: 'all var(--transition-fast)',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
@@ -243,7 +243,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
               width: 56, height: 56, borderRadius: '50%',
               background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 28, transition: 'all var(--transition-fast)',
+              color: 'var(--color-text-primary)', fontSize: 28, transition: 'all var(--transition-fast)',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
@@ -256,7 +256,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
             position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
           }}>
-            <p style={{ color: '#fff', fontSize: 'var(--font-size-base)', fontWeight: 600, textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+            <p style={{ color: 'var(--color-text-primary)', fontSize: 'var(--font-size-base)', fontWeight: 600, textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
               {filteredMedia[lightboxIndex].originalName}
             </p>
             <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
@@ -287,3 +287,4 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
     </div>
   )
 }
+

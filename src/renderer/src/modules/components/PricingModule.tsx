@@ -121,7 +121,7 @@ export default function PricingModule({ projectId }: { config: Record<string, an
               style={{
                 background: 'var(--color-surface-raised)',
                 border: '1px solid var(--color-border)',
-                color: '#fff',
+                color: 'var(--color-text-primary)',
                 padding: '6px 12px',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-xs)'
@@ -138,7 +138,7 @@ export default function PricingModule({ projectId }: { config: Record<string, an
               style={{
                 background: 'var(--color-surface-raised)',
                 border: '1px solid var(--color-border)',
-                color: '#fff',
+                color: 'var(--color-text-primary)',
                 padding: '6px 12px',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-xs)'
@@ -155,7 +155,7 @@ export default function PricingModule({ projectId }: { config: Record<string, an
               style={{
                 background: 'var(--color-surface-raised)',
                 border: '1px solid var(--color-border)',
-                color: '#fff',
+                color: 'var(--color-text-primary)',
                 padding: '6px 12px',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-xs)'

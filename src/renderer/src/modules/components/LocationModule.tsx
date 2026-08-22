@@ -82,7 +82,7 @@ export default function LocationModule({ config, projectId }: { config: Record<s
                 borderRadius: 'var(--radius-sm)',
                 border: 'none',
                 backgroundColor: activeTab === cat ? 'var(--project-accent)' : 'var(--color-surface-raised)',
-                color: '#fff',
+                color: 'var(--color-text-primary)',
                 cursor: 'pointer',
                 fontSize: '11px',
                 fontWeight: 500,
@@ -116,7 +116,7 @@ export default function LocationModule({ config, projectId }: { config: Record<s
           >
             <div style={{ fontSize: '24px' }}>{getCategoryIcon(lm.category)}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
-              <span style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)', color: '#fff' }}>{lm.name}</span>
+              <span style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{lm.name}</span>
               <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{lm.distance}</span>
             </div>
           </div>

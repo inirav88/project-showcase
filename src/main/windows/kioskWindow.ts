@@ -4,6 +4,7 @@ import { join } from 'path'
 export function kioskWindowOptions(isProduction: boolean): BrowserWindowConstructorOptions {
   return {
     fullscreen: true,
+    autoHideMenuBar: true,
     kiosk: isProduction,
     frame: !isProduction,
     resizable: false,
@@ -23,6 +24,7 @@ export function adminWindowOptions(): BrowserWindowConstructorOptions {
     height: 800,
     minWidth: 1024,
     minHeight: 600,
+    autoHideMenuBar: true,
     frame: true,
     show: false,
     webPreferences: {

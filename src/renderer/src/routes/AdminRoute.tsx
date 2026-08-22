@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { IPC_CHANNELS } from '../../../main/ipc/channels'
 import { toMediaUrl } from '../utils/media'
+import { ThemeToggle } from '../components/ThemeToggle'
+import { StaffTab, AppointmentsTab, AnalyticsTab, BackupSyncTab } from '../components/admin/AdminTabs'
 
 // ─── Smart Module Config Editor ───────────────────────────────────────────────
 
@@ -11,8 +13,8 @@ function parseConfig(raw: string): Record<string, any> {
 // ─── Native File Picker ───────────────────────────────────────────────────────
 
 const browseBtn: React.CSSProperties = {
-  padding: '8px 14px', backgroundColor: '#334155', color: '#CBD5E1',
-  border: '1px solid #475569', borderRadius: '6px', cursor: 'pointer',
+  padding: '8px 14px', backgroundColor: 'var(--color-surface-hover)', color: 'var(--color-text-secondary)',
+  border: '1px solid var(--color-border)', borderRadius: '6px', cursor: 'pointer',
   fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0,
   display: 'flex', alignItems: 'center', gap: '4px'
 }
@@ -100,7 +102,7 @@ function FilePicker({
         {isImage && (
           <div style={{
             width: '38px', height: '38px', borderRadius: '6px', overflow: 'hidden',
-            border: '1px solid #334155', backgroundColor: '#09090e', flexShrink: 0,
+            border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', flexShrink: 0,
             position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
             <img
@@ -115,9 +117,9 @@ function FilePicker({
         <input
           style={{
             flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '6px',
-            border: uploading ? '1px solid #3B82F6' : showSuccess ? '1px solid #10B981' : '1px solid #334155',
-            backgroundColor: '#09090e',
-            color: '#F8FAFC', fontSize: '13px', boxSizing: 'border-box' as const
+            border: uploading ? '1px solid var(--color-accent)' : showSuccess ? '1px solid var(--color-success)' : '1px solid #334155',
+            backgroundColor: 'var(--color-bg)',
+            color: 'var(--color-text-primary)', fontSize: '13px', boxSizing: 'border-box' as const
           }}
           disabled={uploading}
           value={value}
@@ -132,8 +134,8 @@ function FilePicker({
           style={{
             ...browseBtn,
             opacity: uploading ? 0.5 : 1,
-            backgroundColor: showSuccess ? '#10B981' : '#334155',
-            color: '#fff'
+            backgroundColor: showSuccess ? 'var(--color-success)' : '#334155',
+            color: 'var(--color-text-primary)'
           }}
         >
           {uploading ? '⏳ Processing' : showSuccess ? '✅ Done' : `${iconMap[accept ?? 'any']} Browse`}
@@ -143,15 +145,15 @@ function FilePicker({
       {/* Progress feedback bar */}
       {uploading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 2px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#3B82F6' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--color-accent)' }}>
             <span>⚡ {progressText}</span>
             <span style={{ animation: 'pulse 1.5s infinite' }}>Importing...</span>
           </div>
           {/* Animated loading bar */}
-          <div style={{ width: '100%', height: '4px', backgroundColor: '#1E293B', borderRadius: '2px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--color-border)', borderRadius: '2px', overflow: 'hidden' }}>
             <div style={{
               width: '40%', height: '100%',
-              backgroundColor: '#3B82F6',
+              backgroundColor: 'var(--color-accent)',
               borderRadius: '2px',
               animation: 'loadingProgress 1.5s infinite ease-in-out'
             }} />
@@ -172,24 +174,24 @@ function FilePicker({
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '8px 10px', borderRadius: '6px',
-  border: '1px solid #334155', backgroundColor: '#09090e',
-  color: '#F8FAFC', fontSize: '13px', boxSizing: 'border-box'
+  border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)',
+  color: 'var(--color-text-primary)', fontSize: '13px', boxSizing: 'border-box'
 }
 const labelStyle: React.CSSProperties = {
   display: 'block', marginBottom: '5px', fontSize: '11px',
-  fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em'
+  fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em'
 }
 const fieldStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '4px' }
 const cardStyle: React.CSSProperties = {
-  backgroundColor: '#1a2236', border: '1px solid #2d3f5e',
+  backgroundColor: 'var(--color-surface-raised)', border: '1px solid var(--color-border)',
   borderRadius: '8px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px'
 }
 const removeBtn: React.CSSProperties = {
-  padding: '4px 10px', fontSize: '11px', backgroundColor: '#EF4444', color: '#fff',
+  padding: '4px 10px', fontSize: '11px', backgroundColor: 'var(--color-error)', color: 'var(--color-text-primary)',
   border: 'none', borderRadius: '4px', cursor: 'pointer', alignSelf: 'flex-end', fontWeight: 600
 }
 const addBtn: React.CSSProperties = {
-  padding: '8px 14px', fontSize: '12px', backgroundColor: '#2563EB', color: '#fff',
+  padding: '8px 14px', fontSize: '12px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)',
   border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start'
 }
 
@@ -238,7 +240,7 @@ function ModuleConfigEditor({
     const images: { path: string; caption: string; category: string }[] = cfg.images || []
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0 }}>Click <strong>🖼️ Browse</strong> to pick images from your computer for each gallery entry.</p>
+        <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0 }}>Click <strong>🖼️ Browse</strong> to pick images from your computer for each gallery entry.</p>
         {images.map((img, i) => (
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
@@ -307,7 +309,7 @@ function ModuleConfigEditor({
     const videos: { path: string; title: string; thumbnailPath: string }[] = cfg.videos || []
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0 }}>Click <strong>🎥 Browse</strong> to select .mp4 video files from your computer.</p>
+        <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0 }}>Click <strong>🎥 Browse</strong> to select .mp4 video files from your computer.</p>
         {videos.map((v, i) => (
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
@@ -382,8 +384,8 @@ function ModuleConfigEditor({
           <label style={labelStyle}>Location Aerial / Map Image (optional)</label>
           <FilePicker projectId={projectId} value={cfg.mapImagePath || ''} onChange={v => set('mapImagePath', v)} accept="image" label="Location Map Image" placeholder="Select a location map or aerial image…" />
         </div>
-        <hr style={{ border: 'none', borderTop: '1px solid #2d3f5e' }} />
-        <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0, fontWeight: 600 }}>Nearby Connectivity Points</p>
+        <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)' }} />
+        <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0, fontWeight: 600 }}>Nearby Connectivity Points</p>
         {pois.map((p, i) => (
           <div key={i} style={cardStyle}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 140px', gap: '10px' }}>
@@ -449,8 +451,8 @@ function ModuleConfigEditor({
           <label style={labelStyle}>Pricing Section Headline</label>
           <input style={inputStyle} value={cfg.headline || ''} onChange={e => set('headline', e.target.value)} placeholder="Transparent Pricing, No Hidden Charges" />
         </div>
-        <hr style={{ border: 'none', borderTop: '1px solid #2d3f5e' }} />
-        <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0, fontWeight: 600 }}>Price Summary Cards (shown above the unit table)</p>
+        <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)' }} />
+        <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0, fontWeight: 600 }}>Price Summary Cards (shown above the unit table)</p>
         {configs.map((tier, i) => (
           <div key={i} style={cardStyle}>
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr', gap: '10px' }}>
@@ -514,7 +516,7 @@ function ModuleConfigEditor({
   // ── FALLBACK: raw JSON editor ─────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <p style={{ fontSize: '11px', color: '#94A3B8', margin: 0 }}>No visual editor for <strong>{moduleType}</strong> — edit raw JSON below.</p>
+      <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', margin: 0 }}>No visual editor for <strong>{moduleType}</strong> — edit raw JSON below.</p>
       <textarea
         value={configJson}
         onChange={e => onChange(e.target.value)}
@@ -566,12 +568,13 @@ interface MediaItem {
 
 interface SessionLog {
   id: string
+  projectId: string
   personaMode?: string
   sectionsViewed: string
   unitsShortlisted: string
   startedAt: string
   endedAt?: string
-  project: { name: string }
+  project?: { name: string }
   staff?: { name: string }
 }
 
@@ -586,7 +589,6 @@ interface Lead {
   capturedAt: string
   project?: { name: string }
 }
-
 interface Settings {
   firmName: string
   firmContactPhone: string
@@ -596,7 +598,7 @@ interface Settings {
 }
 
 export default function AdminRoute(): JSX.Element {
-  const [activeTab, setActiveTab] = useState<'projects' | 'modules' | 'media' | 'units' | 'sessions' | 'leads' | 'settings'>('projects')
+  const [activeTab, setActiveTab] = useState<'projects' | 'modules' | 'media' | 'units' | 'sessions' | 'leads' | 'staff' | 'appointments' | 'analytics' | 'backup' | 'settings'>('projects')
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string>('')
   
@@ -616,7 +618,7 @@ export default function AdminRoute(): JSX.Element {
   const [priceMax, setPriceMax] = useState(0)
   const [sortOrder, setSortOrder] = useState(0)
   const [isFeatured, setIsFeatured] = useState(false)
-  const [accentColor, setAccentColor] = useState('#1A73E8')
+  const [accentColor, setAccentColor] = useState('var(--color-accent)')
   const [fontPairing, setFontPairing] = useState('Inter')
 
   // Modules tab state
@@ -767,7 +769,7 @@ export default function AdminRoute(): JSX.Element {
     setPriceMax(0)
     setSortOrder(0)
     setIsFeatured(false)
-    setAccentColor('#1A73E8')
+    setAccentColor('var(--color-accent)')
     setFontPairing('Inter')
   }
 
@@ -1065,6 +1067,10 @@ export default function AdminRoute(): JSX.Element {
             { id: 'units', label: 'Units' },
             { id: 'sessions', label: 'Sessions' },
             { id: 'leads', label: 'Leads' },
+            { id: 'staff', label: 'Staff Profiles' },
+            { id: 'appointments', label: 'Appointments' },
+            { id: 'analytics', label: 'Analytics' },
+            { id: 'backup', label: 'Backup & Sync' },
             { id: 'settings', label: 'Settings' },
           ] as const).map(({ id, label }) => (
             <button
@@ -1075,8 +1081,8 @@ export default function AdminRoute(): JSX.Element {
                 cursor: 'pointer',
                 padding: '10px 14px',
                 borderRadius: '8px',
-                backgroundColor: activeTab === id ? 'var(--color-accent-dim)' : 'transparent',
-                color: activeTab === id ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                backgroundColor: activeTab === id ? 'var(--color-surface-raised)' : 'transparent',
+                color: activeTab === id ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
                 borderLeft: activeTab === id ? '2px solid var(--color-accent)' : '2px solid transparent',
                 fontSize: '13px',
                 fontWeight: activeTab === id ? 600 : 400,
@@ -1131,8 +1137,11 @@ export default function AdminRoute(): JSX.Element {
             </p>
           </div>
 
-          {/* Project Selector (only for tabs that need a project context) */}
-          {['projects', 'modules', 'media', 'units'].includes(activeTab) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <ThemeToggle />
+            
+            {/* Project Selector (only for tabs that need a project context) */}
+            {['projects', 'modules', 'media', 'units'].includes(activeTab) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Project Context:</span>
               <select
@@ -1161,6 +1170,7 @@ export default function AdminRoute(): JSX.Element {
               </select>
             </div>
           )}
+          </div>
         </header>
 
         {/* CONTENT CONTAINER */}
@@ -1170,10 +1180,10 @@ export default function AdminRoute(): JSX.Element {
           {activeTab === 'projects' && (
             <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '24px' }}>
               {/* Projects List sidebar */}
-              <div style={{ backgroundColor: '#111119', padding: '16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '12px', border: '1px solid #1E293B' }}>
+              <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '12px', border: '1px solid var(--color-border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h4 style={{ margin: 0, fontSize: '14px' }}>Property Catalog</h4>
-                  <button onClick={startNewProjectMode} style={{ padding: '4px 8px', fontSize: '11px', backgroundColor: '#10B981', border: 'none', borderRadius: '4px', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>
+                  <button onClick={startNewProjectMode} style={{ padding: '4px 8px', fontSize: '11px', backgroundColor: 'var(--color-success)', border: 'none', borderRadius: '4px', color: 'var(--color-text-primary)', cursor: 'pointer', fontWeight: 600 }}>
                     + New Project
                   </button>
                 </div>
@@ -1187,7 +1197,7 @@ export default function AdminRoute(): JSX.Element {
                         cursor: 'pointer',
                         padding: '8px 12px',
                         borderRadius: '6px',
-                        backgroundColor: selectedProjectId === p.id && isEditing ? '#3B82F6' : '#1E293B',
+                        backgroundColor: selectedProjectId === p.id && isEditing ? 'var(--color-accent)' : 'var(--color-border)',
                         fontSize: '13px',
                         fontWeight: 500,
                         textAlign: 'left'
@@ -1200,40 +1210,40 @@ export default function AdminRoute(): JSX.Element {
               </div>
 
               {/* Project Form */}
-              <form onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+              <form onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                 <h3 style={{ gridColumn: 'span 2', margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
                   {isEditing ? `Modify Project: ${name}` : 'Register New Kiosk Property Showcase'}
                 </h3>
                 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Project Name</label>
-                  <input value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Project Name</label>
+                  <input value={name} onChange={e => setName(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Developer Name</label>
-                  <input value={developer} onChange={e => setDeveloper(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Developer Name</label>
+                  <input value={developer} onChange={e => setDeveloper(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>RERA Registration Number</label>
-                  <input value={reraNumber} onChange={e => setReraNumber(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>RERA Registration Number</label>
+                  <input value={reraNumber} onChange={e => setReraNumber(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Location</label>
-                  <input value={location} onChange={e => setLocation(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Price Min (INR)</label>
-                  <input type="number" value={priceMin} onChange={e => setPriceMin(Number(e.target.value))} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Price Max (INR)</label>
-                  <input type="number" value={priceMax} onChange={e => setPriceMax(Number(e.target.value))} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Location</label>
+                  <input value={location} onChange={e => setLocation(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Project Type</label>
-                  <select value={projectType} onChange={e => setProjectType(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Price Min (INR)</label>
+                  <input type="number" value={priceMin} onChange={e => setPriceMin(Number(e.target.value))} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Price Max (INR)</label>
+                  <input type="number" value={priceMax} onChange={e => setPriceMax(Number(e.target.value))} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Project Type</label>
+                  <select value={projectType} onChange={e => setProjectType(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}>
                     <option value="RESIDENTIAL">Residential</option>
                     <option value="COMMERCIAL">Commercial</option>
                     <option value="MIXED_USE">Mixed Use</option>
@@ -1241,29 +1251,29 @@ export default function AdminRoute(): JSX.Element {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Possession Status</label>
-                  <select value={possessionStatus} onChange={e => setPossessionStatus(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Possession Status</label>
+                  <select value={possessionStatus} onChange={e => setPossessionStatus(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}>
                     <option value="UNDER_CONSTRUCTION">Under Construction</option>
                     <option value="READY">Ready to Move</option>
                   </select>
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Possession Date (Text Description)</label>
-                  <input value={possessionDate} onChange={e => setPossessionDate(e.target.value)} placeholder="E.g. Dec 2026" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Possession Date (Text Description)</label>
+                  <input value={possessionDate} onChange={e => setPossessionDate(e.target.value)} placeholder="E.g. Dec 2026" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Sort Order</label>
-                  <input type="number" value={sortOrder} onChange={e => setSortOrder(Number(e.target.value))} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Sort Order</label>
+                  <input type="number" value={sortOrder} onChange={e => setSortOrder(Number(e.target.value))} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
 
                 <div style={{ gridColumn: 'span 2' }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Description</label>
-                  <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', resize: 'vertical' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Description</label>
+                  <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', resize: 'vertical' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Accent Theme Color</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Accent Theme Color</label>
                   <input type="color" value={accentColor} onChange={e => setAccentColor(e.target.value)} style={{ width: '60px', height: '40px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer', backgroundColor: 'transparent' }} />
                 </div>
 
@@ -1274,12 +1284,12 @@ export default function AdminRoute(): JSX.Element {
 
                 <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
                   {isEditing && (
-                    <button type="button" onClick={handleArchiveProject} style={{ padding: '10px 20px', backgroundColor: '#EF4444', color: '#FFF', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                    <button type="button" onClick={handleArchiveProject} style={{ padding: '10px 20px', backgroundColor: 'var(--color-error)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
                       Archive Project
                     </button>
                   )}
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
-                    <button type="submit" style={{ padding: '10px 24px', backgroundColor: '#2563EB', color: '#FFF', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                    <button type="submit" style={{ padding: '10px 24px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
                       {isEditing ? 'Save Changes' : 'Register Property'}
                     </button>
                   </div>
@@ -1292,12 +1302,12 @@ export default function AdminRoute(): JSX.Element {
           {activeTab === 'modules' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {/* Add Module Panel */}
-              <div style={{ backgroundColor: '#111119', padding: '20px 24px', borderRadius: '8px', border: '1px solid #1E293B', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: '#F8FAFC', whiteSpace: 'nowrap' }}>Add Module to Project</h3>
+              <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '20px 24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap' }}>Add Module to Project</h3>
                 <select
                   value={moduleAddType}
                   onChange={e => setModuleAddType(e.target.value)}
-                  style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#fff', fontSize: '13px', flex: 1, minWidth: '200px' }}
+                  style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px', flex: 1, minWidth: '200px' }}
                 >
                   {['OVERVIEW','GALLERY','AMENITIES','PRICING','CALCULATORS','VIDEOS','LOCATION','USP_SPOTLIGHT','MASTER_PLAN','BROCHURE','TESTIMONIALS','SUSTAINABILITY','SMART_HOME','COMMUNITY_LIFESTYLE','CONSTRUCTION_TIMELINE','FINANCING_PARTNER','FOUNDERS_NOTE','RERA_TRUST','SPORTS_CAROUSEL','COMPARE_UNITS','TOUR_360'].map(t => (
                     <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
@@ -1315,19 +1325,19 @@ export default function AdminRoute(): JSX.Element {
                     })
                     loadModules(selectedProjectId)
                   }}
-                  style={{ padding: '8px 20px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
+                  style={{ padding: '8px 20px', backgroundColor: 'var(--color-success)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
                 >
                   + Add Module
                 </button>
               </div>
 
-              <div style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+              <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
               <h3 style={{ margin: '0 0 16px 0', fontSize: '16px' }}>Property Modules Registry Layout</h3>
               
               {!selectedProjectId ? (
-                <div style={{ color: '#94A3B8', textAlign: 'center', padding: '24px' }}>Please select a project first</div>
+                <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '24px' }}>Please select a project first</div>
               ) : modules.length === 0 ? (
-                <div style={{ color: '#94A3B8', textAlign: 'center', padding: '48px', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '48px', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
                   <span style={{ fontSize: '48px' }}>📦</span>
                   <p style={{ margin: 0, fontSize: '14px' }}>No modules configured yet.</p>
                   <p style={{ margin: 0, fontSize: '12px' }}>Use the panel above to add modules to this project.</p>
@@ -1336,8 +1346,8 @@ export default function AdminRoute(): JSX.Element {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {modules.map((mod, idx) => (
                     <div key={mod.id} style={{
-                      backgroundColor: '#1E293B',
-                      border: editingModuleId === mod.id ? '1px solid #3B82F6' : '1px solid #334155',
+                      backgroundColor: 'var(--color-border)',
+                      border: editingModuleId === mod.id ? '1px solid var(--color-accent)' : '1px solid #334155',
                       borderRadius: '8px',
                       overflow: 'hidden'
                     }}>
@@ -1345,15 +1355,15 @@ export default function AdminRoute(): JSX.Element {
                       <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: editingModuleId === mod.id ? 'rgba(59,130,246,0.08)' : 'transparent' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <span style={{ fontWeight: 700, color: 'var(--project-accent)', fontSize: '14px' }}>{mod.moduleType.replace(/_/g, ' ')}</span>
-                          <span style={{ fontSize: '11px', color: '#64748B', backgroundColor: '#0F172A', padding: '2px 8px', borderRadius: '20px' }}>Order {mod.sortOrder}</span>
+                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-surface)', padding: '2px 8px', borderRadius: '20px' }}>Order {mod.sortOrder}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <label style={{ fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: mod.isVisible ? '#10B981' : '#64748B' }}>
+                          <label style={{ fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: mod.isVisible ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
                             <input type="checkbox" checked={mod.isVisible} onChange={() => handleToggleModuleVisibility(mod)} />
                             {mod.isVisible ? 'Visible on Kiosk' : 'Hidden'}
                           </label>
-                          <button onClick={() => handleMoveModule(idx, 'UP')} disabled={idx === 0} style={{ padding: '4px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0F172A', color: '#fff' }}>▲</button>
-                          <button onClick={() => handleMoveModule(idx, 'DOWN')} disabled={idx === modules.length - 1} style={{ padding: '4px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0F172A', color: '#fff' }}>▼</button>
+                          <button onClick={() => handleMoveModule(idx, 'UP')} disabled={idx === 0} style={{ padding: '4px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text-primary)' }}>▲</button>
+                          <button onClick={() => handleMoveModule(idx, 'DOWN')} disabled={idx === modules.length - 1} style={{ padding: '4px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text-primary)' }}>▼</button>
                           <button
                             onClick={() => {
                               if (editingModuleId === mod.id) {
@@ -1365,10 +1375,10 @@ export default function AdminRoute(): JSX.Element {
                             }}
                             style={{
                               padding: '6px 14px',
-                              backgroundColor: editingModuleId === mod.id ? '#64748B' : '#2563EB',
+                              backgroundColor: editingModuleId === mod.id ? 'var(--color-text-muted)' : 'var(--color-accent)',
                               border: 'none',
                               borderRadius: '6px',
-                              color: '#fff',
+                              color: 'var(--color-text-primary)',
                               fontSize: '12px',
                               fontWeight: 600,
                               cursor: 'pointer'
@@ -1381,7 +1391,7 @@ export default function AdminRoute(): JSX.Element {
 
                       {/* Module smart config panel */}
                       {editingModuleId === mod.id && (
-                        <div style={{ padding: '20px', borderTop: '1px solid #334155', backgroundColor: '#0F1829', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div style={{ padding: '20px', borderTop: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           <ModuleConfigEditor
                             moduleType={mod.moduleType}
                             configJson={moduleConfigInput}
@@ -1391,13 +1401,13 @@ export default function AdminRoute(): JSX.Element {
                           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '4px' }}>
                             <button
                               onClick={() => setEditingModuleId('')}
-                              style={{ padding: '8px 16px', backgroundColor: 'transparent', color: '#94A3B8', border: '1px solid #334155', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                              style={{ padding: '8px 16px', backgroundColor: 'transparent', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
                             >
                               Discard
                             </button>
                             <button
                               onClick={() => handleSaveModuleConfig(mod)}
-                              style={{ padding: '8px 20px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                              style={{ padding: '8px 20px', backgroundColor: 'var(--color-success)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
                             >
                               Save Configuration
                             </button>
@@ -1416,19 +1426,19 @@ export default function AdminRoute(): JSX.Element {
           {activeTab === 'media' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
               {/* Media List Grid */}
-              <div style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+              <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                 <h3 style={{ margin: '0 0 16px 0', fontSize: '16px' }}>Project Storage Library</h3>
                 {!selectedProjectId ? (
-                  <div style={{ color: '#94A3B8', textAlign: 'center' }}>Select project context</div>
+                  <div style={{ color: 'var(--color-text-muted)', textAlign: 'center' }}>Select project context</div>
                 ) : mediaList.length === 0 ? (
-                  <div style={{ color: '#94A3B8', textAlign: 'center', padding: '24px' }}>No media files linked. Use the uploader sidebar to upload files.</div>
+                  <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '24px' }}>No media files linked. Use the uploader sidebar to upload files.</div>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '16px' }}>
                     {mediaList.map((m) => (
                       <div key={m.id} style={{
-                        backgroundColor: '#1E293B',
+                        backgroundColor: 'var(--color-border)',
                         borderRadius: '6px',
-                        border: '1px solid #334155',
+                        border: '1px solid var(--color-border)',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column'
@@ -1436,18 +1446,18 @@ export default function AdminRoute(): JSX.Element {
                         {m.category !== 'VIDEO' && m.category !== 'AUDIO' && m.thumbnailPath ? (
                           <img src={toMediaUrl(m.thumbnailPath)} alt={m.originalName} style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
                         ) : (
-                          <div style={{ height: '100px', backgroundColor: '#09090e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
+                          <div style={{ height: '100px', backgroundColor: 'var(--color-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
                             {m.category === 'VIDEO' ? '🎥' : '🎵'}
                           </div>
                         )}
                         <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-                          <span style={{ fontSize: '11px', fontWeight: 600, color: '#fff', wordBreak: 'break-all' }}>{m.originalName}</span>
-                          <span style={{ fontSize: '10px', color: '#94A3B8' }}>{m.category}</span>
+                          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', wordBreak: 'break-all' }}>{m.originalName}</span>
+                          <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>{m.category}</span>
                           <button
                             onClick={() => handleDeleteMedia(m.id)}
                             style={{
-                              marginTop: 'auto', padding: '4px', backgroundColor: '#EF4444', border: 'none',
-                              borderRadius: '4px', color: '#fff', fontSize: '10px', cursor: 'pointer', fontWeight: 600
+                              marginTop: 'auto', padding: '4px', backgroundColor: 'var(--color-error)', border: 'none',
+                              borderRadius: '4px', color: 'var(--color-text-primary)', fontSize: '10px', cursor: 'pointer', fontWeight: 600
                             }}
                           >
                             Delete
@@ -1460,10 +1470,10 @@ export default function AdminRoute(): JSX.Element {
               </div>
 
               {/* Upload Form */}
-              <form onSubmit={handleUploadMedia} style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B', display: 'flex', flexDirection: 'column', gap: '16px', height: 'fit-content' }}>
+              <form onSubmit={handleUploadMedia} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '16px', height: 'fit-content' }}>
                 <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Import New Media Element</h4>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Select File</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Select File</label>
                   <FilePicker
                     value={uploadFilePath}
                     onChange={setUploadFilePath}
@@ -1476,11 +1486,11 @@ export default function AdminRoute(): JSX.Element {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Category</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Category</label>
                   <select
                     value={uploadCategory}
                     onChange={(e) => setUploadCategory(e.target.value)}
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}
                   >
                     <option value="GALLERY">General Gallery</option>
                     <option value="EXTERIOR">Exterior Walk</option>
@@ -1493,15 +1503,15 @@ export default function AdminRoute(): JSX.Element {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Search tags</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Search tags</label>
                   <input
                     value={uploadTags}
                     onChange={(e) => setUploadTags(e.target.value)}
                     placeholder="E.g. bedroom, entrance"
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
                   />
                 </div>
-                <button type="submit" style={{ padding: '10px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', marginTop: '8px' }}>
+                <button type="submit" style={{ padding: '10px', backgroundColor: 'var(--color-success)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', marginTop: '8px' }}>
                   Store Media
                 </button>
               </form>
@@ -1512,9 +1522,9 @@ export default function AdminRoute(): JSX.Element {
           {activeTab === 'units' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
               {/* CSV Import */}
-              <div style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+              <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                 <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>Bulk Unit CSV Import</h3>
-                <p style={{ margin: '0 0 16px 0', color: '#94A3B8', fontSize: '12px' }}>
+                <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', fontSize: '12px' }}>
                   Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes</code>
                 </p>
                 <textarea
@@ -1524,59 +1534,59 @@ export default function AdminRoute(): JSX.Element {
                   rows={10}
                   style={{
                     width: '100%', padding: '12px', borderRadius: '6px',
-                    border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF',
+                    border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)',
                     fontFamily: 'monospace', fontSize: '12px', resize: 'vertical', marginBottom: '16px'
                   }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 500, color: '#38BDF8' }}>{importStatus}</span>
-                  <button onClick={handleCsvImport} style={{ padding: '10px 20px', backgroundColor: '#2563EB', color: '#FFF', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-secondary)' }}>{importStatus}</span>
+                  <button onClick={handleCsvImport} style={{ padding: '10px 20px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
                     Bulk Import
                   </button>
                 </div>
               </div>
 
               {/* Single Unit Form */}
-              <form onSubmit={handleSingleUnitSubmit} style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B', display: 'flex', flexDirection: 'column', gap: '12px', height: 'fit-content' }}>
+              <form onSubmit={handleSingleUnitSubmit} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '12px', height: 'fit-content' }}>
                 <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Create Single Unit Record</h4>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Tower Name *</label>
-                  <input value={towerName} onChange={(e) => setTowerName(e.target.value)} placeholder="Block A" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Tower Name *</label>
+                  <input value={towerName} onChange={(e) => setTowerName(e.target.value)} placeholder="Block A" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Floor Number *</label>
-                  <input type="number" value={floorNumber} onChange={(e) => setFloorNumber(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Floor Number *</label>
+                  <input type="number" value={floorNumber} onChange={(e) => setFloorNumber(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Unit Number *</label>
-                  <input value={unitNumber} onChange={(e) => setUnitNumber(e.target.value)} placeholder="A-101" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Number *</label>
+                  <input value={unitNumber} onChange={(e) => setUnitNumber(e.target.value)} placeholder="A-101" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Configuration</label>
-                  <input value={unitConfig} onChange={(e) => setUnitConfig(e.target.value)} placeholder="3BHK" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Configuration</label>
+                  <input value={unitConfig} onChange={(e) => setUnitConfig(e.target.value)} placeholder="3BHK" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Carpet Area</label>
-                    <input type="number" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Carpet Area</label>
+                    <input type="number" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Built Up Area</label>
-                    <input type="number" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Built Up Area</label>
+                    <input type="number" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Super Area</label>
-                    <input type="number" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Super Area</label>
+                    <input type="number" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Price (INR) *</label>
-                    <input type="number" value={unitPrice} onChange={(e) => setUnitPrice(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price (INR) *</label>
+                    <input type="number" value={unitPrice} onChange={(e) => setUnitPrice(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Price Label</label>
-                    <select value={priceLabel} onChange={(e) => setPriceLabel(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }}>
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price Label</label>
+                    <select value={priceLabel} onChange={(e) => setPriceLabel(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
                       <option value="OFFICIAL">Official</option>
                       <option value="ESTIMATED">Estimated</option>
                       <option value="INDICATIVE">Indicative</option>
@@ -1585,22 +1595,22 @@ export default function AdminRoute(): JSX.Element {
                   </div>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Unit Facing</label>
-                  <input value={unitFacing} onChange={(e) => setUnitFacing(e.target.value)} placeholder="East" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Facing</label>
+                  <input value={unitFacing} onChange={(e) => setUnitFacing(e.target.value)} placeholder="East" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Status</label>
-                  <select value={unitStatus} onChange={(e) => setUnitStatus(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }}>
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Status</label>
+                  <select value={unitStatus} onChange={(e) => setUnitStatus(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
                     <option value="AVAILABLE">Available</option>
                     <option value="HELD">Held</option>
                     <option value="SOLD">Sold</option>
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: '#94A3B8' }}>Notes</label>
-                  <input value={unitNotes} onChange={(e) => setUnitNotes(e.target.value)} placeholder="E.g. Pool view" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', fontSize: '12px' }} />
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Notes</label>
+                  <input value={unitNotes} onChange={(e) => setUnitNotes(e.target.value)} placeholder="E.g. Pool view" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                 </div>
-                <button type="submit" style={{ padding: '8px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', fontSize: '12px' }}>
+                <button type="submit" style={{ padding: '8px', backgroundColor: 'var(--color-success)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', fontSize: '12px' }}>
                   Register Unit
                 </button>
               </form>
@@ -1609,12 +1619,12 @@ export default function AdminRoute(): JSX.Element {
 
           {/* TAB 5: SESSIONS */}
           {activeTab === 'sessions' && (
-            <div style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+            <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
               <h3 style={{ margin: '0 0 16px 0', fontSize: '16px' }}>Interactive Presentation Session Logs</h3>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '1px solid #334155', color: '#94A3B8' }}>
+                    <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
                       <th style={{ padding: '12px' }}>Property</th>
                       <th style={{ padding: '12px' }}>Persona</th>
                       <th style={{ padding: '12px' }}>Started At</th>
@@ -1633,12 +1643,12 @@ export default function AdminRoute(): JSX.Element {
                       let shortlistCount = 0
                       try { shortlistCount = JSON.parse(s.unitsShortlisted || '[]').length } catch(err) {}
                       return (
-                        <tr key={s.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                        <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                           <td style={{ padding: '12px', fontWeight: 600 }}>{s.project?.name}</td>
                           <td style={{ padding: '12px' }}>{s.personaMode || 'Not specified'}</td>
                           <td style={{ padding: '12px' }}>{new Date(s.startedAt).toLocaleString()}</td>
                           <td style={{ padding: '12px' }}>{dur}</td>
-                          <td style={{ padding: '12px', color: '#38BDF8' }}>{viewsCount} sections</td>
+                          <td style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>{viewsCount} sections</td>
                           <td style={{ padding: '12px', fontWeight: 600 }}>{shortlistCount} units</td>
                         </tr>
                       )
@@ -1651,12 +1661,24 @@ export default function AdminRoute(): JSX.Element {
 
           {/* TAB 6: LEADS */}
           {activeTab === 'leads' && (
-            <div style={{ backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B' }}>
-              <h3 style={{ margin: '0 0 16px 0', fontSize: '16px' }}>Captured Customer Leads</h3>
+            <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h3 style={{ margin: 0, fontSize: '16px' }}>Captured Customer Leads</h3>
+              <button
+                onClick={async () => {
+                  const res = await (window as any).api.invoke(IPC_CHANNELS.LEAD_EXPORT_CSV) as any
+                  if (res.success) alert('Exported ' + res.count + ' leads to: ' + res.filePath)
+                  else if (res.reason !== 'Cancelled') alert('Export failed: ' + res.reason)
+                }}
+                style={{ padding: '8px 18px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
+              >
+                Export CSV
+              </button>
+            </div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '1px solid #334155', color: '#94A3B8' }}>
+                    <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
                       <th style={{ padding: '12px' }}>Customer Name</th>
                       <th style={{ padding: '12px' }}>Phone Number</th>
                       <th style={{ padding: '12px' }}>Email Address</th>
@@ -1667,13 +1689,13 @@ export default function AdminRoute(): JSX.Element {
                   </thead>
                   <tbody>
                     {leads.map((l) => (
-                      <tr key={l.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                      <tr key={l.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                         <td style={{ padding: '12px', fontWeight: 600 }}>{l.name}</td>
                         <td style={{ padding: '12px' }}>{l.phone}</td>
                         <td style={{ padding: '12px' }}>{l.email || 'N/A'}</td>
-                        <td style={{ padding: '12px', color: '#10B981' }}>{l.project?.name || 'General interest'}</td>
+                        <td style={{ padding: '12px', color: 'var(--color-success)' }}>{l.project?.name || 'General interest'}</td>
                         <td style={{ padding: '12px' }}>{new Date(l.capturedAt).toLocaleString()}</td>
-                        <td style={{ padding: '12px', color: '#94A3B8' }}>{l.notes}</td>
+                        <td style={{ padding: '12px', color: 'var(--color-text-muted)' }}>{l.notes}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1681,50 +1703,69 @@ export default function AdminRoute(): JSX.Element {
               </div>
             </div>
           )}
+          {/* TAB: STAFF PROFILES */}
+          {activeTab === 'staff' && (
+            <StaffTab />
+          )}
+
+          {/* TAB: APPOINTMENTS */}
+          {activeTab === 'appointments' && (
+            <AppointmentsTab />
+          )}
+
+          {/* TAB: ANALYTICS */}
+          {activeTab === 'analytics' && (
+            <AnalyticsTab sessions={sessions} />
+          )}
+
+          {/* TAB: BACKUP & SYNC */}
+          {activeTab === 'backup' && (
+            <BackupSyncTab />
+          )}
 
           {/* TAB 7: SETTINGS */}
           {activeTab === 'settings' && (
-            <form onSubmit={handleSettingsSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: '#111119', padding: '24px', borderRadius: '8px', border: '1px solid #1E293B', maxWidth: '600px' }}>
+            <form onSubmit={handleSettingsSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', maxWidth: '600px' }}>
               <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>Global Firm Configuration</h3>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Company Name</label>
-                <input value={settings.firmName} onChange={(e) => setSettings({ ...settings, firmName: e.target.value })} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Company Name</label>
+                <input value={settings.firmName} onChange={(e) => setSettings({ ...settings, firmName: e.target.value })} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Contact Phone</label>
-                  <input value={settings.firmContactPhone} onChange={(e) => setSettings({ ...settings, firmContactPhone: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Contact Phone</label>
+                  <input value={settings.firmContactPhone} onChange={(e) => setSettings({ ...settings, firmContactPhone: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Website</label>
-                  <input value={settings.firmWebsite} onChange={(e) => setSettings({ ...settings, firmWebsite: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Website</label>
+                  <input value={settings.firmWebsite} onChange={(e) => setSettings({ ...settings, firmWebsite: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Contact Email</label>
-                <input value={settings.firmContactEmail} onChange={(e) => setSettings({ ...settings, firmContactEmail: e.target.value })} type="email" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Contact Email</label>
+                <input value={settings.firmContactEmail} onChange={(e) => setSettings({ ...settings, firmContactEmail: e.target.value })} type="email" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8' }}>Kiosk Footer Disclaimer Text</label>
-                <textarea value={settings.disclaimerText} onChange={(e) => setSettings({ ...settings, disclaimerText: e.target.value })} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF', resize: 'vertical' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Kiosk Footer Disclaimer Text</label>
+                <textarea value={settings.disclaimerText} onChange={(e) => setSettings({ ...settings, disclaimerText: e.target.value })} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', resize: 'vertical' }} />
               </div>
 
-              <div style={{ borderTop: '1px solid #334155', paddingTop: '16px', marginTop: '8px' }}>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: '#94A3B8', fontWeight: 600 }}>Change Admin Security PIN</label>
+              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Change Admin Security PIN</label>
                 <input
                   type="password"
                   placeholder="Leave blank to keep current PIN"
                   value={adminPinInput}
                   onChange={(e) => setAdminPinInput(e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#09090e', color: '#FFF' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}
                 />
               </div>
 
-              <button type="submit" style={{ padding: '12px', backgroundColor: '#2563EB', color: '#FFF', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', marginTop: '8px', alignSelf: 'flex-end' }}>
+              <button type="submit" style={{ padding: '12px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', marginTop: '8px', alignSelf: 'flex-end' }}>
                 Save branding Settings
               </button>
             </form>
@@ -1735,3 +1776,11 @@ export default function AdminRoute(): JSX.Element {
     </div>
   )
 }
+
+
+
+
+
+
+
+

@@ -87,7 +87,7 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
           <h2 style={{
             fontSize: 'var(--font-size-3xl)',
             fontWeight: 800,
-            color: heroImage ? '#fff' : 'var(--color-text-primary)',
+            color: heroImage ? 'var(--color-text-primary)' : 'var(--color-text-primary)',
             letterSpacing: '-0.03em',
             lineHeight: 1.1,
             marginBottom: 'var(--space-2)',
@@ -114,7 +114,7 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
                   border: '1px solid rgba(255,255,255,0.2)',
                   fontSize: 'var(--font-size-xs)',
                   fontWeight: 600,
-                  color: heroImage ? '#fff' : 'var(--color-text-primary)',
+                  color: heroImage ? 'var(--color-text-primary)' : 'var(--color-text-primary)',
                   backdropFilter: 'blur(8px)',
                 }}>
                   {s}
@@ -161,3 +161,4 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
     </div>
   )
 }
+

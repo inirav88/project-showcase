@@ -4,6 +4,10 @@ import { useKioskExit } from '../../hooks/useKioskExit'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { moduleRegistry, isRegisteredModule } from '../../modules/registry'
 import { useShortlistStore } from '../../store/useShortlistStore'
+import { IntroVideoOverlay } from '../../components/IntroVideoOverlay'
+import { PersonaSelector, type Persona } from '../../components/PersonaSelector'
+import { useAmbientAudio } from '../../hooks/useAmbientAudio'
+// toMediaUrl removed from direct import - used in child components
 
 interface Project {
   id: string
@@ -12,6 +16,9 @@ interface Project {
   reraNumber: string
   themeAccentColor: string
   themeFontPairing: string
+  introVideoMediaId?: string | null
+  ambientAudioMediaId?: string | null
+  media?: { id: string; filePath: string; category: string }[]
 }
 
 interface ModuleRecord {
@@ -170,7 +177,7 @@ function ShortlistDrawer({
       <div
         onClick={onClose}
         style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+          position: 'fixed', inset: 0, background: 'var(--backdrop-modal)',
           backdropFilter: 'blur(4px)', zIndex: 200, animation: 'fadeIn 0.2s ease'
         }}
       />
@@ -223,7 +230,7 @@ function ShortlistDrawer({
                 padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
               }}>
                 <div>
-                  <div style={{ fontWeight: 600, color: '#fff', fontSize: 'var(--font-size-base)' }}>
+                  <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', fontSize: 'var(--font-size-base)' }}>
                     {item.towerName} · Unit {item.unitNumber}
                   </div>
                   <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 4 }}>
@@ -258,7 +265,7 @@ function ShortlistDrawer({
               style={{
                 all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', gap: 8, padding: '14px',
-                background: 'var(--color-accent)', color: '#000', fontWeight: 700,
+                background: 'var(--color-accent)', color: 'var(--color-bg)', fontWeight: 700,
                 borderRadius: 'var(--radius-md)', fontSize: 'var(--font-size-base)',
                 transition: 'all var(--transition-fast)',
               }}
@@ -286,7 +293,7 @@ function ShortlistDrawer({
 
         {showExport && (
           <div style={{
-            position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.85)',
+            position: 'absolute', inset: 0, background: 'var(--backdrop-modal)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10,
             padding: 24
           }}>
@@ -306,7 +313,7 @@ function ShortlistDrawer({
                   required
                   style={{
                     width: '100%', padding: '10px 14px', borderRadius: 8,
-                    border: '1px solid var(--color-border)', background: 'var(--color-surface-raised)', color: '#fff',
+                    border: '1px solid var(--color-border)', background: 'var(--color-surface-raised)', color: 'var(--color-text-primary)',
                     fontSize: 'var(--font-size-base)', fontFamily: 'var(--font-sans)',
                     outline: 'none'
                   }}
@@ -315,13 +322,13 @@ function ShortlistDrawer({
               <div style={{ display: 'flex', gap: 12 }}>
                 <button type="button" onClick={() => setShowExport(false)} style={{
                   flex: 1, padding: '12px', borderRadius: 8, border: '1px solid var(--color-border)',
-                  background: 'transparent', color: '#fff', cursor: 'pointer', fontWeight: 500
+                  background: 'transparent', color: 'var(--color-text-primary)', cursor: 'pointer', fontWeight: 500
                 }}>
                   Back
                 </button>
                 <button type="submit" disabled={exporting} style={{
                   flex: 2, padding: '12px', borderRadius: 8, border: 'none',
-                  background: 'var(--color-accent)', color: '#000', cursor: 'pointer', fontWeight: 700
+                  background: 'var(--color-accent)', color: 'var(--color-bg)', cursor: 'pointer', fontWeight: 700
                 }}>
                   {exporting ? 'Generating…' : 'Download PDF'}
                 </button>
@@ -346,6 +353,12 @@ export default function ProjectShowcase(): JSX.Element {
   const [showLeadModal, setShowLeadModal] = useState(true)
   const [showShortlist, setShowShortlist] = useState(false)
 
+  // Intro video, persona, ambient audio
+  const [showIntroVideo, setShowIntroVideo] = useState(false)
+  const [introVideoPath, setIntroVideoPath] = useState<string | null>(null)
+  const [showPersona, setShowPersona] = useState(false)
+  const [_persona, setPersona] = useState<Persona | null>(null)
+
   // Lead capture
   const [leadName, setLeadName] = useState('')
   const [leadPhone, setLeadPhone] = useState('')
@@ -357,6 +370,12 @@ export default function ProjectShowcase(): JSX.Element {
   const [sectionsViewed, setSectionsViewed] = useState<Set<string>>(new Set(['OVERVIEW']))
 
   const { items: shortlistItems } = useShortlistStore()
+
+  // Ambient audio � resolved after project loads
+  const ambientAudioPath = (project as any)?.ambientAudioMediaId && (project as any)?.media
+    ? ((project as any).media as {id:string;filePath:string}[]).find((m) => m.id === (project as any).ambientAudioMediaId)?.filePath ?? null
+    : null
+  const { muted, toggleMute, hasAudio } = useAmbientAudio(ambientAudioPath)
 
   const { startHold, endHold } = useKioskExit({
     onExit: () => setShowPinModal(true),
@@ -387,6 +406,17 @@ export default function ProjectShowcase(): JSX.Element {
     window.api.invoke(IPC_CHANNELS.SESSION_START, { projectId: project.id })
       .then((res: any) => res?.id && setSessionId(res.id))
       .catch(console.error)
+
+    // Trigger intro video if configured
+    if ((project as any).introVideoMediaId && (project as any).media) {
+      const introMedia = ((project as any).media as {id:string;filePath:string}[]).find(
+        (m) => m.id === (project as any).introVideoMediaId
+      )
+      if (introMedia?.filePath) {
+        setIntroVideoPath(introMedia.filePath)
+        setShowIntroVideo(true)
+      }
+    }
 
     return () => {
       document.documentElement.style.removeProperty('--project-accent')
@@ -443,11 +473,17 @@ export default function ProjectShowcase(): JSX.Element {
         notes: `Session start — ${project.name}`,
       })
       setShowLeadModal(false)
+      setShowPersona(true)
     } catch (err) {
       console.error(err)
     } finally {
       setSubmittingLead(false)
     }
+  }
+
+  const handlePersonaSelect = (p: Persona) => {
+    setPersona(p)
+    setShowPersona(false)
   }
 
   const activeModule = modules.find((m) => m.id === activeModuleId) ?? modules[0]
@@ -457,6 +493,14 @@ export default function ProjectShowcase(): JSX.Element {
 
   return (
     <div className="showcase">
+      {/* Intro Video Overlay */}
+      {showIntroVideo && introVideoPath && (
+        <IntroVideoOverlay mediaFilePath={introVideoPath} onComplete={() => setShowIntroVideo(false)} />
+      )}
+      {/* Persona Selector */}
+      {showPersona && (
+        <PersonaSelector onSelect={handlePersonaSelect} onSkip={() => setShowPersona(false)} />
+      )}
       {/* Corner hold zone for admin PIN */}
       <div
         className="kiosk-exit-corner"
@@ -505,12 +549,28 @@ export default function ProjectShowcase(): JSX.Element {
             <span style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)',
-              color: '#000', fontSize: 11, fontWeight: 800
+              color: 'var(--color-bg)', fontSize: 11, fontWeight: 800
             }}>
               {shortlistItems.length}
             </span>
           )}
         </button>
+        {/* Ambient audio mute button */}
+        {hasAudio && (
+          <button
+            onClick={toggleMute}
+            title={muted ? "Unmute ambient audio" : "Mute ambient audio"}
+            style={{
+              all: "unset", cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+              padding: "10px 14px", borderRadius: "var(--radius-sm)",
+              background: "var(--color-surface-raised)", border: "1px solid var(--color-border)",
+              fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)",
+              transition: "all var(--transition-fast)",
+            }}
+          >
+            {muted ? "??" : "??"}
+          </button>
+        )}
       </header>
 
       {/* Tab navigation */}
@@ -562,7 +622,7 @@ export default function ProjectShowcase(): JSX.Element {
       {/* Lead capture modal */}
       {showLeadModal && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)',
+          position: 'fixed', inset: 0, background: 'var(--backdrop-modal)',
           backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center',
           justifyContent: 'center', zIndex: 300, animation: 'fadeIn 0.25s ease'
         }}>
@@ -606,7 +666,7 @@ export default function ProjectShowcase(): JSX.Element {
                   style={{
                     width: '100%', padding: '12px 14px', borderRadius: 10,
                     border: '1px solid var(--color-border)', background: 'var(--color-surface-raised)',
-                    color: '#fff', fontSize: 'var(--font-size-base)', fontFamily: 'var(--font-sans)', outline: 'none'
+                    color: 'var(--color-text-primary)', fontSize: 'var(--font-size-base)', fontFamily: 'var(--font-sans)', outline: 'none'
                   }}
                 />
               </div>
@@ -630,7 +690,7 @@ export default function ProjectShowcase(): JSX.Element {
                 type="submit"
                 disabled={submittingLead}
                 style={{
-                  flex: 1, padding: '14px', background: 'var(--color-accent)', color: '#000',
+                  flex: 1, padding: '14px', background: 'var(--color-accent)', color: 'var(--color-bg)',
                   border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 'var(--font-size-base)',
                   cursor: 'pointer', fontFamily: 'var(--font-sans)',
                   transition: 'opacity var(--transition-fast)', opacity: submittingLead ? 0.7 : 1
@@ -645,3 +705,9 @@ export default function ProjectShowcase(): JSX.Element {
     </div>
   )
 }
+
+
+
+
+
+

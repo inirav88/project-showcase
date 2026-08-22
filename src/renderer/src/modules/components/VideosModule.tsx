@@ -65,7 +65,7 @@ export default function VideosModule({ projectId }: { config: Record<string, any
                 autoPlay={false}
                 style={{
                   width: '100%',
-                  backgroundColor: '#000',
+                  backgroundColor: 'var(--color-bg)',
                   aspectRatio: '16/9',
                   display: 'block',
                 }}
@@ -136,7 +136,7 @@ export default function VideosModule({ projectId }: { config: Record<string, any
                       {/* Thumbnail */}
                       <div style={{
                         width: 60, height: 38, borderRadius: 6,
-                        background: vid.thumbnailPath ? 'transparent' : '#111',
+                        background: vid.thumbnailPath ? 'transparent' : 'var(--color-surface)',
                         overflow: 'hidden', flexShrink: 0, position: 'relative',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
@@ -147,7 +147,7 @@ export default function VideosModule({ projectId }: { config: Record<string, any
                         )}
                         {isActive && (
                           <div style={{
-                            position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
+                            position: 'absolute', inset: 0, background: 'var(--backdrop-modal)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             color: 'var(--color-accent)', fontSize: 14,
                           }}>▶</div>
