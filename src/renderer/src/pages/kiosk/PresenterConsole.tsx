@@ -90,11 +90,11 @@ export default function PresenterConsole(): JSX.Element {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--color-accent)' }}>?? Sales Presenter Control Console</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--color-accent)' }}>💼 Sales Presenter Control Console</h1>
           <p style={{ fontSize: 12, color: '#a1a1aa', margin: '4px 0 0' }}>Dual-Screen mode active for: <strong>{project.name}</strong></p>
         </div>
         <div style={{ background: '#22c55e20', border: '1px solid #22c55e40', padding: '6px 12px', borderRadius: 20, fontSize: 11, color: '#22c55e', fontWeight: 600 }}>
-          ? Synchronized with Client TV
+          🟢 Synchronized with Client TV
         </div>
       </header>
 
@@ -122,7 +122,7 @@ export default function PresenterConsole(): JSX.Element {
                 >
                   <span>{MODULE_LABELS[mod.moduleType] || mod.moduleType}</span>
                   <span style={{ fontSize: 11, opacity: isActive ? 1 : 0.4 }}>
-                    {isActive ? 'Showing ?' : 'Show ?'}
+                    {isActive ? 'Showing 🟢' : 'Show ➔'}
                   </span>
                 </button>
               )
@@ -136,7 +136,7 @@ export default function PresenterConsole(): JSX.Element {
             <>
               <div style={{ background: '#1c1c20', borderRadius: 12, padding: 28, border: '1px solid #27272a' }}>
                 <h2 style={{ fontSize: 18, margin: '0 0 12px 0', color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  ??? Presenter Script & Strategic Notes
+                  📝 Presenter Script & Strategic Notes
                 </h2>
                 <div style={{
                   fontSize: 15, lineHeight: 1.6, color: '#e4e4e7', background: '#121214',

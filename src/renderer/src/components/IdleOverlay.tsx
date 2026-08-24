@@ -55,7 +55,7 @@ export function IdleOverlay({ heroImages, onDismiss }: Props) {
       <div style={{
         position: 'relative', textAlign: 'center', color: '#fff', padding: '0 24px',
       }}>
-        <div style={{ fontSize: 56, marginBottom: 16, opacity: 0.9 }}>???</div>
+        <div style={{ fontSize: 56, marginBottom: 16, opacity: 0.9 }}>✨</div>
         <h2 style={{
           fontSize: 'clamp(24px,3vw,40px)', fontWeight: 800, letterSpacing: '-0.03em',
           marginBottom: 16, textShadow: '0 2px 12px rgba(0,0,0,0.5)',

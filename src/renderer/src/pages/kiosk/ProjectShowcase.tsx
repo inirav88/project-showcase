@@ -303,7 +303,7 @@ function ShortlistDrawer({
             gap: '12px'
           }}>
             <div style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span>??</span> QR Take-Away
+              <span>📱</span> QR Take-Away
             </div>
             
             <div style={{ display: 'flex', background: 'var(--color-bg)', borderRadius: 8, padding: 2, width: '100%' }}>
