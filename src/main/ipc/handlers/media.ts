@@ -61,8 +61,11 @@ export class MediaHandlers {
           .run()
       })
       targetFilePath = convertedPath
-    } else if (['VIDEO', 'INTRO_VIDEO'].includes(category) || ['.mov', '.mkv', '.avi', '.mp4'].includes(fileExt)) {
-      // Compress video to H.264 1080p MP4 for stable performance (FR-8)
+    } else if (fileExt === '.mp4') {
+      // Standard MP4 is natively supported by Chromium. Copy directly for instant upload (no transcoding delay).
+      fs.copyFileSync(filePath, targetFilePath)
+    } else if (['VIDEO', 'INTRO_VIDEO'].includes(category) || ['.mov', '.mkv', '.avi'].includes(fileExt)) {
+      // Compress other formats to H.264 1080p MP4 for stable performance (FR-8)
       const compressedPath = path.join(this.mediaDir, uniqueName + '.mp4')
       await new Promise<void>((resolve, reject) => {
         ffmpeg(filePath)
