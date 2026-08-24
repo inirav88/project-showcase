@@ -15,7 +15,7 @@ export function getDb(): PrismaClient {
       : path.join(app.getPath('userData'), 'showcaseos.db')
 
     // Initialize production database from the bundled template on first app startup
-    if (!isDev && !fs.existsSync(dbPath)) {
+    if (!isDev && (!fs.existsSync(dbPath) || fs.statSync(dbPath).size === 0)) {
       const dbDir = path.dirname(dbPath)
       if (!fs.existsSync(dbDir)) {
         fs.mkdirSync(dbDir, { recursive: true })
@@ -36,4 +36,5 @@ export function getDb(): PrismaClient {
   }
   return _client
 }
+
 
