@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+ï»¿import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { toMediaUrl } from '../../utils/media'
@@ -354,7 +354,7 @@ export default function ProjectLauncher(): JSX.Element {
                   <div className="tile-meta">{p.developer} {String.fromCharCode(8226)} {p.location}</div>
                   <div className="tile-badges">
                     <span className="price-badge">
-                      {formatPrice(p.priceRangeMin)} — {formatPrice(p.priceRangeMax)}
+                      {formatPrice(p.priceRangeMin)} {" \u2014 "} {formatPrice(p.priceRangeMax)}
                     </span>
                     <span className={`possession-badge ${p.possessionStatus}`}>
                       {p.possessionStatus === 'READY' ? 'Ready' : 'Under Const.'}
@@ -379,5 +379,8 @@ export default function ProjectLauncher(): JSX.Element {
     </div>
   )
 }
+
+
+
 
 

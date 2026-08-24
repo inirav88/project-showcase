@@ -1,4 +1,4 @@
-import React from 'react'
+ï»¿import React from 'react'
 
 export type Persona = 'END_USE' | 'INVESTMENT' | 'NRI'
 
@@ -106,11 +106,14 @@ export function PersonaSelector({ onSelect, onSkip }: Props) {
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text-primary)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
           >
-            Skip — general browse
+            Skip {" \u2014 "} general browse
           </button>
         </div>
       </div>
     </div>
   )
 }
+
+
+
 
