@@ -1,9 +1,9 @@
-﻿import { app, BrowserWindow, shell, protocol, net, Menu, MenuItemConstructorOptions, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, shell, protocol, net, Menu, MenuItemConstructorOptions, ipcMain, screen } from 'electron'
 import path, { join } from 'path'
 import fs from 'fs'
 import { pathToFileURL } from 'url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { kioskWindowOptions, adminWindowOptions } from './windows/kioskWindow'
+import { kioskWindowOptions } from './windows/kioskWindow'
 import { getDb } from './db/client'
 import { ModuleHandlers } from './ipc/handlers/modules'
 import { ProjectHandlers } from './ipc/handlers/projects'
@@ -41,15 +41,12 @@ protocol.registerSchemesAsPrivileged([
 const isProd = !is.dev
 
 let kioskWin: BrowserWindow | null = null
-let adminWin: BrowserWindow | null = null
 let presenterWin: BrowserWindow | null = null
 
 function createWindows(): void {
   kioskWin = new BrowserWindow(kioskWindowOptions(isProd))
-  adminWin = new BrowserWindow(adminWindowOptions())
 
   kioskWin.on('ready-to-show', () => kioskWin?.show())
-  adminWin.on('ready-to-show', () => adminWin?.show())
 
   kioskWin.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -58,10 +55,8 @@ function createWindows(): void {
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     kioskWin.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#/kiosk')
-    adminWin.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#/admin')
   } else {
     kioskWin.loadFile(join(__dirname, '../renderer/index.html'), { hash: '/kiosk' })
-    adminWin.loadFile(join(__dirname, '../renderer/index.html'), { hash: '/admin' })
   }
 }
 
