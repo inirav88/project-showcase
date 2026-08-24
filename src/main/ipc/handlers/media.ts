@@ -9,7 +9,11 @@ import sharp from 'sharp'
 
 // Wire up the static path for fluent-ffmpeg wrapper
 if (ffmpegStatic) {
-  ffmpeg.setFfmpegPath(ffmpegStatic)
+  let ffmpegPath = ffmpegStatic
+  if (ffmpegPath.includes('app.asar') && !ffmpegPath.includes('app.asar.unpacked')) {
+    ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked')
+  }
+  ffmpeg.setFfmpegPath(ffmpegPath)
 }
 
 export class MediaHandlers {

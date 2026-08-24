@@ -91,7 +91,8 @@
                               "target":  "dmg"
                           },
                   "asarUnpack":  [
-                                     "node_modules/@prisma/client/showcase-client/**/*"
+                                     "node_modules/@prisma/client/showcase-client/**/*",
+                                     "node_modules/ffmpeg-static/**/*"
                                  ]
               }
 }
