@@ -9,11 +9,11 @@
                     "dev":  "electron-vite dev",
                     "build":  "electron-vite build",
                     "preview":  "electron-vite preview",
-                    "package":  "electron-vite build \u0026\u0026 electron-builder",
+                    "package":  "electron-vite build \u0026\u0026 node scripts/patch-prisma-client.js \u0026\u0026 electron-builder",
                     "test":  "vitest run",
                     "test:ui":  "vitest --ui",
                     "test:watch":  "vitest",
-                    "prisma:generate":  "prisma generate",
+                    "prisma:generate":  "prisma generate \u0026\u0026 node scripts/patch-prisma-client.js",
                     "prisma:migrate":  "prisma migrate dev",
                     "prisma:seed":  "ts-node --project tsconfig.node.json prisma/seed.ts",
                     "prisma:studio":  "prisma studio"
