@@ -400,14 +400,22 @@ export default function ProjectLauncher(): JSX.Element {
             const score = matchScores?.[p.id]
             const isCompareSelected = compareSelected.some((s) => s.id === p.id)
             return (
-              <button
+              <div
                 key={p.id}
+                role="button"
+                tabIndex={0}
                 className={`project-tile${isCompareSelected ? ' compare-selected' : ''}`}
                 style={{
                   '--project-accent': p.themeAccentColor,
                   ...(isCompareSelected ? { outline: `3px solid ${p.themeAccentColor}`, outlineOffset: 3 } : {}),
                 } as React.CSSProperties}
                 onClick={() => handleProjectClick(p)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleProjectClick(p)
+                  }
+                }}
               >
                 <div className="project-tile-image-wrap">
                   {p.thumbnailPath ? (
@@ -468,7 +476,7 @@ export default function ProjectLauncher(): JSX.Element {
                     )}
                   </div>
                 </div>
-              </button>
+              </div>
             )
           })}
         </div>

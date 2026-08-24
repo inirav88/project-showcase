@@ -466,7 +466,7 @@ html, body, #root {
 
 /* ─── Project Tile ───────────────────────────────────────────────────────────── */
 .project-tile {
-  all: unset;
+  box-sizing: border-box;
   cursor: pointer;
   display: flex;
   flex-direction: column;
