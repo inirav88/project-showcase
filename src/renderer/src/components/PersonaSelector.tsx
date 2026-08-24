@@ -106,10 +106,11 @@ export function PersonaSelector({ onSelect, onSkip }: Props) {
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text-primary)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
           >
-            Skip \u2014 general browse
+            Skip — general browse
           </button>
         </div>
       </div>
     </div>
   )
 }
+

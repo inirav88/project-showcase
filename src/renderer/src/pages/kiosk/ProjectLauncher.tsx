@@ -354,7 +354,7 @@ export default function ProjectLauncher(): JSX.Element {
                   <div className="tile-meta">{p.developer} {String.fromCharCode(8226)} {p.location}</div>
                   <div className="tile-badges">
                     <span className="price-badge">
-                      {formatPrice(p.priceRangeMin)} \u2014 {formatPrice(p.priceRangeMax)}
+                      {formatPrice(p.priceRangeMin)} — {formatPrice(p.priceRangeMax)}
                     </span>
                     <span className={`possession-badge ${p.possessionStatus}`}>
                       {p.possessionStatus === 'READY' ? 'Ready' : 'Under Const.'}
@@ -379,4 +379,5 @@ export default function ProjectLauncher(): JSX.Element {
     </div>
   )
 }
+
 
