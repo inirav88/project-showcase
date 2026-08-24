@@ -32,7 +32,12 @@
                          "react":  "^18.3.1",
                          "react-dom":  "^18.3.1",
                          "react-router-dom":  "^6.27.0",
-                         "zustand":  "^5.0.1"
+                         "zustand":  "^5.0.1",
+                         "sharp":  "^0.33.5",
+                         "adm-zip":  "^0.5.18",
+                         "csv-parse":  "^5.5.6",
+                         "ffmpeg-static":  "^5.2.0",
+                         "zod":  "^3.23.8"
                      },
     "devDependencies":  {
                             "@electron-toolkit/eslint-config-prettier":  "^2.0.0",
@@ -51,23 +56,18 @@
                             "@types/react":  "^18.3.12",
                             "@types/react-dom":  "^18.3.1",
                             "@vitejs/plugin-react":  "^4.3.3",
-                            "adm-zip":  "^0.5.18",
-                            "csv-parse":  "^5.5.6",
                             "electron":  "^33.4.11",
                             "electron-builder":  "^25.1.8",
                             "electron-vite":  "^2.3.0",
-                            "ffmpeg-static":  "^5.2.0",
                             "happy-dom":  "^20.11.2",
                             "jsdom":  "^25.0.1",
                             "pdf-parse":  "^1.1.1",
                             "prisma":  "^5.22.0",
                             "react-hook-form":  "^7.53.2",
-                            "sharp":  "^0.33.5",
                             "ts-node":  "^10.9.2",
                             "typescript":  "^5.6.3",
                             "vite":  "^5.4.11",
-                            "vitest":  "^2.1.5",
-                            "zod":  "^3.23.8"
+                            "vitest":  "^2.1.5"
                         },
     "prisma":  {
                    "seed":  "ts-node --project tsconfig.node.json prisma/seed.ts"
