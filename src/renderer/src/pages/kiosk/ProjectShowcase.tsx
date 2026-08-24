@@ -474,16 +474,23 @@ export default function ProjectShowcase(): JSX.Element {
       el.scrollLeft = scrollLeft - walk
     }
 
+    // Prevent default dragstart event so clicking/dragging on tabs doesn't trigger native drag-and-drop
+    const onDragStart = (e: DragEvent) => {
+      e.preventDefault()
+    }
+
     el.addEventListener('mousedown', onMouseDown)
     el.addEventListener('mouseleave', onMouseLeave)
     el.addEventListener('mouseup', onMouseUp)
     el.addEventListener('mousemove', onMouseMove)
+    el.addEventListener('dragstart', onDragStart)
 
     return () => {
       el.removeEventListener('mousedown', onMouseDown)
       el.removeEventListener('mouseleave', onMouseLeave)
       el.removeEventListener('mouseup', onMouseUp)
       el.removeEventListener('mousemove', onMouseMove)
+      el.removeEventListener('dragstart', onDragStart)
     }
   }, [])
 
