@@ -82,16 +82,15 @@
                                 "out/**/*",
                                 "node_modules/**/*"
                             ],
-                  "asarUnpack":  [
-                                     "node_modules/.prisma/**/*",
-                                     "node_modules/@prisma/client/**/*"
-                                 ],
                   "extraResources":  "dev.db",
                   "win":  {
                               "target":  "nsis"
                           },
                   "mac":  {
                               "target":  "dmg"
-                          }
+                          },
+                  "asarUnpack":  [
+                                     "node_modules/@prisma/client/showcase-client/**/*"
+                                 ]
               }
 }
