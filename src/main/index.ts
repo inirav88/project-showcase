@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, protocol, net, Menu, MenuItemConstructorOptions, ipcMain, screen } from 'electron'
+ï»¿import { app, BrowserWindow, shell, protocol, net, Menu, MenuItemConstructorOptions, ipcMain, screen } from 'electron'
 import path, { join } from 'path'
 import fs from 'fs'
 import { pathToFileURL } from 'url'
@@ -121,7 +121,7 @@ app.whenReady().then(async () => {
     new UsbHandlers(db, appDataPath, dbPath).registerIpc()
     new SyncHandlers(db).registerIpc()
 
-    // Register dialog (file picker) handlers — no DB dependency
+    // Register dialog (file picker) handlers ï¿½ no DB dependency
     registerDialogHandlers()
 
     // Register system:secondDisplay IPC handler for presenter console
@@ -220,7 +220,7 @@ app.whenReady().then(async () => {
 
       const normalizedPath = path.normalize(filePath)
       if (!fs.existsSync(normalizedPath)) { console.warn(`[Media Protocol] WARNING: File does not exist at: ${normalizedPath}`); return new Response("File not found", { status: 404 }); }
-      return net.fetch(pathToFileURL(normalizedPath).toString())
+      return net.fetch(pathToFileURL(normalizedPath).toString(), { method: request.method, headers: request.headers })
     })
 
   } catch (error) {
@@ -240,6 +240,7 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
 
 
 

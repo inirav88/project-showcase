@@ -119,7 +119,17 @@ export default function VideosModule({ projectId }: { config: Record<string, any
                   return (
                     <button
                       key={vid.id}
-                      onClick={() => setActiveVideo(vid)}
+                      onClick={() => {
+                        if (activeVideo?.id === vid.id) {
+                          const videoEl = document.querySelector('video')
+                          if (videoEl) {
+                            videoEl.currentTime = 0
+                            videoEl.play().catch(console.error)
+                          }
+                        } else {
+                          setActiveVideo(vid)
+                        }
+                      }}
                       style={{
                         all: 'unset', cursor: 'pointer', display: 'flex',
                         gap: 'var(--space-3)', alignItems: 'center',
