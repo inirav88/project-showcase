@@ -748,6 +748,14 @@ html, body, #root {
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
+  touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.module-tabs-bar:active {
+  cursor: grabbing;
 }
 
 .module-tabs-bar::-webkit-scrollbar { display: none; }

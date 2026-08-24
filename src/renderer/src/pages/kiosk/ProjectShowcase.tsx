@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useKioskExit } from '../../hooks/useKioskExit'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
@@ -441,6 +441,52 @@ export default function ProjectShowcase(): JSX.Element {
   const [modules, setModules] = useState<ModuleRecord[]>([])
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null)
 
+  const tabsRef = useRef<HTMLElement>(null)
+
+  // Implement mouse click-and-drag horizontal scrolling for the tab navigation
+  useEffect(() => {
+    const el = tabsRef.current
+    if (!el) return
+
+    let isDown = false
+    let startX: number
+    let scrollLeft: number
+
+    const onMouseDown = (e: MouseEvent) => {
+      isDown = true
+      startX = e.pageX - el.offsetLeft
+      scrollLeft = el.scrollLeft
+    }
+
+    const onMouseLeave = () => {
+      isDown = false
+    }
+
+    const onMouseUp = () => {
+      isDown = false
+    }
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return
+      e.preventDefault()
+      const x = e.pageX - el.offsetLeft
+      const walk = (x - startX) * 1.5 // Speed multiplier
+      el.scrollLeft = scrollLeft - walk
+    }
+
+    el.addEventListener('mousedown', onMouseDown)
+    el.addEventListener('mouseleave', onMouseLeave)
+    el.addEventListener('mouseup', onMouseUp)
+    el.addEventListener('mousemove', onMouseMove)
+
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown)
+      el.removeEventListener('mouseleave', onMouseLeave)
+      el.removeEventListener('mouseup', onMouseUp)
+      el.removeEventListener('mousemove', onMouseMove)
+    }
+  }, [])
+
   const [showPinModal, setShowPinModal] = useState(false)
   const [showLeadModal, setShowLeadModal] = useState(true)
   const [showShortlist, setShowShortlist] = useState(false)
@@ -756,7 +802,7 @@ export default function ProjectShowcase(): JSX.Element {
       </header>
 
       {/* Tab navigation */}
-      <nav className="module-tabs-bar" role="tablist">
+      <nav ref={tabsRef} className="module-tabs-bar" role="tablist">
         {modules.map((mod) => (
           <button
             key={mod.id}
