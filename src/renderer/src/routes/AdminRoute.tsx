@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../main/ipc/channels'
 import { toMediaUrl } from '../utils/media'
 import { ThemeToggle } from '../components/ThemeToggle'
@@ -975,6 +976,7 @@ interface Settings {
 }
 
 export default function AdminRoute(): JSX.Element {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'projects' | 'modules' | 'media' | 'units' | 'sessions' | 'leads' | 'staff' | 'appointments' | 'analytics' | 'backup' | 'settings'>('projects')
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string>('')
@@ -1651,7 +1653,25 @@ export default function AdminRoute(): JSX.Element {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Launch Kiosk button — switches back to the client-facing kiosk view */}
+            <button
+              onClick={() => navigate('/')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '8px 16px', borderRadius: '8px',
+                background: 'var(--color-accent)', color: '#fff',
+                border: 'none', cursor: 'pointer',
+                fontSize: '13px', fontWeight: 700,
+                fontFamily: 'var(--font-sans)',
+                transition: 'opacity 0.15s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+              title="Switch to client kiosk view"
+            >
+              {String.fromCodePoint(128250)} Launch Kiosk
+            </button>
             <ThemeToggle />
             
             {/* Project Selector (only for tabs that need a project context) */}
