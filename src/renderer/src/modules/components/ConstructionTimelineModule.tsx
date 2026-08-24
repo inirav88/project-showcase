@@ -130,21 +130,7 @@ export default function ConstructionTimelineModule({ config, projectId: _project
         </div>
       </div>
 
-      {/* Helper documentation inside raw editor default */}
-      {!config.milestones && (
-        <div style={{
-          background: 'rgba(59,130,246,0.06)',
-          border: '1px dashed rgba(59,130,246,0.3)',
-          borderRadius: 'var(--radius-md)',
-          padding: 'var(--space-4)',
-          marginBottom: 'var(--space-6)',
-          fontSize: 13,
-          color: 'var(--color-text-primary)',
-          lineHeight: 1.5,
-        }}>
-          {String.fromCharCode(128161)} <strong>Tip for Administrators:</strong> Currently viewing demo construction data. To configure your own milestones, open the **Modules Management** panel in Admin, expand **CONSTRUCTION TIMELINE**, and configure the JSON schema (e.g. <code>{`{ "milestones": [{ "title": "Clearance", "status": "COMPLETED", "progress": 100, "date": "Jan 2026", "description": "Details..." }] }`}</code>).
-        </div>
-      )}
+
 
       {/* Timeline Layout */}
       <div style={{ position: 'relative', paddingLeft: 40, marginTop: 'var(--space-4)' }}>
