@@ -385,6 +385,7 @@ html, body, #root {
 /* ─── Search + Filter Bar ────────────────────────────────────────────────────── */
 .filter-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
   align-items: center;
   background: var(--color-surface);
@@ -456,7 +457,7 @@ html, body, #root {
 /* ─── Project Grid ───────────────────────────────────────────────────────────── */
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(calc(300px * var(--font-scale, 1)), 1fr));
   gap: var(--space-5);
   overflow-y: auto;
   flex: 1;
@@ -470,7 +471,7 @@ html, body, #root {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  min-height: 310px;
+  min-height: calc(310px * var(--font-scale, 1));
   background: var(--glass-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
