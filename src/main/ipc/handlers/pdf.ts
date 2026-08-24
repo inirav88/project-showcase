@@ -1,5 +1,5 @@
 import { ipcMain, dialog } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib'
 import fs from 'fs'
@@ -108,3 +108,4 @@ export class PdfHandlers {
     )
   }
 }
+

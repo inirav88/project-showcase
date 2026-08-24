@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/showcase-client'
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
 import { createClient } from '@libsql/client'
 import path from 'path'
@@ -36,3 +36,4 @@ export function getDb(): PrismaClient {
   }
   return _client
 }
+

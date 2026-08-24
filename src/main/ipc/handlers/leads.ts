@@ -1,5 +1,5 @@
 import { ipcMain, dialog } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import fs from 'fs'
 import path from 'path'
@@ -80,3 +80,4 @@ export class LeadHandlers {
     ipcMain.handle(IPC_CHANNELS.LEAD_EXPORT_CSV, () => this.exportCsv())
   }
 }
+

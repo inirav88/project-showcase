@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import crypto from 'crypto'
 
@@ -44,3 +44,4 @@ export class SettingsHandlers {
     ipcMain.handle(IPC_CHANNELS.SETTINGS_VERIFY_PIN, (_, pin: string) => this.verifyPin(pin))
   }
 }
+

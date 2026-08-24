@@ -86,10 +86,7 @@
                                      "node_modules/.prisma/**/*",
                                      "node_modules/@prisma/client/**/*"
                                  ],
-                  "extraResources":  [
-                                         "dev.db",
-                                         "node_modules/.prisma/**/*"
-                                     ],
+                  "extraResources":  "dev.db",
                   "win":  {
                               "target":  "nsis"
                           },

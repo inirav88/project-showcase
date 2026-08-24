@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import { parse } from 'csv-parse/sync'
 import { z } from 'zod'
@@ -172,5 +172,6 @@ export class UnitHandlers {
     ipcMain.handle(IPC_CHANNELS.TOWER_DELETE, (_, towerId: string) => this.deleteTower(towerId))
   }
 }
+
 
 

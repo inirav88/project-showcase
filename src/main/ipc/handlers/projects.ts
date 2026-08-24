@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import { z } from 'zod'
 
@@ -83,3 +83,4 @@ export class ProjectHandlers {
     ipcMain.handle(IPC_CHANNELS.PROJECT_ARCHIVE, (_, id: string) => this.archive(id))
   }
 }
+

@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import path from 'path'
 import fs from 'fs'
@@ -166,4 +166,5 @@ export class MediaHandlers {
     ipcMain.handle(IPC_CHANNELS.MEDIA_DELETE, (_, id: string) => this.delete(id))
   }
 }
+
 

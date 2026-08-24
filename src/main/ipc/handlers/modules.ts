@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 
 export class ModuleHandlers {
@@ -36,3 +36,4 @@ export class ModuleHandlers {
     ipcMain.handle(IPC_CHANNELS.MODULE_UPSERT, (_, data: any) => this.upsert(data))
   }
 }
+

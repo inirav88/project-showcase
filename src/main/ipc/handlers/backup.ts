@@ -1,5 +1,5 @@
 import { ipcMain, dialog, app } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import path from 'path'
 import fs from 'fs'
@@ -127,3 +127,4 @@ export class BackupHandlers {
     })
   }
 }
+

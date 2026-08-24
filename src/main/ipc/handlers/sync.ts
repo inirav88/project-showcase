@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 
 export class SyncHandlers {
@@ -142,4 +142,5 @@ export class SyncHandlers {
     ipcMain.handle(IPC_CHANNELS.SYNC_PUBLISH_NOW, () => this.publishNow())
   }
 }
+
 

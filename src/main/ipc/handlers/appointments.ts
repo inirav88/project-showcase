@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 
 export class AppointmentHandlers {
@@ -53,3 +53,4 @@ export class AppointmentHandlers {
     )
   }
 }
+
