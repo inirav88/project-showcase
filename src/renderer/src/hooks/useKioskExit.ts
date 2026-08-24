@@ -5,7 +5,7 @@ interface Options {
   holdMs?: number
 }
 
-export function useKioskExit({ onExit, holdMs = 5000 }: Options): {
+export function useKioskExit({ onExit, holdMs = 3000 }: Options): {
   startHold: () => void
   endHold: () => void
 } {
