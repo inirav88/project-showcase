@@ -1,15 +1,16 @@
 /**
  * patch-prisma-client.js
  *
- * Prisma v5 generates code with Node.js package subpath imports (# imports)
- * which Electron's ASAR virtual filesystem does NOT support, causing crashes.
+ * Prisma v5 generates a package.json with `exports` and `imports` fields.
+ * Both of these trigger Node.js ESM-style resolution code paths that
+ * Electron's ASAR virtual filesystem does NOT support, causing a crash.
+ *
+ * Without `exports`/`imports`, Node falls back to the `main` field which
+ * goes through the normal CJS require path that Electron DOES patch correctly.
  *
  * This script:
- * 1. Patches default.js to not use #main-entry-point
- * 2. Removes the `imports` field from package.json so Node never tries to
- *    resolve any # subpath from within this package scope
- *
- * Run this after every `prisma generate` as part of the build pipeline.
+ * 1. Patches default.js to use ./index.js directly
+ * 2. Removes `exports` AND `imports` from package.json
  */
 const fs = require('fs')
 const path = require('path')
@@ -19,7 +20,7 @@ const clientDir = path.join(__dirname, '../node_modules/@prisma/client/showcase-
 // --- 1. Patch default.js ---
 const defaultJsPath = path.join(clientDir, 'default.js')
 if (!fs.existsSync(defaultJsPath)) {
-  console.error('[patch-prisma] ERROR: default.js not found at', defaultJsPath)
+  console.error('[patch-prisma] ERROR: default.js not found. Run prisma generate first.')
   process.exit(1)
 }
 const defaultJs = fs.readFileSync(defaultJsPath, 'utf-8')
@@ -30,15 +31,20 @@ if (defaultJs.includes('#main-entry-point')) {
   console.log('[patch-prisma] default.js already patched')
 }
 
-// --- 2. Remove `imports` from package.json ---
-// The `imports` field defines Node.js package subpath imports (# imports).
-// Electron ASAR cannot resolve these, so we remove the field entirely.
+// --- 2. Remove `exports` AND `imports` from package.json ---
+// Both fields trigger ESM-style resolution (resolveExports/finalizeEsmResolution)
+// that Electron's ASAR cannot handle. Without them, Node uses the `main` field
+// which goes through the normal CJS path that Electron patches correctly.
 const pkgPath = path.join(clientDir, 'package.json')
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-if (pkg.imports) {
-  delete pkg.imports
+
+let changed = false
+if (pkg.exports) { delete pkg.exports; changed = true }
+if (pkg.imports) { delete pkg.imports; changed = true }
+
+if (changed) {
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2))
-  console.log('[patch-prisma] Removed "imports" field from package.json')
+  console.log('[patch-prisma] Removed exports/imports from package.json')
 } else {
   console.log('[patch-prisma] package.json already patched')
 }
