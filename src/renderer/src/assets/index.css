@@ -470,6 +470,7 @@ html, body, #root {
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  min-height: 310px;
   background: var(--glass-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -522,6 +523,30 @@ html, body, #root {
 
 .project-tile:hover .project-tile-image-wrap img {
   transform: scale(1.06);
+}
+
+.project-tile-logo-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(14, 14, 24, 0.45);
+  pointer-events: none;
+  backdrop-filter: blur(1px);
+}
+
+.project-tile-logo-overlay img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  transition: transform 300ms var(--ease-out);
+}
+
+.project-tile:hover .project-tile-logo-overlay img {
+  transform: scale(1.04);
 }
 
 .project-tile-gradient-cover {

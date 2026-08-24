@@ -23,6 +23,7 @@ interface Project {
   priceRangeMax: number
   themeAccentColor: string
   thumbnailPath?: string
+  logoPath?: string
   reraNumber?: string
   description?: string
   towers?: Tower[]
@@ -425,10 +426,18 @@ export default function ProjectLauncher(): JSX.Element {
                       className="project-tile-gradient-cover"
                       style={{ background: `linear-gradient(135deg, ${p.themeAccentColor}30 0%, ${p.themeAccentColor}08 100%)` }}
                     >
-                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={p.themeAccentColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity={0.6}>
-                        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-                      </svg>
+                      {!p.logoPath && (
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={p.themeAccentColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity={0.6}>
+                          <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+                          <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                  {/* Overlaid logo if available */}
+                  {p.logoPath && (
+                    <div className="project-tile-logo-overlay">
+                      <img src={toMediaUrl(p.logoPath)} alt={`${p.name} logo`} />
                     </div>
                   )}
                   {/* Match score badge */}

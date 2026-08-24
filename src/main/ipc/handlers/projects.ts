@@ -19,6 +19,8 @@ export const ProjectCreateSchema = z.object({
   isFeatured: z.boolean().default(false),
   themeAccentColor: z.string().default('#1A73E8'),
   themeFontPairing: z.string().default('Inter'),
+  logoPath: z.string().optional().default(''),
+  thumbnailPath: z.string().optional().default(''),
 })
 
 export const ProjectUpdateSchema = ProjectCreateSchema.partial()

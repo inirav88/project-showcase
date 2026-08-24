@@ -922,6 +922,8 @@ interface Project {
   sortOrder: number
   themeAccentColor: string
   themeFontPairing: string
+  logoPath?: string
+  thumbnailPath?: string
 }
 
 interface ProjectModule {
@@ -999,6 +1001,8 @@ export default function AdminRoute(): JSX.Element {
   const [isFeatured, setIsFeatured] = useState(false)
   const [accentColor, setAccentColor] = useState('var(--color-accent)')
   const [fontPairing, setFontPairing] = useState('Inter')
+  const [logoPath, setLogoPath] = useState('')
+  const [thumbnailPath, setThumbnailPath] = useState('')
 
   // Modules tab state
   const [modules, setModules] = useState<ProjectModule[]>([])
@@ -1164,6 +1168,8 @@ export default function AdminRoute(): JSX.Element {
     setIsFeatured(project.isFeatured || false)
     setAccentColor(project.themeAccentColor)
     setFontPairing(project.themeFontPairing || 'Inter')
+    setLogoPath(project.logoPath || '')
+    setThumbnailPath(project.thumbnailPath || '')
     
     // Load modules, media, towers & units for this selected project
     loadModules(project.id)
@@ -1188,6 +1194,8 @@ export default function AdminRoute(): JSX.Element {
     setIsFeatured(false)
     setAccentColor('var(--color-accent)')
     setFontPairing('Inter')
+    setLogoPath('')
+    setThumbnailPath('')
   }
 
   const handleProjectSubmit = async (e: React.FormEvent) => {
@@ -1208,6 +1216,8 @@ export default function AdminRoute(): JSX.Element {
         isFeatured,
         themeAccentColor: accentColor,
         themeFontPairing: fontPairing,
+        logoPath,
+        thumbnailPath,
         status: 'ACTIVE'
       }
 
@@ -1815,6 +1825,39 @@ export default function AdminRoute(): JSX.Element {
                   <input type="checkbox" id="isFeatured" checked={isFeatured} onChange={e => setIsFeatured(e.target.checked)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
                   <label htmlFor="isFeatured" style={{ fontSize: '13px', cursor: 'pointer' }}>Highlight as Featured Property</label>
                 </div>
+
+                {isEditing ? (
+                  <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)' }}>Project Brand Logo</label>
+                      <FilePicker
+                        projectId={selectedProjectId}
+                        value={logoPath}
+                        onChange={setLogoPath}
+                        accept="image"
+                        label="Project Logo"
+                        placeholder="Upload project brand logo..."
+                        mediaCategory="LOGO"
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)' }}>Project Launcher Thumbnail / Cover</label>
+                      <FilePicker
+                        projectId={selectedProjectId}
+                        value={thumbnailPath}
+                        onChange={setThumbnailPath}
+                        accept="image"
+                        label="Project Thumbnail"
+                        placeholder="Upload project launcher cover image..."
+                        mediaCategory="THUMBNAIL"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ gridColumn: 'span 2', padding: '16px', border: '1px dashed var(--color-border)', borderRadius: '6px', fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                    Note: Project Logo and Launcher Cover Image can be uploaded after saving the project.
+                  </div>
+                )}
 
                 <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
                   {isEditing && (

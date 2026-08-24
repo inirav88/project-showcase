@@ -39,6 +39,8 @@ model Project {
   themeFontPairing    String   @default("Inter")
   introVideoMediaId   String?
   ambientAudioMediaId String?
+  logoPath            String   @default("")
+  thumbnailPath       String   @default("")
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
