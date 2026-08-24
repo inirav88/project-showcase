@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { toMediaUrl } from '../../utils/media'
@@ -8,6 +8,7 @@ import { MatchmakerQuiz } from '../../components/MatchmakerQuiz'
 import { ProjectComparison } from '../../components/ProjectComparison'
 import { IdleOverlay } from '../../components/IdleOverlay'
 import { useIdleTimer } from '../../hooks/useIdleTimer'
+import { useKioskExit } from '../../hooks/useKioskExit'
 
 interface Unit { id: string; status: string }
 interface Tower { id: string; units: Unit[] }
@@ -81,6 +82,71 @@ function FilterChipGroup({ options, value, onChange }: {
   )
 }
 
+// ── PIN Keypad Modal (Launcher) ───────────────────────────────────────────────
+function LauncherPinModal({
+  onVerify, onClose,
+}: {
+  onVerify: (pin: string) => Promise<boolean>
+  onClose: () => void
+}) {
+  const [digits, setDigits] = useState<string[]>([])
+  const [error, setError] = useState('')
+  const [checking, setChecking] = useState(false)
+
+  const handleKey = async (d: string) => {
+    if (checking) return
+    if (d === '⌫') { setDigits((p) => p.slice(0, -1)); setError(''); return }
+    const next = [...digits, d]
+    setDigits(next)
+    if (next.length === 4) {
+      setChecking(true)
+      const ok = await onVerify(next.join(''))
+      if (!ok) { setError('Incorrect PIN — try again'); setDigits([]) }
+      setChecking(false)
+    }
+  }
+
+  return (
+    <div className="pin-backdrop" role="dialog" aria-label="Admin PIN entry">
+      <div className="pin-modal">
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+            Admin Access
+          </div>
+          <div style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)', fontWeight: 600 }}>
+            Enter 4-digit PIN
+          </div>
+        </div>
+        <div className="pin-display">
+          {[0,1,2,3].map((i) => (
+            <div key={i} className={`pin-dot${digits[i] !== undefined ? ' filled' : ''}`} />
+          ))}
+        </div>
+        {error && (
+          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-error)', textAlign: 'center', fontWeight: 600 }}>
+            {error}
+          </div>
+        )}
+        <div className="pin-keypad">
+          {['1','2','3','4','5','6','7','8','9','','0','⌫'].map((key, i) => (
+            key === '' ? <div key={i} /> : (
+              <button key={key + i} className="pin-key" onClick={() => handleKey(key)} disabled={checking}>{key}</button>
+            )
+          ))}
+        </div>
+        <button
+          onClick={onClose}
+          style={{ all: 'unset', cursor: 'pointer', textAlign: 'center', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', padding: '8px', transition: 'color var(--transition-fast)' }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text-primary)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function ProjectLauncher(): JSX.Element {
   const [projects, setProjects] = useState<Project[]>([])
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -94,7 +160,26 @@ export default function ProjectLauncher(): JSX.Element {
   const [compareSelected, setCompareSelected] = useState<Project[]>([])
   const [showComparison, setShowComparison] = useState(false)
   const [isIdle, setIsIdle] = useState(false)
+  const [showPinModal, setShowPinModal] = useState(false)
   const navigate = useNavigate()
+
+  const { startHold, endHold } = useKioskExit({
+    onExit: () => setShowPinModal(true),
+  })
+
+  const handlePinVerify = async (pin: string): Promise<boolean> => {
+    try {
+      const isValid = await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_VERIFY_PIN, pin)
+      if (isValid) {
+        setShowPinModal(false)
+        navigate('/admin')
+        return true
+      }
+      return false
+    } catch {
+      return false
+    }
+  }
 
   useEffect(() => {
     window.api.invoke(IPC_CHANNELS.PROJECT_LIST)
@@ -154,6 +239,22 @@ export default function ProjectLauncher(): JSX.Element {
 
   return (
     <div className="launcher">
+      {/* Hidden corner hold zone for admin PIN access (hold bottom-right corner 5s) */}
+      <div
+        className="kiosk-exit-corner"
+        onPointerDown={startHold}
+        onPointerUp={endHold}
+        onPointerLeave={endHold}
+      />
+
+      {/* Admin PIN Modal */}
+      {showPinModal && (
+        <LauncherPinModal
+          onVerify={handlePinVerify}
+          onClose={() => setShowPinModal(false)}
+        />
+      )}
+
       {/* Idle overlay */}
       {isIdle && (
         <IdleOverlay heroImages={heroImages} onDismiss={() => setIsIdle(false)} />
