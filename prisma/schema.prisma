@@ -204,4 +204,6 @@ model Settings {
   contentVersion     String   @default("0")
   vpsBaseUrl         String   @default("")
   vpsApiKey          String   @default("")
+  narrationEnabled   Boolean  @default(true)
+  watermarkEnabled   Boolean  @default(true)
 }

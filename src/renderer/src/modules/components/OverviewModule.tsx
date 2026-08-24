@@ -17,8 +17,8 @@ interface Project {
 
 function formatPrice(n: number): string {
   if (!n) return 'N/A'
-  if (n >= 10000000) return `₹${(n / 10000000).toFixed(1)} Cr`
-  return `₹${(n / 100000).toFixed(0)} L`
+  if (n >= 10000000) return String.fromCharCode(8377) + (n / 10000000).toFixed(1) + ' Cr'
+  return String.fromCharCode(8377) + (n / 100000).toFixed(0) + ' L'
 }
 
 export default function OverviewModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element {
@@ -31,10 +31,10 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
       .catch(console.error)
   }, [projectId])
 
-  if (!project) return <div className="loading">Loading overview…</div>
+  if (!project) return <div className="loading">Loading overview...</div>
 
   const headline = config.heroHeadline || `Welcome to ${project.name}`
-  const subHeadline = config.subHeadline || `${project.developer} · ${project.location}`
+  const subHeadline = config.subHeadline || `${project.developer} ${String.fromCharCode(8226)} ${project.location}`
   const stats: string[] = config.stats || []
   const heroImage = config.heroImage || ''
 
@@ -42,7 +42,7 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
     { label: 'Developer', value: project.developer },
     { label: 'Location', value: project.location },
     { label: 'Type', value: project.type.replace('_', ' ') },
-    { label: 'Price Range', value: `${formatPrice(project.priceRangeMin)} – ${formatPrice(project.priceRangeMax)}`, accent: true },
+    { label: 'Price Range', value: `${formatPrice(project.priceRangeMin)} - ${formatPrice(project.priceRangeMax)}`, accent: true },
     { label: 'Possession', value: project.possessionStatus === 'READY' ? 'Ready to Move' : `Under Construction${project.possessionDate ? ` (${project.possessionDate})` : ''}` },
     ...(project.reraNumber ? [{ label: 'RERA No.', value: project.reraNumber }] : []),
   ]
@@ -87,7 +87,7 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
           <h2 style={{
             fontSize: 'var(--font-size-3xl)',
             fontWeight: 800,
-            color: heroImage ? 'var(--color-text-primary)' : 'var(--color-text-primary)',
+            color: heroImage ? '#ffffff' : 'var(--color-text-primary)',
             letterSpacing: '-0.03em',
             lineHeight: 1.1,
             marginBottom: 'var(--space-2)',
@@ -96,7 +96,7 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
           </h2>
           <p style={{
             fontSize: 'var(--font-size-lg)',
-            color: heroImage ? 'rgba(255,255,255,0.75)' : 'var(--color-text-secondary)',
+            color: heroImage ? 'rgba(255,255,255,0.9)' : 'var(--color-text-secondary)',
             fontWeight: 400,
             marginBottom: stats.length > 0 ? 'var(--space-5)' : 0,
           }}>
@@ -114,7 +114,7 @@ export default function OverviewModule({ config, projectId }: { config: Record<s
                   border: '1px solid rgba(255,255,255,0.2)',
                   fontSize: 'var(--font-size-xs)',
                   fontWeight: 600,
-                  color: heroImage ? 'var(--color-text-primary)' : 'var(--color-text-primary)',
+                  color: heroImage ? '#ffffff' : 'var(--color-text-primary)',
                   backdropFilter: 'blur(8px)',
                 }}>
                   {s}

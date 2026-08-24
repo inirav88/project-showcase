@@ -24,8 +24,8 @@ interface Props {
 
 function fmt(n: number) {
   if (!n) return 'N/A'
-  if (n >= 10000000) return `?${(n / 10000000).toFixed(1)} Cr`
-  return `?${(n / 100000).toFixed(0)} L`
+  if (n >= 10000000) return `\u20B9${(n / 10000000).toFixed(1)} Cr`
+  return `\u20B9${(n / 100000).toFixed(0)} L`
 }
 
 function Cell({ children, accent }: { children: React.ReactNode; accent?: string }) {
@@ -44,7 +44,7 @@ const ROWS: { label: string; key: keyof Project; format?: (v: any) => string }[]
   { label: 'Developer', key: 'developer' },
   { label: 'Location', key: 'location' },
   { label: 'Type', key: 'type' },
-  { label: 'Possession', key: 'possessionStatus', format: (v) => v === 'READY' ? '? Ready to Move' : '?? Under Construction' },
+  { label: 'Possession', key: 'possessionStatus', format: (v) => v === 'READY' ? String.fromCharCode(10003) + ' Ready to Move' : String.fromCodePoint(128295) + ' Under Construction' },
   { label: 'Price Range', key: 'priceRangeMin' as keyof Project, format: (v: any) => fmt(Number(v)) },
   { label: 'RERA No.', key: 'reraNumber' },
 ]
@@ -65,14 +65,14 @@ export function ProjectComparison({ projectA, projectB, onClose }: Props) {
         background: 'var(--color-surface)',
       }}>
         <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 800, letterSpacing: '-0.02em', margin: 0 }}>
-          ?? Project Comparison
+          {String.fromCodePoint(9878)} Project Comparison
         </h2>
         <button onClick={onClose} style={{
           all: 'unset', cursor: 'pointer', padding: '8px 20px', borderRadius: 8,
           border: '1px solid var(--color-border)', fontSize: 'var(--font-size-sm)',
           color: 'var(--color-text-secondary)', fontFamily: 'var(--font-sans)',
         }}>
-          ? Close
+          {String.fromCharCode(10005)} Close
         </button>
       </header>
 
@@ -86,7 +86,7 @@ export function ProjectComparison({ projectA, projectB, onClose }: Props) {
             {p.thumbnailPath ? (
               <img src={toMediaUrl(p.thumbnailPath)} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${p.themeAccentColor}30, ${p.themeAccentColor}08)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>??</div>
+              <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${p.themeAccentColor}30, ${p.themeAccentColor}08)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>{String.fromCodePoint(128194)}</div>
             )}
             <div style={{
               position: 'absolute', inset: 0,
@@ -122,10 +122,10 @@ export function ProjectComparison({ projectA, projectB, onClose }: Props) {
                   {row.label}
                 </td>
                 <Cell>
-                  {row.format ? row.format((projectA as any)[row.key]) : String((projectA as any)[row.key] ?? '—')}
+                  {row.format ? row.format((projectA as any)[row.key]) : String((projectA as any)[row.key] ?? '-')}
                 </Cell>
                 <Cell>
-                  {row.format ? row.format((projectB as any)[row.key]) : String((projectB as any)[row.key] ?? '—')}
+                  {row.format ? row.format((projectB as any)[row.key]) : String((projectB as any)[row.key] ?? '-')}
                 </Cell>
               </tr>
             ))}

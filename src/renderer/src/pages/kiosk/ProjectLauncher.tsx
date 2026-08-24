@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { toMediaUrl } from '../../utils/media'
 import { ThemeToggle } from '../../components/ThemeToggle'
+import { AccessibilityToggle } from '../../components/AccessibilityToggle'
 import { MatchmakerQuiz } from '../../components/MatchmakerQuiz'
 import { ProjectComparison } from '../../components/ProjectComparison'
 import { IdleOverlay } from '../../components/IdleOverlay'
@@ -34,8 +35,8 @@ interface Settings {
 
 function formatPrice(n: number): string {
   if (!n) return 'N/A'
-  if (n >= 10000000) return `?${(n / 10000000).toFixed(1)} Cr`
-  return `?${(n / 100000).toFixed(0)} L`
+  if (n >= 10000000) return `\u20B9${(n / 10000000).toFixed(1)} Cr`
+  return `\u20B9${(n / 100000).toFixed(0)} L`
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -54,10 +55,10 @@ const POSSESSION_LABELS: Record<string, string> = {
 
 const BUDGET_OPTIONS = [
   { label: 'Any Budget', value: 'ALL' },
-  { label: 'Under ?50L', value: '5000000' },
-  { label: 'Under ?1 Cr', value: '10000000' },
-  { label: 'Under ?3 Cr', value: '30000000' },
-  { label: 'Under ?5 Cr', value: '50000000' },
+  { label: 'Under \u20B950L', value: '5000000' },
+  { label: 'Under \u20B91 Cr', value: '10000000' },
+  { label: 'Under \u20B93 Cr', value: '30000000' },
+  { label: 'Under \u20B95 Cr', value: '50000000' },
 ]
 
 function FilterChipGroup({ options, value, onChange }: {
@@ -207,7 +208,7 @@ export default function ProjectLauncher(): JSX.Element {
               transition: 'all 0.15s',
             }}
           >
-            {matchScores ? '? Matched' : '? Find Match'}
+            {matchScores ? String.fromCharCode(10003) + ' Matched' : String.fromCodePoint(128269) + ' Find Match'}
           </button>
           {matchScores && (
             <button
@@ -218,7 +219,7 @@ export default function ProjectLauncher(): JSX.Element {
                 fontWeight: 600, fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-sans)',
               }}
             >
-              ? Clear
+              {String.fromCharCode(10005)} Clear
             </button>
           )}
           {/* Compare button */}
@@ -232,7 +233,7 @@ export default function ProjectLauncher(): JSX.Element {
               transition: 'all 0.15s',
             }}
           >
-            ?? {compareMode ? 'Cancel Compare' : 'Compare'}
+            {String.fromCodePoint(9878)} {compareMode ? 'Cancel Compare' : 'Compare'}
           </button>
           {compareMode && compareSelected.length === 2 && (
             <button
@@ -243,9 +244,10 @@ export default function ProjectLauncher(): JSX.Element {
                 fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-sans)',
               }}
             >
-              Compare Now ?
+              Compare Now {String.fromCharCode(8594)}
             </button>
           )}
+          <AccessibilityToggle />
           <ThemeToggle />
           <div className="launcher-status-pill">
             <span className="status-dot" />
@@ -261,7 +263,7 @@ export default function ProjectLauncher(): JSX.Element {
           padding: '10px 32px', fontSize: 13, color: 'var(--color-accent)', fontWeight: 600,
           display: 'flex', alignItems: 'center', gap: 12,
         }}>
-          <span>?? Compare Mode: Select 2 projects to compare</span>
+          <span>{String.fromCodePoint(9878)} Compare Mode: Select 2 projects to compare</span>
           <span style={{ opacity: 0.7 }}>({compareSelected.length}/2 selected)</span>
         </div>
       )}
@@ -272,7 +274,7 @@ export default function ProjectLauncher(): JSX.Element {
           role="searchbox"
           type="search"
           className="filter-search"
-          placeholder="Search by name, developer, or location…"
+          placeholder="Search by name, developer, or location..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -286,7 +288,7 @@ export default function ProjectLauncher(): JSX.Element {
       {/* Project Grid */}
       {displayed.length === 0 ? (
         <div className="empty-state" style={{ flex: 1 }}>
-          <span className="empty-state-icon">??</span>
+          <span className="empty-state-icon">{String.fromCodePoint(128194)}</span>
           <h3>No Projects Found</h3>
           <p>Try adjusting your search or filter criteria, or add a new project from the Admin Panel.</p>
         </div>
@@ -342,17 +344,17 @@ export default function ProjectLauncher(): JSX.Element {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 14, color: '#fff', fontWeight: 800,
                     }}>
-                      {isCompareSelected ? '?' : ''}
+                      {isCompareSelected ? String.fromCharCode(10003) : ''}
                     </div>
                   )}
                 </div>
 
                 <div className="tile-body">
                   <div className="tile-name">{p.name}</div>
-                  <div className="tile-meta">{p.developer} · {p.location}</div>
+                  <div className="tile-meta">{p.developer} {String.fromCharCode(8226)} {p.location}</div>
                   <div className="tile-badges">
                     <span className="price-badge">
-                      {formatPrice(p.priceRangeMin)} – {formatPrice(p.priceRangeMax)}
+                      {formatPrice(p.priceRangeMin)} \u2014 {formatPrice(p.priceRangeMax)}
                     </span>
                     <span className={`possession-badge ${p.possessionStatus}`}>
                       {p.possessionStatus === 'READY' ? 'Ready' : 'Under Const.'}
@@ -377,3 +379,4 @@ export default function ProjectLauncher(): JSX.Element {
     </div>
   )
 }
+

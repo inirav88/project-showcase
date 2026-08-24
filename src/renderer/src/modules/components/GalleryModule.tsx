@@ -99,7 +99,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
       {/* Gallery Grid */}
       {filteredMedia.length === 0 ? (
         <div className="empty-state">
-          <span className="empty-state-icon">🖼️</span>
+          <span className="empty-state-icon">{String.fromCodePoint(128507)}</span>
           <h3>No Images Yet</h3>
           <p>Add images to this project's gallery from the Admin Panel.</p>
         </div>
@@ -200,7 +200,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
           >
-            ×
+            {String.fromCharCode(10005)}
           </button>
 
           {/* Prev */}
@@ -217,7 +217,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
           >
-            ‹
+            {String.fromCharCode(8249)}
           </button>
 
           {/* Image */}
@@ -248,7 +248,7 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
           >
-            ›
+            {String.fromCharCode(8250)}
           </button>
 
           {/* Caption */}
@@ -256,11 +256,11 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
             position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
           }}>
-            <p style={{ color: 'var(--color-text-primary)', fontSize: 'var(--font-size-base)', fontWeight: 600, textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-              {filteredMedia[lightboxIndex].originalName}
-            </p>
+
+
+
             <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              {filteredMedia[lightboxIndex].category} · {lightboxIndex + 1} of {filteredMedia.length}
+              {filteredMedia[lightboxIndex].category} {String.fromCharCode(8226)} {lightboxIndex + 1} of {filteredMedia.length}
             </span>
             {/* Dot indicators */}
             <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>

@@ -7,6 +7,8 @@ import { useShortlistStore } from '../../store/useShortlistStore'
 import { IntroVideoOverlay } from '../../components/IntroVideoOverlay'
 import { PersonaSelector, type Persona } from '../../components/PersonaSelector'
 import { useAmbientAudio } from '../../hooks/useAmbientAudio'
+import QRCode from 'qrcode'
+import { AccessibilityToggle } from '../../components/AccessibilityToggle'
 // toMediaUrl removed from direct import - used in child components
 
 interface Project {
@@ -16,8 +18,9 @@ interface Project {
   reraNumber: string
   themeAccentColor: string
   themeFontPairing: string
+  location: string
+  type: string
   introVideoMediaId?: string | null
-  ambientAudioMediaId?: string | null
   media?: { id: string; filePath: string; category: string }[]
 }
 
@@ -136,15 +139,43 @@ function PinModal({
 
 // ── Shortlist Drawer ─────────────────────────────────────────────────────────
 function ShortlistDrawer({
-  projectId, onClose,
+  projectId, projectName, onClose,
 }: {
   projectId: string
+  projectName: string
   onClose: () => void
 }) {
   const { items, removeItem, clearShortlist } = useShortlistStore()
   const [customerName, setCustomerName] = useState('')
   const [exporting, setExporting] = useState(false)
   const [showExport, setShowExport] = useState(false)
+
+  // QR Take-Away settings and state
+  const [settings, setSettings] = useState<any>(null)
+  const [qrUrl, setQrUrl] = useState<string>('')
+  const [qrType, setQrType] = useState<'whatsapp' | 'vcard'>('whatsapp')
+
+  useEffect(() => {
+    window.api.invoke(IPC_CHANNELS.SETTINGS_GET)
+      .then((data) => setSettings(data as any))
+      .catch(console.error)
+  }, [])
+
+  useEffect(() => {
+    if (!settings) return
+    let text = ''
+    if (qrType === 'whatsapp') {
+      const rawPhone = settings.firmContactPhone || ''
+      const phone = rawPhone.replace(/\D/g, '')
+      const msg = `Interested in ${projectName}, please send more details.`
+      text = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+    } else {
+      text = `BEGIN:VCARD\nVERSION:3.0\nFN:${settings.firmName || 'Sales Office'}\nTEL;TYPE=CELL:${settings.firmContactPhone || ''}\nEMAIL:${settings.firmContactEmail || ''}\nURL:${settings.firmWebsite || ''}\nEND:VCARD`
+    }
+    QRCode.toDataURL(text, { width: 140, margin: 1 })
+      .then(setQrUrl)
+      .catch(console.error)
+  }, [settings, qrType, projectName])
 
   const handleExport = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -258,6 +289,67 @@ function ShortlistDrawer({
           )}
         </div>
 
+        {/* QR Take-Away Section */}
+        {settings && (
+          <div style={{
+            margin: '0 24px 16px',
+            padding: '16px',
+            background: 'var(--color-surface-raised)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--color-border)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>??</span> QR Take-Away
+            </div>
+            
+            <div style={{ display: 'flex', background: 'var(--color-bg)', borderRadius: 8, padding: 2, width: '100%' }}>
+              <button
+                type="button"
+                onClick={() => setQrType('whatsapp')}
+                style={{
+                  flex: 1, padding: '6px', fontSize: 11, border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600,
+                  background: qrType === 'whatsapp' ? 'var(--color-accent)' : 'transparent',
+                  color: qrType === 'whatsapp' ? '#fff' : 'var(--color-text-muted)',
+                  fontFamily: 'var(--font-sans)', transition: 'all 0.2s'
+                }}
+              >
+                WhatsApp Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => setQrType('vcard')}
+                style={{
+                  flex: 1, padding: '6px', fontSize: 11, border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600,
+                  background: qrType === 'vcard' ? 'var(--color-accent)' : 'transparent',
+                  color: qrType === 'vcard' ? '#fff' : 'var(--color-text-muted)',
+                  fontFamily: 'var(--font-sans)', transition: 'all 0.2s'
+                }}
+              >
+                Save Contact
+              </button>
+            </div>
+
+            {qrUrl ? (
+              <div style={{ background: '#fff', padding: 8, borderRadius: 8, display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: 'var(--shadow-sm)' }}>
+                <img src={qrUrl} alt="QR Code" style={{ width: 120, height: 120 }} />
+              </div>
+            ) : (
+              <div style={{ height: 136, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>Generating QR...</div>
+            )}
+
+            <div style={{ fontSize: 10, color: 'var(--color-text-muted)', textAlign: 'center', lineHeight: 1.4 }}>
+              {qrType === 'whatsapp' 
+                ? `Scan to open a pre-filled WhatsApp chat with the sales team.`
+                : `Scan to quickly save the sales team's contact details.`
+              }
+            </div>
+          </div>
+        )}
+
         {items.length > 0 && (
           <div style={{ padding: '16px 24px', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button
@@ -364,6 +456,8 @@ export default function ProjectShowcase(): JSX.Element {
   const [leadPhone, setLeadPhone] = useState('')
   const [leadEmail, setLeadEmail] = useState('')
   const [submittingLead, setSubmittingLead] = useState(false)
+  const [settings, setSettings] = useState<any>(null)
+  const [narrationMuted, setNarrationMuted] = useState(false)
 
   // Session
   const [sessionId, setSessionId] = useState<string | null>(null)
@@ -371,7 +465,7 @@ export default function ProjectShowcase(): JSX.Element {
 
   const { items: shortlistItems } = useShortlistStore()
 
-  // Ambient audio � resolved after project loads
+  // Ambient audio - resolved after project loads
   const ambientAudioPath = (project as any)?.ambientAudioMediaId && (project as any)?.media
     ? ((project as any).media as {id:string;filePath:string}[]).find((m) => m.id === (project as any).ambientAudioMediaId)?.filePath ?? null
     : null
@@ -385,6 +479,15 @@ export default function ProjectShowcase(): JSX.Element {
     if (!projectId) return
     window.api.invoke(IPC_CHANNELS.PROJECT_GET, projectId)
       .then((data) => setProject(data as Project))
+      .catch(console.error)
+
+    window.api.invoke(IPC_CHANNELS.SETTINGS_GET)
+      .then((data: any) => {
+        setSettings(data)
+        if (data && data.narrationEnabled === false) {
+          setNarrationMuted(true);
+        }
+      })
       .catch(console.error)
 
     window.api.invoke(IPC_CHANNELS.MODULE_LIST, projectId)
@@ -432,6 +535,58 @@ export default function ProjectShowcase(): JSX.Element {
     }).catch(console.error)
   }, [shortlistItems, sessionId])
 
+  // 1. Sync navigation listener from presenter window (FR-14)
+  useEffect(() => {
+    const unsub = window.api.on('system:navigateToModule', (moduleId: any) => {
+      const target = modules.find((m) => m.id === moduleId)
+      if (target) {
+        setActiveModuleId(target.id)
+        setSectionsViewed((prev) => new Set([...prev, target.moduleType]))
+      }
+    })
+    return () => unsub()
+  }, [modules])
+
+  // 2. Voice Narration effect (FR-20) using Web Speech API
+  useEffect(() => {
+    if (!project || !activeModule) return
+    window.speechSynthesis.cancel()
+    if (narrationMuted) return
+
+    let narrationText = ''
+    try {
+      const config = JSON.parse(activeModule.config || '{}')
+      if (config.narrationText) {
+        narrationText = config.narrationText
+      }
+    } catch {}
+
+    if (!narrationText) {
+      if (activeModule.moduleType === 'OVERVIEW') {
+        narrationText = `Welcome to the overview of ${project.name}, developed by ${project.developer}. It is situated in ${project.location} and features a premium ${project.type.toLowerCase()} development.`
+      } else if (activeModule.moduleType === 'LOCATION') {
+        narrationText = `Here is the location map for ${project.name} in ${project.location}. Exploring the connectivity and nearby points of interest.`
+      } else if (activeModule.moduleType === 'PRICING') {
+        narrationText = `Explore the pricing details and unit availability for ${project.name}. You can click the heart icon on any unit to add it to your shortlist.`
+      } else if (activeModule.moduleType === 'AMENITIES') {
+        narrationText = `Take a look at the curated lifestyle amenities offered at ${project.name}. Designed to provide a luxurious experience.`
+      }
+    }
+
+    if (narrationText) {
+      const timer = setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(narrationText)
+        utterance.rate = 0.95
+        utterance.pitch = 1.0
+        window.speechSynthesis.speak(utterance)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+
+    return () => {
+      window.speechSynthesis.cancel()
+    }
+  }, [activeModuleId, project, narrationMuted])
   if (!project) return <div className="loading">Loading project…</div>
 
   const handleBack = () => {
@@ -447,6 +602,7 @@ export default function ProjectShowcase(): JSX.Element {
   const handleTabClick = (mod: ModuleRecord) => {
     setActiveModuleId(mod.id)
     setSectionsViewed((prev) => new Set([...prev, mod.moduleType]))
+    window.api.invoke(IPC_CHANNELS.SECOND_DISPLAY, { action: 'sync', moduleType: mod.moduleType }).catch(console.error)
   }
 
   const handlePinVerify = async (pin: string) => {
@@ -454,6 +610,12 @@ export default function ProjectShowcase(): JSX.Element {
       const isValid = await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_VERIFY_PIN, pin)
       if (isValid) {
         setShowPinModal(false)
+        if (sessionId) {
+          window.api.invoke(IPC_CHANNELS.SESSION_END, {
+            id: sessionId,
+            sectionsViewed: Array.from(sectionsViewed),
+          }).catch(console.error)
+        }
         navigate('/admin')
         return true
       }
@@ -470,7 +632,7 @@ export default function ProjectShowcase(): JSX.Element {
     try {
       await window.api.invoke(IPC_CHANNELS.LEAD_CREATE, {
         projectId: project.id, name: leadName, phone: leadPhone, email: leadEmail,
-        notes: `Session start — ${project.name}`,
+        notes: `Session start - ${project.name}`,
       })
       setShowLeadModal(false)
       setShowPersona(true)
@@ -512,17 +674,17 @@ export default function ProjectShowcase(): JSX.Element {
       {/* Header */}
       <header className="showcase-header">
         <button className="back-btn" onClick={handleBack}>
-          ← Back
+          {String.fromCharCode(8592)} Back
         </button>
         <div className="showcase-header-info">
           <h1>{project.name}</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
               {project.developer}
             </span>
             {project.reraNumber && (
               <>
-                <span style={{ color: 'var(--color-border)', fontSize: 12 }}>·</span>
+                <span style={{ color: 'var(--color-border)', fontSize: 12 }}>{String.fromCharCode(8226)}</span>
                 <span className="rera-badge">: {project.reraNumber}</span>
               </>
             )}
@@ -568,9 +730,29 @@ export default function ProjectShowcase(): JSX.Element {
               transition: "all var(--transition-fast)",
             }}
           >
-            {muted ? "??" : "??"}
+            {muted ? String.fromCodePoint(128263) : String.fromCodePoint(128266)}
           </button>
         )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 12 }}>
+          <AccessibilityToggle />
+          <button
+            onClick={() => {
+              const nextVal = !narrationMuted
+              setNarrationMuted(nextVal)
+              if (nextVal) window.speechSynthesis.cancel()
+            }}
+            title={narrationMuted ? 'Unmute voice narration' : 'Mute voice narration'}
+            style={{
+              all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+              padding: '10px 14px', borderRadius: 'var(--radius-sm)',
+              background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)',
+              fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)',
+              transition: 'all var(--transition-fast)',
+            }}
+          >
+            {narrationMuted ? String.fromCodePoint(128263) + ' Narration' : String.fromCodePoint(128483) + ' Narration'}
+          </button>
+        </div>
       </header>
 
       {/* Tab navigation */}
@@ -589,7 +771,26 @@ export default function ProjectShowcase(): JSX.Element {
       </nav>
 
       {/* Module Content */}
-      <main className="showcase-content" key={activeModuleId}>
+      <main className="showcase-content" key={activeModuleId} style={{ position: "relative" }}>
+        {/* Subtle firm-branded watermark overlay (FR-18) */}
+        {settings?.firmName && settings.watermarkEnabled !== false && (
+          <div style={{
+            position: "absolute", inset: 0, pointerEvents: "none", zIndex: 999,
+            opacity: 0.05, color: "var(--color-text-primary)", display: "flex",
+            flexWrap: "wrap", gap: "80px", padding: "40px", overflow: "hidden",
+            justifyContent: "center", alignContent: "center"
+          }}>
+            {Array.from({ length: 48 }).map((_, i) => (
+              <div key={i} style={{
+                transform: "rotate(-30deg)", fontSize: "14px", fontWeight: 700,
+                whiteSpace: "nowrap", fontFamily: "var(--font-sans)",
+                letterSpacing: "0.1em", textTransform: "uppercase"
+              }}>
+                {settings.firmName} Kiosk
+              </div>
+            ))}
+          </div>
+        )}
         {activeModule && isRegisteredModule(activeModule.moduleType) && projectId ? (
           <Suspense fallback={<div className="loading">Loading…</div>}>
             {(() => {
@@ -608,7 +809,7 @@ export default function ProjectShowcase(): JSX.Element {
 
       {/* Shortlist Drawer */}
       {showShortlist && projectId && (
-        <ShortlistDrawer projectId={projectId} onClose={() => setShowShortlist(false)} />
+        <ShortlistDrawer projectId={projectId} projectName={project.name} onClose={() => setShowShortlist(false)} />
       )}
 
       {/* PIN Modal */}
@@ -705,6 +906,16 @@ export default function ProjectShowcase(): JSX.Element {
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

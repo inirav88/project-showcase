@@ -39,14 +39,14 @@ export class MediaHandlers {
     const fileExt = path.extname(filePath).toLowerCase()
     const fileBase = path.basename(filePath, fileExt)
     const uniqueName = `${projectId}_${category}_${Date.now()}_${fileBase}`
-    const targetFilePath = path.join(this.mediaDir, `${uniqueName}${fileExt}`)
+    let targetFilePath = path.join(this.mediaDir, `${uniqueName}${fileExt}`)
 
     let thumbnailPath = ''
     let durationSecs: number | null = null
 
     // 1. Process Audio Conversion (compress wav/mp3 to AAC m4a for performance)
     if (category === 'AUDIO' && ['.wav', '.mp3', '.ogg'].includes(fileExt)) {
-      const convertedPath = path.join(this.mediaDir, `${uniqueName}.m4a`)
+      const convertedPath = path.join(this.mediaDir, uniqueName + '.m4a')
       await new Promise<void>((resolve, reject) => {
         ffmpeg(filePath)
           .output(convertedPath)
@@ -56,16 +56,31 @@ export class MediaHandlers {
           .on('error', (err) => reject(err))
           .run()
       })
-      input.filePath = convertedPath
+      targetFilePath = convertedPath
+    } else if (['VIDEO', 'INTRO_VIDEO'].includes(category) || ['.mov', '.mkv', '.avi', '.mp4'].includes(fileExt)) {
+      // Compress video to H.264 1080p MP4 for stable performance (FR-8)
+      const compressedPath = path.join(this.mediaDir, uniqueName + '.mp4')
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(filePath)
+          .output(compressedPath)
+          .videoCodec('libx264')
+          .size('1920x1080')
+          .videoBitrate('2500k')
+          .audioCodec('aac')
+          .audioBitrate('128k')
+          .on('end', () => resolve())
+          .on('error', (err) => reject(err))
+          .run()
+      })
+      targetFilePath = compressedPath
     } else {
       // Copy source file to app storage
       fs.copyFileSync(filePath, targetFilePath)
     }
 
     // Resolve final file size
-    const finalFilePath = category === 'AUDIO' && ['.wav', '.mp3', '.ogg'].includes(fileExt)
-      ? path.join(this.mediaDir, `${uniqueName}.m4a`)
-      : targetFilePath
+    // Resolve final file size
+    const finalFilePath = targetFilePath
     const sizeBytes = fs.statSync(finalFilePath).size
 
     // 2. Process Video Duration Metadata Extraction
@@ -151,3 +166,4 @@ export class MediaHandlers {
     ipcMain.handle(IPC_CHANNELS.MEDIA_DELETE, (_, id: string) => this.delete(id))
   }
 }
+

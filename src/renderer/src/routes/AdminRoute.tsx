@@ -22,7 +22,7 @@ const browseBtn: React.CSSProperties = {
 type FileFilter = { name: string; extensions: string[] }
 
 function FilePicker({
-  value, onChange, placeholder, accept, label, projectId
+  value, onChange, placeholder, accept, label, projectId, mediaCategory
 }: {
   value: string
   onChange: (path: string) => void
@@ -30,6 +30,7 @@ function FilePicker({
   accept?: 'image' | 'video' | 'audio' | 'pdf' | 'any'
   label?: string
   projectId?: string
+  mediaCategory?: string
 }) {
   const [uploading, setUploading] = React.useState(false)
   const [progressText, setProgressText] = React.useState('')
@@ -58,10 +59,10 @@ function FilePicker({
       setUploading(true)
       setProgressText('Copying file to project storage...')
       try {
-        let category = 'GALLERY'
-        if (accept === 'video') category = 'VIDEO'
-        if (accept === 'audio') category = 'AUDIO'
-        if (accept === 'pdf') category = 'DOCUMENT'
+        let category = mediaCategory || 'GALLERY'
+        if (accept === 'video') category = mediaCategory || 'VIDEO'
+        if (accept === 'audio') category = mediaCategory || 'AUDIO'
+        if (accept === 'pdf') category = mediaCategory || 'DOCUMENT'
 
         // 1. Trigger the background upload/optimization handler
         setProgressText('Optimizing and registering media element...')
@@ -225,7 +226,7 @@ function ModuleConfigEditor({
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Hero Background Image (optional)</label>
-          <FilePicker projectId={projectId} value={cfg.heroImage || ''} onChange={v => set('heroImage', v)} accept="image" label="Hero Background Image" placeholder="Select a hero background image…" />
+          <FilePicker projectId={projectId} value={cfg.heroImage || ''} onChange={v => set('heroImage', v)} accept="image" label="Hero Background Image" placeholder="Select a hero background image..." />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Call-to-action Button Label</label>
@@ -245,7 +246,7 @@ function ModuleConfigEditor({
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
               <label style={labelStyle}>Image File</label>
-              <FilePicker projectId={projectId} value={img.path} onChange={v => { const a = [...images]; a[i] = { ...a[i], path: v }; setArr('images', a) }} accept="image" label="Gallery Image" placeholder="Select an image file…" />
+              <FilePicker projectId={projectId} value={img.path} onChange={v => { const a = [...images]; a[i] = { ...a[i], path: v }; setArr('images', a) }} accept="image" label="Gallery Image" placeholder="Select an image file..." />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div style={fieldStyle}>
@@ -294,7 +295,7 @@ function ModuleConfigEditor({
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Amenity Image (optional)</label>
-              <FilePicker projectId={projectId} value={item.imagePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], imagePath: v }; setArr('amenities', a) }} accept="image" label="Amenity Image" placeholder="Select an image for this amenity…" />
+              <FilePicker projectId={projectId} value={item.imagePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], imagePath: v }; setArr('amenities', a) }} accept="image" label="Amenity Image" placeholder="Select an image for this amenity..." mediaCategory="AMENITIES" />
             </div>
             <button style={removeBtn} onClick={() => setArr('amenities', items.filter((_, j) => j !== i))}>Remove</button>
           </div>
@@ -314,7 +315,7 @@ function ModuleConfigEditor({
           <div key={i} style={cardStyle}>
             <div style={fieldStyle}>
               <label style={labelStyle}>Video File (.mp4 / .mov)</label>
-              <FilePicker projectId={projectId} value={v.path} onChange={p => { const a = [...videos]; a[i] = { ...a[i], path: p }; setArr('videos', a) }} accept="video" label="Walkthrough Video" placeholder="Select a video file…" />
+              <FilePicker projectId={projectId} value={v.path} onChange={p => { const a = [...videos]; a[i] = { ...a[i], path: p }; setArr('videos', a) }} accept="video" label="Walkthrough Video" placeholder="Select a video file..." />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div style={fieldStyle}>
@@ -323,7 +324,7 @@ function ModuleConfigEditor({
               </div>
               <div style={fieldStyle}>
                 <label style={labelStyle}>Thumbnail Image (optional)</label>
-                <FilePicker projectId={projectId} value={v.thumbnailPath || ''} onChange={p => { const a = [...videos]; a[i] = { ...a[i], thumbnailPath: p }; setArr('videos', a) }} accept="image" label="Video Thumbnail" placeholder="Select thumbnail image…" />
+                <FilePicker projectId={projectId} value={v.thumbnailPath || ''} onChange={p => { const a = [...videos]; a[i] = { ...a[i], thumbnailPath: p }; setArr('videos', a) }} accept="image" label="Video Thumbnail" placeholder="Select thumbnail image..." />
               </div>
             </div>
             <button style={removeBtn} onClick={() => setArr('videos', videos.filter((_, j) => j !== i))}>Remove</button>
@@ -357,7 +358,7 @@ function ModuleConfigEditor({
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Highlight Image (optional)</label>
-              <FilePicker projectId={projectId} value={c.imagePath || ''} onChange={v => { const a = [...cards]; a[i] = { ...a[i], imagePath: v }; setArr('highlights', a) }} accept="image" label="Highlight Image" placeholder="Select a highlight image…" />
+              <FilePicker projectId={projectId} value={c.imagePath || ''} onChange={v => { const a = [...cards]; a[i] = { ...a[i], imagePath: v }; setArr('highlights', a) }} accept="image" label="Highlight Image" placeholder="Select a highlight image..." />
             </div>
             <button style={removeBtn} onClick={() => setArr('highlights', cards.filter((_, j) => j !== i))}>Remove</button>
           </div>
@@ -382,7 +383,7 @@ function ModuleConfigEditor({
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Location Aerial / Map Image (optional)</label>
-          <FilePicker projectId={projectId} value={cfg.mapImagePath || ''} onChange={v => set('mapImagePath', v)} accept="image" label="Location Map Image" placeholder="Select a location map or aerial image…" />
+          <FilePicker projectId={projectId} value={cfg.mapImagePath || ''} onChange={v => set('mapImagePath', v)} accept="image" label="Location Map Image" placeholder="Select a location map or aerial image..." mediaCategory="LOCATION" />
         </div>
         <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)' }} />
         <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0, fontWeight: 600 }}>Nearby Connectivity Points</p>
@@ -487,7 +488,7 @@ function ModuleConfigEditor({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
           <label style={labelStyle}>Master Plan Image</label>
-          <FilePicker projectId={projectId} value={cfg.imagePath || ''} onChange={v => set('imagePath', v)} accept="image" label="Master Plan Image" placeholder="Select the master plan image…" />
+          <FilePicker projectId={projectId} value={cfg.imagePath || ''} onChange={v => set('imagePath', v)} accept="image" label="Master Plan Image" placeholder="Select the master plan image..." mediaCategory="MASTER_PLAN" />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Description / Legend Text</label>
@@ -503,12 +504,386 @@ function ModuleConfigEditor({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
           <label style={labelStyle}>PDF Brochure File</label>
-          <FilePicker projectId={projectId} value={cfg.brochurePath || ''} onChange={v => set('brochurePath', v)} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file…" />
+          <FilePicker projectId={projectId} value={cfg.brochurePath || ''} onChange={v => set('brochurePath', v)} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file..." />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Download Button Label</label>
           <input style={inputStyle} value={cfg.buttonLabel || ''} onChange={e => set('buttonLabel', e.target.value)} placeholder="Download Project Brochure" />
         </div>
+      </div>
+    )
+  }
+  if (moduleType === 'CONSTRUCTION_TIMELINE') {
+    const items: { title: string; status: 'COMPLETED' | 'IN_PROGRESS' | 'PENDING'; date: string; progress: number; description: string }[] = cfg.milestones || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Milestone Title</label>
+                <input style={inputStyle} value={item.title} onChange={e => { const a = [...items]; a[i] = { ...a[i], title: e.target.value }; setArr('milestones', a) }} placeholder='e.g. Pile Foundation' />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Status</label>
+                <select style={inputStyle} value={item.status} onChange={e => { const a = [...items]; a[i] = { ...a[i], status: e.target.value as any }; setArr('milestones', a) }}>
+                  <option value='COMPLETED'>Completed</option>
+                  <option value='IN_PROGRESS'>In Progress</option>
+                  <option value='PENDING'>Scheduled</option>
+                </select>
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Date Tag</label>
+                <input style={inputStyle} value={item.date} onChange={e => { const a = [...items]; a[i] = { ...a[i], date: e.target.value }; setArr('milestones', a) }} placeholder='e.g. Jan 2026' />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '10px' }}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Progress % ({item.progress || 0}%)</label>
+                <input type='range' min='0' max='100' style={{ width: '100%', height: '36px' }} value={item.progress || 0} onChange={e => { const a = [...items]; a[i] = { ...a[i], progress: Number(e.target.value) }; setArr('milestones', a) }} />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Description</label>
+                <input style={inputStyle} value={item.description} onChange={e => { const a = [...items]; a[i] = { ...a[i], description: e.target.value }; setArr('milestones', a) }} placeholder='Brief overview of structural milestones met' />
+              </div>
+            </div>
+            <button style={removeBtn} onClick={() => setArr('milestones', items.filter((_, j) => j !== i))}>Remove Milestone</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('milestones', [...items, { title: '', status: 'PENDING', date: '', progress: 0, description: '' }])}>+ Add Milestone</button>
+      </div>
+    )
+  }
+  // TOUR_360
+  if (moduleType === 'TOUR_360' || moduleType === 'TOUR360') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>360° Virtual Tour Title</label>
+          <input style={inputStyle} value={cfg.title || ''} onChange={e => set('title', e.target.value)} placeholder="e.g. 360° Immersive Virtual Tour" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Description / Subtext</label>
+          <input style={inputStyle} value={cfg.subtext || ''} onChange={e => set('subtext', e.target.value)} placeholder="e.g. Experience the residence in immersive virtual reality." />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Embed URL</label>
+          <input style={inputStyle} value={cfg.embedUrl || ''} onChange={e => set('embedUrl', e.target.value)} placeholder="e.g. https://my.matterport.com/show/?m=..." />
+        </div>
+      </div>
+    )
+  }
+
+  // SMART_HOME
+  if (moduleType === 'SMART_HOME') {
+    const items: { title: string; description: string; icon: string }[] = cfg.features || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Headline</label>
+          <input style={inputStyle} value={cfg.headline || ''} onChange={e => set('headline', e.target.value)} placeholder="e.g. Automation & Smart Living" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Subtext</label>
+          <input style={inputStyle} value={cfg.subtext || ''} onChange={e => set('subtext', e.target.value)} placeholder="e.g. Next-generation home automation features integrated for absolute convenience." />
+        </div>
+        <label style={labelStyle}>Smart Features List</label>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px' }}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Feature Title</label>
+                <input style={inputStyle} value={item.title} onChange={e => { const a = [...items]; a[i] = { ...a[i], title: e.target.value }; setArr('features', a) }} placeholder="e.g. Biometric Access" />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Icon</label>
+                <input style={inputStyle} value={item.icon} onChange={e => { const a = [...items]; a[i] = { ...a[i], icon: e.target.value }; setArr('features', a) }} placeholder="e.g. 🔒" />
+              </div>
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Description</label>
+              <input style={inputStyle} value={item.description} onChange={e => { const a = [...items]; a[i] = { ...a[i], description: e.target.value }; setArr('features', a) }} placeholder="Brief overview of how the feature works..." />
+            </div>
+            <button style={removeBtn} onClick={() => setArr('features', items.filter((_, j) => j !== i))}>Remove Feature</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('features', [...items, { title: '', description: '', icon: '🤖' }])}>+ Add Smart Feature</button>
+      </div>
+    )
+  }
+
+  // RERA_TRUST
+  if (moduleType === 'RERA_TRUST') {
+    const items: { title: string; filePath: string }[] = cfg.documents || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>RERA Registration No.</label>
+            <input style={inputStyle} value={cfg.reraNo || ''} onChange={e => set('reraNo', e.target.value)} placeholder="e.g. PR/GJ/GANDHINAGAR/..." />
+          </div>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Approved Authority</label>
+            <input style={inputStyle} value={cfg.approvedBy || ''} onChange={e => set('approvedBy', e.target.value)} placeholder="e.g. GUJRERA" />
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Validity Date Info</label>
+            <input style={inputStyle} value={cfg.validityDate || ''} onChange={e => set('validityDate', e.target.value)} placeholder="e.g. December 2028" />
+          </div>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Details / Disclaimer Text</label>
+            <input style={inputStyle} value={cfg.detailsText || ''} onChange={e => set('detailsText', e.target.value)} placeholder="Compliance text details..." />
+          </div>
+        </div>
+        <label style={labelStyle}>Official Certification Certificates</label>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Certificate Title</label>
+              <input style={inputStyle} value={item.title} onChange={e => { const a = [...items]; a[i] = { ...a[i], title: e.target.value }; setArr('documents', a) }} placeholder="e.g. Approved Building Layout Plan" />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>PDF Certificate File</label>
+              <FilePicker projectId={projectId} value={item.filePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], filePath: v }; setArr('documents', a) }} accept="pdf" label="RERA Document PDF" placeholder="Select a PDF certificate file..." />
+            </div>
+            <button style={removeBtn} onClick={() => setArr('documents', items.filter((_, j) => j !== i))}>Remove Document</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('documents', [...items, { title: '', filePath: '' }])}>+ Add Document</button>
+      </div>
+    )
+  }
+
+  // TESTIMONIALS
+  if (moduleType === 'TESTIMONIALS') {
+    const items: { clientName: string; designation: string; text: string; rating: number; photoPath?: string }[] = cfg.reviews || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Headline</label>
+          <input style={inputStyle} value={cfg.headline || ''} onChange={e => set('headline', e.target.value)} placeholder="e.g. What Our Buyers Say" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Subtext</label>
+          <input style={inputStyle} value={cfg.subtext || ''} onChange={e => set('subtext', e.target.value)} placeholder="e.g. Hear from client reviews who found their dream properties." />
+        </div>
+        <label style={labelStyle}>Buyer Testimonials List</label>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 100px', gap: '10px' }}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Client Name</label>
+                <input style={inputStyle} value={item.clientName} onChange={e => { const a = [...items]; a[i] = { ...a[i], clientName: e.target.value }; setArr('reviews', a) }} placeholder="e.g. Rajesh Sharma" />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Designation / Row Meta</label>
+                <input style={inputStyle} value={item.designation} onChange={e => { const a = [...items]; a[i] = { ...a[i], designation: e.target.value }; setArr('reviews', a) }} placeholder="e.g. Premium 4BHK Resident" />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Rating (Stars)</label>
+                <select style={inputStyle} value={item.rating || 5} onChange={e => { const a = [...items]; a[i] = { ...a[i], rating: Number(e.target.value) }; setArr('reviews', a) }}>
+                  <option value={5}>5 Stars</option>
+                  <option value={4}>4 Stars</option>
+                  <option value={3}>3 Stars</option>
+                </select>
+              </div>
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Testimonial Review Message</label>
+              <textarea style={{ ...inputStyle, fontFamily: 'sans-serif' }} rows={3} value={item.text} onChange={e => { const a = [...items]; a[i] = { ...a[i], text: e.target.value }; setArr('reviews', a) }} placeholder="Testimonial message details..." />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Client Portrait Photo (optional)</label>
+              <FilePicker projectId={projectId} value={item.photoPath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], photoPath: v }; setArr('reviews', a) }} accept="image" label="Client Photo" placeholder="Select client portrait photo..." mediaCategory="TESTIMONIALS" />
+            </div>
+            <button style={removeBtn} onClick={() => setArr('reviews', items.filter((_, j) => j !== i))}>Remove Testimonial</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('reviews', [...items, { clientName: '', designation: '', text: '', rating: 5, photoPath: '' }])}>+ Add Testimonial</button>
+      </div>
+    )
+  }
+
+  // FOUNDERS_NOTE
+  if (moduleType === 'FOUNDERS_NOTE') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Founder Name</label>
+            <input style={inputStyle} value={cfg.founderName || ''} onChange={e => set('founderName', e.target.value)} placeholder="e.g. Sanjay Kumbhani" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={labelStyle}>Founder Designation / Role</label>
+            <input style={inputStyle} value={cfg.founderRole || ''} onChange={e => set('founderRole', e.target.value)} placeholder="e.g. Managing Director" />
+          </div>
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Message Address Text</label>
+          <textarea style={{ ...inputStyle, fontFamily: 'sans-serif' }} rows={4} value={cfg.noteText || ''} onChange={e => set('noteText', e.target.value)} placeholder="Note message..." />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Founder Portrait Image</label>
+          <FilePicker projectId={projectId} value={cfg.photoPath || ''} onChange={v => set('photoPath', v)} accept="image" label="Founder Portrait" placeholder="Select portrait image..." mediaCategory="FOUNDERS_NOTE" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Founder Digital Signature (optional)</label>
+          <FilePicker projectId={projectId} value={cfg.signaturePath || ''} onChange={v => set('signaturePath', v)} accept="image" label="Founder Signature" placeholder="Select signature overlay transparent image..." mediaCategory="FOUNDERS_NOTE" />
+        </div>
+      </div>
+    )
+  }
+
+  // SUSTAINABILITY
+  if (moduleType === 'SUSTAINABILITY') {
+    const items: { title: string; description: string; icon: string }[] = cfg.initiatives || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Headline</label>
+          <input style={inputStyle} value={cfg.headline || ''} onChange={e => set('headline', e.target.value)} placeholder="e.g. Green & Eco-Friendly Design" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Subtext</label>
+          <input style={inputStyle} value={cfg.subtext || ''} onChange={e => set('subtext', e.target.value)} placeholder="e.g. Responsible architecture solutions engineered for resource efficiency." />
+        </div>
+        <label style={labelStyle}>Green Initiatives List</label>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px', gap: '10px' }}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Initiative Title</label>
+                <input style={inputStyle} value={item.title} onChange={e => { const a = [...items]; a[i] = { ...a[i], title: e.target.value }; setArr('initiatives', a) }} placeholder="e.g. Solar Panels Grid" />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Icon</label>
+                <input style={inputStyle} value={item.icon} onChange={e => { const a = [...items]; a[i] = { ...a[i], icon: e.target.value }; setArr('initiatives', a) }} placeholder="e.g. ☀️" />
+              </div>
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Description</label>
+              <input style={inputStyle} value={item.description} onChange={e => { const a = [...items]; a[i] = { ...a[i], description: e.target.value }; setArr('initiatives', a) }} placeholder="How this practice benefits sustainability..." />
+            </div>
+            <button style={removeBtn} onClick={() => setArr('initiatives', items.filter((_, j) => j !== i))}>Remove Initiative</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('initiatives', [...items, { title: '', description: '', icon: '🌱' }])}>+ Add Initiative</button>
+      </div>
+    )
+  }
+
+  // SPORTS_CAROUSEL
+  if (moduleType === 'SPORTS_CAROUSEL') {
+    const items: { name: string; description: string; imagePath?: string }[] = cfg.facilities || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Headline</label>
+          <input style={inputStyle} value={cfg.headline || ''} onChange={e => set('headline', e.target.value)} placeholder="e.g. Active Sports & Fitness" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Subtext</label>
+          <input style={inputStyle} value={cfg.subtext || ''} onChange={e => set('subtext', e.target.value)} placeholder="e.g. Premium sports facilities engineered to keep you active." />
+        </div>
+        <label style={labelStyle}>Sports & Outdoor Arenas</label>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Arena Name</label>
+              <input style={inputStyle} value={item.name} onChange={e => { const a = [...items]; a[i] = { ...a[i], name: e.target.value }; setArr('facilities', a) }} placeholder="e.g. Rooftop Tennis Court" />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Description</label>
+              <input style={inputStyle} value={item.description} onChange={e => { const a = [...items]; a[i] = { ...a[i], description: e.target.value }; setArr('facilities', a) }} placeholder="Specify court dimensions, features, floorings..." />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Facility Picture</label>
+              <FilePicker projectId={projectId} value={item.imagePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], imagePath: v }; setArr('facilities', a) }} accept="image" label="Facility Photo" placeholder="Select facility picture..." mediaCategory="SPORTS_CAROUSEL" />
+            </div>
+            <button style={removeBtn} onClick={() => setArr('facilities', items.filter((_, j) => j !== i))}>Remove Arena</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('facilities', [...items, { name: '', description: '', imagePath: '' }])}>+ Add Arena</button>
+      </div>
+    )
+  }
+
+  // FINANCING_PARTNER
+  if (moduleType === 'FINANCING_PARTNER') {
+    const items: { bankName: string; logoPath?: string; interestRate?: string; maxTenure?: string }[] = cfg.partners || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Headline</label>
+          <input style={inputStyle} value={cfg.headline || ''} onChange={e => set('headline', e.target.value)} placeholder="e.g. Approved Banking Partners" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Subtext</label>
+          <input style={inputStyle} value={cfg.subtext || ''} onChange={e => set('subtext', e.target.value)} placeholder="e.g. Get home loan pre-approvals with attractive interest rates." />
+        </div>
+        <label style={labelStyle}>Home Loan Bank Partners List</label>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Bank Name</label>
+              <input style={inputStyle} value={item.bankName} onChange={e => { const a = [...items]; a[i] = { ...a[i], bankName: e.target.value }; setArr('partners', a) }} placeholder="e.g. State Bank of India" />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Interest Rate Info (p.a.)</label>
+                <input style={inputStyle} value={item.interestRate || ''} onChange={e => { const a = [...items]; a[i] = { ...a[i], interestRate: e.target.value }; setArr('partners', a) }} placeholder="e.g. 8.40%" />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Max Tenure Period</label>
+                <input style={inputStyle} value={item.maxTenure || ''} onChange={e => { const a = [...items]; a[i] = { ...a[i], maxTenure: e.target.value }; setArr('partners', a) }} placeholder="e.g. 30 Years" />
+              </div>
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Bank Brand Logo</label>
+              <FilePicker projectId={projectId} value={item.logoPath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], logoPath: v }; setArr('partners', a) }} accept="image" label="Bank Logo" placeholder="Select bank brand logo..." mediaCategory="FINANCING_PARTNER" />
+            </div>
+            <button style={removeBtn} onClick={() => setArr('partners', items.filter((_, j) => j !== i))}>Remove Bank Partner</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('partners', [...items, { bankName: '', logoPath: '', interestRate: '', maxTenure: '' }])}>+ Add Banking Partner</button>
+      </div>
+    )
+  }
+
+  // COMMUNITY_LIFESTYLE
+  if (moduleType === 'COMMUNITY_LIFESTYLE') {
+    const items: { title: string; description: string; imagePath?: string }[] = cfg.activities || []
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Headline</label>
+          <input style={inputStyle} value={cfg.headline || ''} onChange={e => set('headline', e.target.value)} placeholder="e.g. Community & Social Lifestyle" />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Subtext</label>
+          <input style={inputStyle} value={cfg.subtext || ''} onChange={e => set('subtext', e.target.value)} placeholder="e.g. Interactive spaces designed for social events and relaxing walks." />
+        </div>
+        <label style={labelStyle}>Community Social Activities & Features</label>
+        {items.map((item, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Feature / Activity Title</label>
+              <input style={inputStyle} value={item.title} onChange={e => { const a = [...items]; a[i] = { ...a[i], title: e.target.value }; setArr('activities', a) }} placeholder="e.g. Senior Citizen Tranquil Park" />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Description</label>
+              <input style={inputStyle} value={item.description} onChange={e => { const a = [...items]; a[i] = { ...a[i], description: e.target.value }; setArr('activities', a) }} placeholder="Describe the layout feature details..." />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Activity Picture</label>
+              <FilePicker projectId={projectId} value={item.imagePath || ''} onChange={v => { const a = [...items]; a[i] = { ...a[i], imagePath: v }; setArr('activities', a) }} accept="image" label="Activity Photo" placeholder="Select activity photo..." mediaCategory="COMMUNITY_LIFESTYLE" />
+            </div>
+            <button style={removeBtn} onClick={() => setArr('activities', items.filter((_, j) => j !== i))}>Remove Social Feature</button>
+          </div>
+        ))}
+        <button style={addBtn} onClick={() => setArr('activities', [...items, { title: '', description: '', imagePath: '' }])}>+ Add Social Feature</button>
       </div>
     )
   }
@@ -595,6 +970,8 @@ interface Settings {
   firmContactEmail: string
   firmWebsite: string
   disclaimerText: string
+  narrationEnabled: boolean
+  watermarkEnabled: boolean
 }
 
 export default function AdminRoute(): JSX.Element {
@@ -650,6 +1027,19 @@ export default function AdminRoute(): JSX.Element {
   const [unitStatus, setUnitStatus] = useState('AVAILABLE')
   const [unitNotes, setUnitNotes] = useState('')
 
+  // Towers management state
+  const [towers, setTowers] = useState<any[]>([])
+  const [newTowerName, setNewTowerName] = useState('')
+  const [renamingTowerId, setRenamingTowerId] = useState('')
+  const [renamingTowerValue, setRenamingTowerValue] = useState('')
+
+  // Units management additional state
+  const [units, setUnits] = useState<any[]>([])
+  const [filterTowerId, setFilterTowerId] = useState<string>('ALL')
+  const [unitSearchQuery, setUnitSearchQuery] = useState<string>('')
+  const [editingUnit, setEditingUnit] = useState<any | null>(null)
+  const [useExistingTower, setUseExistingTower] = useState(true)
+
   // Session & Lead list state
   const [sessions, setSessions] = useState<SessionLog[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
@@ -660,7 +1050,9 @@ export default function AdminRoute(): JSX.Element {
     firmContactPhone: '',
     firmContactEmail: '',
     firmWebsite: '',
-    disclaimerText: ''
+    disclaimerText: '',
+    narrationEnabled: true,
+    watermarkEnabled: true
   })
   const [adminPinInput, setAdminPinInput] = useState('')
 
@@ -670,6 +1062,13 @@ export default function AdminRoute(): JSX.Element {
     loadLeads()
     loadSettings()
   }, [])
+
+  useEffect(() => {
+    if (activeTab === 'units' && selectedProjectId) {
+      loadTowers(selectedProjectId)
+      loadUnits(selectedProjectId)
+    }
+  }, [activeTab, selectedProjectId])
 
   const loadProjects = async () => {
     try {
@@ -703,6 +1102,16 @@ export default function AdminRoute(): JSX.Element {
     }
   }
 
+  const loadUnits = async (projId: string) => {
+    if (!projId) return
+    try {
+      const list = await (window as any).api.invoke(IPC_CHANNELS.UNIT_LIST_ALL, projId)
+      setUnits(list || [])
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const loadSessions = async () => {
     try {
       const list = await (window as any).api.invoke(IPC_CHANNELS.SESSION_LOG_LIST)
@@ -725,7 +1134,11 @@ export default function AdminRoute(): JSX.Element {
     try {
       const config = await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_GET)
       if (config) {
-        setSettings(config as Settings)
+        setSettings({
+          ...config,
+          narrationEnabled: config.narrationEnabled !== false,
+          watermarkEnabled: config.watermarkEnabled !== false
+        } as Settings)
       }
     } catch (e) {
       console.error(e)
@@ -750,9 +1163,11 @@ export default function AdminRoute(): JSX.Element {
     setAccentColor(project.themeAccentColor)
     setFontPairing(project.themeFontPairing || 'Inter')
     
-    // Load modules & media for this selected project
+    // Load modules, media, towers & units for this selected project
     loadModules(project.id)
     loadMedia(project.id)
+    loadTowers(project.id)
+    loadUnits(project.id)
   }
 
   const startNewProjectMode = () => {
@@ -930,6 +1345,46 @@ export default function AdminRoute(): JSX.Element {
     }
   }
 
+  // ── Tower management handlers ─────────────────────────────────────────────
+  const loadTowers = async (pid: string) => {
+    if (!pid) return
+    try {
+      const data = await (window as any).api.invoke(IPC_CHANNELS.TOWER_LIST, pid) as any[]
+      setTowers(data)
+    } catch { setTowers([]) }
+  }
+
+  const handleCreateTower = async () => {
+    if (!selectedProjectId) { alert('Select a project first'); return }
+    if (!newTowerName.trim()) { alert('Enter a tower name'); return }
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.TOWER_CREATE, { projectId: selectedProjectId, name: newTowerName.trim() })
+      setNewTowerName('')
+      await loadTowers(selectedProjectId)
+    } catch (err: any) { alert(`Error: ${err.message}`) }
+  }
+
+  const handleRenameTower = async (towerId: string) => {
+    if (!renamingTowerValue.trim()) { alert('Name cannot be empty'); return }
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.TOWER_RENAME, { towerId, name: renamingTowerValue.trim() })
+      setRenamingTowerId('')
+      setRenamingTowerValue('')
+      await loadTowers(selectedProjectId)
+    } catch (err: any) { alert(`Error: ${err.message}`) }
+  }
+
+  const handleDeleteTower = async (towerId: string, towerName: string, unitCount: number) => {
+    const msg = unitCount > 0
+      ? `Delete tower "${towerName}" and its ${unitCount} unit${unitCount !== 1 ? 's' : ''}? This cannot be undone.`
+      : `Delete tower "${towerName}"?`
+    if (!confirm(msg)) return
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.TOWER_DELETE, towerId)
+      await loadTowers(selectedProjectId)
+    } catch (err: any) { alert(`Error: ${err.message}`) }
+  }
+
   // Unit actions
   const handleCsvImport = async () => {
     if (!selectedProjectId) {
@@ -950,6 +1405,8 @@ export default function AdminRoute(): JSX.Element {
       if (res.success) {
         setImportStatus(`Success! Imported ${res.count} units.`)
         setCsvContent('')
+        await loadTowers(selectedProjectId)
+        await loadUnits(selectedProjectId)
       } else {
         setImportStatus(`Failed: ${res.reason}`)
       }
@@ -978,12 +1435,13 @@ export default function AdminRoute(): JSX.Element {
       if (tower) {
         towerId = tower.id
       } else {
-        // Mock creating a tower or use transaction. Since unit upsert schema needs towerId, let's notify user to import via CSV or handle it
-        alert('Tower not found. Please use bulk CSV importer to register towers first, or import units.')
-        return
+        // Auto-create the tower using our new IPC handler
+        const newTower = await (window as any).api.invoke(IPC_CHANNELS.TOWER_CREATE, { projectId: selectedProjectId, name: towerName.trim() }) as any
+        towerId = newTower.id
+        await loadTowers(selectedProjectId) // refresh panel
       }
 
-      await (window as any).api.invoke(IPC_CHANNELS.UNIT_UPSERT, {
+      const payload: any = {
         towerId,
         floor: Number(floorNumber),
         unitNumber,
@@ -996,14 +1454,68 @@ export default function AdminRoute(): JSX.Element {
         priceLabel,
         status: unitStatus,
         notes: unitNotes
-      })
+      }
 
-      alert('Unit record created successfully!')
-      setUnitNumber('')
-      setUnitPrice(0)
+      if (editingUnit) {
+        payload.id = editingUnit.id
+      }
+
+      await (window as any).api.invoke(IPC_CHANNELS.UNIT_UPSERT, payload)
+
+      alert(editingUnit ? 'Unit updated successfully!' : 'Unit record created successfully!')
+      cancelEditUnit()
+      await loadTowers(selectedProjectId)
+      await loadUnits(selectedProjectId)
     } catch (err: any) {
       alert(`Error saving unit: ${err.message}`)
     }
+  }
+
+  const handleDeleteUnit = async (unitId: string) => {
+    if (!confirm('Are you sure you want to delete this unit?')) return
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.UNIT_DELETE, unitId)
+      await loadTowers(selectedProjectId)
+      await loadUnits(selectedProjectId)
+    } catch (err: any) {
+      alert(`Error deleting unit: ${err.message}`)
+    }
+  }
+
+  const startEditUnit = (u: any) => {
+    setEditingUnit(u)
+    const tName = u.tower?.name || ''
+    setTowerName(tName)
+    const hasTower = towers.some((t: any) => t.name.toLowerCase() === tName.toLowerCase())
+    setUseExistingTower(hasTower && towers.length > 0)
+    setFloorNumber(u.floor)
+    setUnitNumber(u.unitNumber)
+    setUnitConfig(u.configuration)
+    setCarpetArea(u.carpetArea)
+    setBuiltUpArea(u.builtUpArea)
+    setSuperBuiltUpArea(u.superBuiltUpArea || 0)
+    setUnitFacing(u.facing || '')
+    setUnitPrice(u.price)
+    setPriceLabel(u.priceLabel)
+    setUnitStatus(u.status)
+    setUnitNotes(u.notes || '')
+  }
+
+  const cancelEditUnit = () => {
+    setEditingUnit(null)
+    setTowerName('')
+    setUseExistingTower(true)
+    setFloorNumber(0)
+    setUnitNumber('')
+    setUnitConfig('2BHK')
+    setCarpetArea(0)
+    setBuiltUpArea(0)
+    setSuperBuiltUpArea(0)
+    setUnitFacing('East')
+    setUnitPrice(0)
+    setPriceLabel('OFFICIAL')
+    setUnitStatus('AVAILABLE')
+    setUnitNotes('')
   }
 
   // Settings action
@@ -1015,7 +1527,9 @@ export default function AdminRoute(): JSX.Element {
         firmContactPhone: settings.firmContactPhone,
         firmContactEmail: settings.firmContactEmail,
         firmWebsite: settings.firmWebsite,
-        disclaimerText: settings.disclaimerText
+        disclaimerText: settings.disclaimerText,
+        narrationEnabled: settings.narrationEnabled,
+        watermarkEnabled: settings.watermarkEnabled
       }
       if (adminPinInput) {
         payload.adminPin = adminPinInput
@@ -1482,7 +1996,7 @@ export default function AdminRoute(): JSX.Element {
                       uploadCategory === 'AUDIO' ? 'audio' : 'image'
                     }
                     label="Media File"
-                    placeholder="Click Browse to select a file from your computer…"
+                    placeholder="Click Browse to select a file from your computer..."
                   />
                 </div>
                 <div>
@@ -1520,100 +2034,373 @@ export default function AdminRoute(): JSX.Element {
 
           {/* TAB 4: UNITS */}
           {activeTab === 'units' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
-              {/* CSV Import */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+              {/* ── TOWERS MANAGEMENT PANEL ─────────────────────────────── */}
               <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>Bulk Unit CSV Import</h3>
-                <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', fontSize: '12px' }}>
-                  Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes</code>
-                </p>
-                <textarea
-                  value={csvContent}
-                  onChange={(e) => setCsvContent(e.target.value)}
-                  placeholder="Tower A,5,A-501,4BHK,2450,4050,0,East,16500000,OFFICIAL,AVAILABLE,Luxury pool view"
-                  rows={10}
-                  style={{
-                    width: '100%', padding: '12px', borderRadius: '6px',
-                    border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)',
-                    fontFamily: 'monospace', fontSize: '12px', resize: 'vertical', marginBottom: '16px'
-                  }}
-                />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-secondary)' }}>{importStatus}</span>
-                  <button onClick={handleCsvImport} style={{ padding: '10px 20px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
-                    Bulk Import
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700 }}>Towers / Blocks Management</h3>
+                    <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>Create, rename or delete towers. Towers appear as clickable blocks on the Master Plan screen.</p>
+                  </div>
+                  <button
+                    onClick={() => loadTowers(selectedProjectId)}
+                    style={{ padding: '6px 14px', fontSize: '12px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text-secondary)', cursor: 'pointer' }}
+                  >
+                    &#x21BB; Refresh
+                  </button>
+                </div>
+
+                {/* Tower list */}
+                {towers.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px', color: 'var(--color-text-muted)', fontSize: '13px', border: '1px dashed var(--color-border)', borderRadius: '8px' }}>
+                    No towers yet. Create one below or import via CSV.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+                    {towers.map((tower: any) => {
+                      const unitCount = tower.units?.length || 0
+                      const available = tower.units?.filter((u: any) => u.status === 'AVAILABLE').length || 0
+                      const sold = tower.units?.filter((u: any) => u.status === 'SOLD').length || 0
+                      const held = tower.units?.filter((u: any) => u.status === 'HELD').length || 0
+                      const isRenaming = renamingTowerId === tower.id
+                      return (
+                        <div key={tower.id} style={{
+                          display: 'flex', alignItems: 'center', gap: '12px',
+                          padding: '14px 16px', background: 'var(--color-bg)',
+                          borderRadius: '8px', border: '1px solid var(--color-border)'
+                        }}>
+                          {/* Tower icon */}
+                          <div style={{ fontSize: '22px', lineHeight: 1 }}>&#x1F3E2;</div>
+
+                          {/* Name / inline rename */}
+                          <div style={{ flex: 1 }}>
+                            {isRenaming ? (
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <input
+                                  autoFocus
+                                  value={renamingTowerValue}
+                                  onChange={e => setRenamingTowerValue(e.target.value)}
+                                  onKeyDown={e => { if (e.key === 'Enter') handleRenameTower(tower.id); if (e.key === 'Escape') setRenamingTowerId('') }}
+                                  style={{ flex: 1, padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--color-accent)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text-primary)', fontSize: '13px', fontWeight: 600 }}
+                                />
+                                <button onClick={() => handleRenameTower(tower.id)} style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: 'var(--color-accent)', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>Save</button>
+                                <button onClick={() => setRenamingTowerId('')} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '12px' }}>Cancel</button>
+                              </div>
+                            ) : (
+                              <>
+                                <div style={{ fontWeight: 700, fontSize: '14px' }}>{tower.name}</div>
+                                <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                                  {unitCount} unit{unitCount !== 1 ? 's' : ''}
+                                  {unitCount > 0 && (
+                                    <span style={{ marginLeft: '8px' }}>
+                                      <span style={{ color: 'var(--color-available)' }}>&#x25CF; {available} avail</span>
+                                      {held > 0 && <span style={{ color: 'var(--color-held)', marginLeft: '8px' }}>&#x25CF; {held} held</span>}
+                                      {sold > 0 && <span style={{ color: 'var(--color-sold)', marginLeft: '8px' }}>&#x25CF; {sold} sold</span>}
+                                    </span>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          {!isRenaming && (
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                onClick={() => { setRenamingTowerId(tower.id); setRenamingTowerValue(tower.name) }}
+                                style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '12px' }}
+                              >
+                                &#x270E; Rename
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTower(tower.id, tower.name, unitCount)}
+                                style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #f87171', background: 'none', color: '#f87171', cursor: 'pointer', fontSize: '12px', fontWeight: 600 }}
+                              >
+                                &#x1F5D1; Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Create new tower */}
+                <div style={{ display: 'flex', gap: '10px', marginTop: towers.length > 0 ? '0' : '8px' }}>
+                  <input
+                    value={newTowerName}
+                    onChange={e => setNewTowerName(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleCreateTower() }}
+                    placeholder="New tower name, e.g. Tower C or Block 3"
+                    style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px' }}
+                  />
+                  <button
+                    onClick={handleCreateTower}
+                    style={{ padding: '8px 20px', borderRadius: '6px', border: 'none', background: 'var(--color-accent)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
+                  >
+                    + Add Tower
                   </button>
                 </div>
               </div>
 
-              {/* Single Unit Form */}
-              <form onSubmit={handleSingleUnitSubmit} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '12px', height: 'fit-content' }}>
-                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Create Single Unit Record</h4>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Tower Name *</label>
-                  <input value={towerName} onChange={(e) => setTowerName(e.target.value)} placeholder="Block A" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+              {/* ── UNIT INVENTORY EXPLORER + CSV & SINGLE UNIT FORM ── */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
+                
+                {/* Left Side: Unit Explorer & CSV Import stacked */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  
+                  {/* 1. Unit Inventory Explorer */}
+                  <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700 }}>Unit Inventory Explorer</h3>
+                      <button
+                        onClick={() => loadUnits(selectedProjectId)}
+                        style={{ padding: '6px 14px', fontSize: '12px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text-secondary)', cursor: 'pointer' }}
+                      >
+                        &#x21BB; Reload List
+                      </button>
+                    </div>
+
+                    {/* Search & Filters */}
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                      <input
+                        value={unitSearchQuery}
+                        onChange={e => setUnitSearchQuery(e.target.value)}
+                        placeholder="Search unit number (e.g. 501)..."
+                        style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px' }}
+                      />
+                      <select
+                        value={filterTowerId}
+                        onChange={e => setFilterTowerId(e.target.value)}
+                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px', minWidth: '150px' }}
+                      >
+                        <option value="ALL">All Towers</option>
+                        {towers.map((t: any) => (
+                          <option key={t.id} value={t.id}>{t.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Table View */}
+                    <div style={{ maxHeight: '380px', overflowY: 'auto', border: '1px solid var(--color-border)', borderRadius: '6px' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                        <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--color-surface-raised)', zIndex: 1, borderBottom: '1px solid var(--color-border)' }}>
+                          <tr style={{ color: 'var(--color-text-muted)' }}>
+                            <th style={{ padding: '10px 12px' }}>Tower</th>
+                            <th style={{ padding: '10px 12px' }}>Floor</th>
+                            <th style={{ padding: '10px 12px' }}>Unit No.</th>
+                            <th style={{ padding: '10px 12px' }}>Config</th>
+                            <th style={{ padding: '10px 12px' }}>Area</th>
+                            <th style={{ padding: '10px 12px' }}>Price</th>
+                            <th style={{ padding: '10px 12px' }}>Status</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            const filtered = units.filter((u: any) => {
+                              const matchesSearch = u.unitNumber.toLowerCase().includes(unitSearchQuery.toLowerCase())
+                              const matchesTower = filterTowerId === 'ALL' || u.towerId === filterTowerId
+                              return matchesSearch && matchesTower
+                            })
+                            
+                            const formatPrice = (p: number) => {
+                              if (p >= 10000000) return `${(p / 10000000).toFixed(2)} Cr`
+                              if (p >= 100000) return `${(p / 100000).toFixed(2)} Lk`
+                              return p.toLocaleString('en-IN')
+                            }
+
+                            if (filtered.length === 0) {
+                              return (
+                                <tr>
+                                  <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--color-text-muted)' }}>
+                                    No units found matching search/filter criteria.
+                                  </td>
+                                </tr>
+                              )
+                            }
+
+                            return filtered.map((u: any) => {
+                              const statusColor = u.status === 'AVAILABLE' ? 'var(--color-available)' : u.status === 'HELD' ? 'var(--color-held)' : 'var(--color-sold)'
+                              return (
+                                <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                                  <td style={{ padding: '10px 12px', fontWeight: 600 }}>{u.tower?.name}</td>
+                                  <td style={{ padding: '10px 12px' }}>{u.floor}</td>
+                                  <td style={{ padding: '10px 12px', fontWeight: 700 }}>{u.unitNumber}</td>
+                                  <td style={{ padding: '10px 12px' }}>{u.configuration}</td>
+                                  <td style={{ padding: '10px 12px' }}>{u.carpetArea} sqft</td>
+                                  <td style={{ padding: '10px 12px', color: 'var(--color-accent)', fontWeight: 600 }}>{formatPrice(u.price)}</td>
+                                  <td style={{ padding: '10px 12px' }}>
+                                    <span style={{
+                                      display: 'inline-block', padding: '2px 8px', borderRadius: '99px',
+                                      backgroundColor: `${statusColor}15`, color: statusColor,
+                                      border: `1px solid ${statusColor}35`, fontSize: '10px', fontWeight: 600
+                                    }}>
+                                      {u.status}
+                                    </span>
+                                  </td>
+                                  <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                      <button onClick={() => startEditUnit(u)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', background: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '11px' }}>Edit</button>
+                                      <button onClick={() => handleDeleteUnit(u.id)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #f87171', background: 'none', color: '#f87171', cursor: 'pointer', fontSize: '11px' }}>Delete</button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )
+                            })
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* 2. CSV Import */}
+                  <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                    <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>Bulk Unit CSV Import</h3>
+                    <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', fontSize: '12px' }}>
+                      Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes</code>
+                    </p>
+                    <textarea
+                      value={csvContent}
+                      onChange={(e) => setCsvContent(e.target.value)}
+                      placeholder="Tower A,5,A-501,4BHK,2450,4050,0,East,16500000,OFFICIAL,AVAILABLE,Luxury pool view"
+                      rows={6}
+                      style={{
+                        width: '100%', padding: '12px', borderRadius: '6px',
+                        border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)',
+                        fontFamily: 'monospace', fontSize: '12px', resize: 'vertical', marginBottom: '16px'
+                      }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-secondary)' }}>{importStatus}</span>
+                      <button onClick={handleCsvImport} style={{ padding: '10px 20px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                        Bulk Import
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Floor Number *</label>
-                  <input type="number" value={floorNumber} onChange={(e) => setFloorNumber(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Number *</label>
-                  <input value={unitNumber} onChange={(e) => setUnitNumber(e.target.value)} placeholder="A-101" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Configuration</label>
-                  <input value={unitConfig} onChange={(e) => setUnitConfig(e.target.value)} placeholder="3BHK" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+
+                {/* Right Side: Form (Single Unit Entry or Edit) */}
+                <form onSubmit={handleSingleUnitSubmit} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '12px', height: 'fit-content' }}>
+                  <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>
+                    {editingUnit ? 'Edit Unit Record' : 'Create Single Unit Record'}
+                  </h4>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Carpet Area</label>
-                    <input type="number" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Tower Name *</label>
+                      {towers.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUseExistingTower(!useExistingTower)
+                            if (useExistingTower) {
+                              setTowerName('')
+                            } else {
+                              setTowerName(towers[0]?.name || '')
+                            }
+                          }}
+                          style={{ background: 'none', border: 'none', color: 'var(--color-accent)', cursor: 'pointer', fontSize: '11px', padding: 0 }}
+                        >
+                          {useExistingTower ? 'Create new tower' : 'Choose existing'}
+                        </button>
+                      )}
+                    </div>
+                    {useExistingTower && towers.length > 0 ? (
+                      <select
+                        value={towerName}
+                        onChange={(e) => setTowerName(e.target.value)}
+                        required
+                        style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
+                      >
+                        <option value="">-- Select Tower --</option>
+                        {towers.map((t: any) => (
+                          <option key={t.id} value={t.name}>{t.name}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={towerName}
+                        onChange={(e) => setTowerName(e.target.value)}
+                        placeholder="E.g. Tower C"
+                        required
+                        style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
+                      />
+                    )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Built Up Area</label>
-                    <input type="number" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Floor Number *</label>
+                    <input type="number" value={floorNumber} onChange={(e) => setFloorNumber(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Super Area</label>
-                    <input type="number" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price (INR) *</label>
-                    <input type="number" value={unitPrice} onChange={(e) => setUnitPrice(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Number *</label>
+                    <input value={unitNumber} onChange={(e) => setUnitNumber(e.target.value)} placeholder="A-101" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price Label</label>
-                    <select value={priceLabel} onChange={(e) => setPriceLabel(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
-                      <option value="OFFICIAL">Official</option>
-                      <option value="ESTIMATED">Estimated</option>
-                      <option value="INDICATIVE">Indicative</option>
-                      <option value="SUBJECT_TO_CONFIRMATION">Subject to Confirmation</option>
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Configuration</label>
+                    <input value={unitConfig} onChange={(e) => setUnitConfig(e.target.value)} placeholder="3BHK" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Carpet Area</label>
+                      <input type="number" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Built Up Area</label>
+                      <input type="number" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Super Area</label>
+                      <input type="number" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price (INR) *</label>
+                      <input type="number" value={unitPrice} onChange={(e) => setUnitPrice(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price Label</label>
+                      <select value={priceLabel} onChange={(e) => setPriceLabel(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
+                        <option value="OFFICIAL">Official</option>
+                        <option value="ESTIMATED">Estimated</option>
+                        <option value="INDICATIVE">Indicative</option>
+                        <option value="SUBJECT_TO_CONFIRMATION">Subject to Confirmation</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Facing</label>
+                    <input value={unitFacing} onChange={(e) => setUnitFacing(e.target.value)} placeholder="East" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Status</label>
+                    <select value={unitStatus} onChange={(e) => setUnitStatus(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
+                      <option value="AVAILABLE">Available</option>
+                      <option value="HELD">Held</option>
+                      <option value="SOLD">Sold</option>
                     </select>
                   </div>
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Facing</label>
-                  <input value={unitFacing} onChange={(e) => setUnitFacing(e.target.value)} placeholder="East" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Status</label>
-                  <select value={unitStatus} onChange={(e) => setUnitStatus(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
-                    <option value="AVAILABLE">Available</option>
-                    <option value="HELD">Held</option>
-                    <option value="SOLD">Sold</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Notes</label>
-                  <input value={unitNotes} onChange={(e) => setUnitNotes(e.target.value)} placeholder="E.g. Pool view" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                </div>
-                <button type="submit" style={{ padding: '8px', backgroundColor: 'var(--color-success)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', fontSize: '12px' }}>
-                  Register Unit
-                </button>
-              </form>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Notes</label>
+                    <input value={unitNotes} onChange={(e) => setUnitNotes(e.target.value)} placeholder="E.g. Pool view" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                    <button type="submit" style={{ flex: 1, padding: '10px', backgroundColor: 'var(--color-success)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '13px' }}>
+                      {editingUnit ? 'Update Unit' : 'Register Unit'}
+                    </button>
+                    {editingUnit && (
+                      <button type="button" onClick={cancelEditUnit} style={{ padding: '10px 14px', border: '1px solid var(--color-border)', background: 'none', color: 'var(--color-text-secondary)', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </form>
+
+              </div>
             </div>
           )}
 
@@ -1754,6 +2541,90 @@ export default function AdminRoute(): JSX.Element {
                 <textarea value={settings.disclaimerText} onChange={(e) => setSettings({ ...settings, disclaimerText: e.target.value })} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', resize: 'vertical' }} />
               </div>
 
+              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)' }}>Kiosk Features Configuration</h4>
+                
+                {/* Voice Narration Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', backgroundColor: 'var(--color-bg)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>
+                      {'\uD83D\uDD0A'} Voice Narration
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      {settings.narrationEnabled
+                        ? 'Auto-narration is ON \u2014 visitors hear module descriptions when browsing the kiosk.'
+                        : 'Auto-narration is OFF \u2014 the kiosk runs silently.'}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, narrationEnabled: !settings.narrationEnabled })}
+                    style={{
+                      flexShrink: 0,
+                      width: '56px', height: '28px',
+                      borderRadius: '14px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: settings.narrationEnabled ? 'var(--color-accent)' : 'var(--color-border)',
+                      position: 'relative',
+                      transition: 'background-color 0.25s ease'
+                    }}
+                    title={settings.narrationEnabled ? 'Click to disable narration' : 'Click to enable narration'}
+                  >
+                    <span style={{
+                      position: 'absolute',
+                      top: '4px',
+                      left: settings.narrationEnabled ? '31px' : '4px',
+                      width: '20px', height: '20px',
+                      borderRadius: '50%',
+                      backgroundColor: '#fff',
+                      transition: 'left 0.25s ease',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+                    }} />
+                  </button>
+                </div>
+
+                {/* Watermark Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', backgroundColor: 'var(--color-bg)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>
+                      {'\uD83D\uDDFD'} Kiosk Screens Watermark Overlay
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      {settings.watermarkEnabled
+                        ? 'Watermark is ON \u2014 a diagonal overlay of your company name tiles all media and floor plans.'
+                        : 'Watermark is OFF \u2014 kiosk screens remain completely clean and clear.'}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, watermarkEnabled: !settings.watermarkEnabled })}
+                    style={{
+                      flexShrink: 0,
+                      width: '56px', height: '28px',
+                      borderRadius: '14px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: settings.watermarkEnabled ? 'var(--color-accent)' : 'var(--color-border)',
+                      position: 'relative',
+                      transition: 'background-color 0.25s ease'
+                    }}
+                    title={settings.watermarkEnabled ? 'Click to disable watermark' : 'Click to enable watermark'}
+                  >
+                    <span style={{
+                      position: 'absolute',
+                      top: '4px',
+                      left: settings.watermarkEnabled ? '31px' : '4px',
+                      width: '20px', height: '20px',
+                      borderRadius: '50%',
+                      backgroundColor: '#fff',
+                      transition: 'left 0.25s ease',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+                    }} />
+                  </button>
+                </div>
+              </div>
+
               <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px' }}>
                 <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Change Admin Security PIN</label>
                 <input
@@ -1776,6 +2647,7 @@ export default function AdminRoute(): JSX.Element {
     </div>
   )
 }
+
 
 
 

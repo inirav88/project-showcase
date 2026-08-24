@@ -20,7 +20,7 @@ export function useAmbientAudio(mediaFilePath?: string | null) {
 
     audio.addEventListener('canplaythrough', () => setReady(true))
     audio.play().catch(() => {
-      // Autoplay may be blocked — ignore silently
+      // Autoplay may be blocked - ignore silently
     })
 
     return () => {

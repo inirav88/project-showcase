@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { useShortlistStore } from '../../store/useShortlistStore'
+import { toMediaUrl } from '../../utils/media'
 
 interface Unit {
   id: string
@@ -26,8 +27,8 @@ interface Project {
 
 function formatPrice(n: number): string {
   if (!n) return 'N/A'
-  if (n >= 10000000) return `₹${(n / 10000000).toFixed(2)} Cr`
-  return `₹${(n / 100000).toFixed(0)} L`
+  if (n >= 10000000) return String.fromCharCode(8377) + (n / 10000000).toFixed(2) + ' Cr'
+  return String.fromCharCode(8377) + (n / 100000).toFixed(0) + ' L'
 }
 
 export default function MasterPlanModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element {
@@ -63,8 +64,11 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
     }
   }
 
-  // Masterplan placeholder image (fallback if not configured)
-  const masterPlanImg = config?.masterPlanImage || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2000&auto=format&fit=crop'
+  // Masterplan image: admin saves as 'imagePath', legacy key was 'masterPlanImage'
+  const rawImg = config?.imagePath || config?.masterPlanImage || ''
+  const masterPlanImg = rawImg
+    ? toMediaUrl(rawImg)
+    : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2000&auto=format&fit=crop'
 
   return (
     <div className="module-container" data-testid="module-MASTERPLAN" style={{ display: 'flex', gap: 'var(--space-6)', height: '100%', overflow: 'hidden' }}>

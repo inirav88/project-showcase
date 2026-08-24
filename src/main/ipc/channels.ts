@@ -8,9 +8,16 @@ export const IPC_CHANNELS = {
   // Modules
   MODULE_LIST:              'module:list',
   MODULE_UPSERT:            'module:upsert',
+  // Towers
+  TOWER_LIST:               'tower:list',
+  TOWER_CREATE:             'tower:create',
+  TOWER_RENAME:             'tower:rename',
+  TOWER_DELETE:             'tower:delete',
   // Units
   UNIT_LIST:                'unit:list',
+  UNIT_LIST_ALL:            'unit:listAll',
   UNIT_UPSERT:              'unit:upsert',
+  UNIT_DELETE:              'unit:delete',
   UNIT_BULK_IMPORT:         'unit:bulkImport',
   // Media
   MEDIA_UPLOAD:             'media:upload',
@@ -28,6 +35,7 @@ export const IPC_CHANNELS = {
   IMPORT_USB_PACKAGE:       'import:usbPackage',
   // Sync
   SYNC_NOW:                 'sync:now',
+  SYNC_PUBLISH_NOW:         'sync:publishNow',
   SYNC_STATUS:              'sync:status',
   // Settings
   SETTINGS_GET:             'settings:get',
@@ -60,3 +68,4 @@ export const IPC_CHANNELS = {
 } as const
 
 export type IpcChannel = typeof IPC_CHANNELS[keyof typeof IPC_CHANNELS]
+

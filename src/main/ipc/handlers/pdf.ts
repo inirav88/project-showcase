@@ -1,7 +1,7 @@
 import { ipcMain, dialog } from 'electron'
 import type { PrismaClient } from '@prisma/client'
 import { IPC_CHANNELS } from '../channels'
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib'
 import fs from 'fs'
 import path from 'path'
 
@@ -12,12 +12,15 @@ export class PdfHandlers {
    * Generates a customized PDF brochure offline
    */
   async exportBrochure(projectId: string, customerName: string, selectedUnitIds: string[]) {
-    // 1. Fetch metadata
+    // 1. Fetch metadata & settings
     const project = await this.db.project.findUnique({
       where: { id: projectId },
       include: { towers: true },
     })
     if (!project) throw new Error('Project not found')
+
+    const settings = await this.db.settings.findUnique({ where: { id: 1 } })
+    const watermarkText = settings?.firmName ? `${settings.firmName} Kiosk` : 'ShowcaseOS'
 
     const units = await this.db.unit.findMany({
       where: { id: { in: selectedUnitIds } },
@@ -38,8 +41,24 @@ export class PdfHandlers {
     const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
     const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
+    const drawWatermark = (page: any) => {
+      const { width, height } = page.getSize()
+      // Draw subtle transparent watermark
+      page.drawText(watermarkText, {
+        x: width / 5,
+        y: height / 4,
+        size: 38,
+        font: regularFont,
+        color: rgb(0.8, 0.8, 0.8),
+        opacity: 0.12,
+        rotate: degrees(40),
+      })
+    }
+
     // Page 1: Title & Cover
     const page1 = pdfDoc.addPage([600, 800])
+    drawWatermark(page1)
+
     page1.drawText(project.name, { x: 50, y: 700, size: 28, font, color: rgb(0.1, 0.3, 0.8) })
     page1.drawText(`Developer: ${project.developer}`, { x: 50, y: 650, size: 14, font: regularFont })
     page1.drawText(`RERA ID: ${project.reraNumber}`, { x: 50, y: 620, size: 12, font: regularFont })
@@ -56,6 +75,8 @@ export class PdfHandlers {
     // Page 2: Shortlisted Units inventory grid
     if (units.length > 0) {
       const page2 = pdfDoc.addPage([600, 800])
+      drawWatermark(page2)
+
       page2.drawText('Selected Shortlisted Units', { x: 50, y: 720, size: 20, font })
 
       let yOffset = 660

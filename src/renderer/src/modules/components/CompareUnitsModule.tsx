@@ -27,8 +27,8 @@ interface Project {
 
 function formatPrice(n: number): string {
   if (!n) return 'N/A'
-  if (n >= 10000000) return `₹${(n / 10000000).toFixed(2)} Cr`
-  return `₹${(n / 100000).toFixed(0)} L`
+  if (n >= 10000000) return String.fromCharCode(8377) + (n / 10000000).toFixed(2) + ' Cr'
+  return String.fromCharCode(8377) + (n / 100000).toFixed(0) + ' L'
 }
 
 export default function CompareUnitsModule({ config: _config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element {

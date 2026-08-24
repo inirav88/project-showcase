@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, protocol, net, Menu, MenuItemConstructorOptions } from 'electron'
+import { app, BrowserWindow, shell, protocol, net, Menu, MenuItemConstructorOptions, ipcMain, screen } from 'electron'
 import path, { join } from 'path'
 import fs from 'fs'
 import { pathToFileURL } from 'url'
@@ -19,6 +19,11 @@ import { UsbHandlers } from './ipc/handlers/usb'
 import { SyncHandlers } from './ipc/handlers/sync'
 import { registerDialogHandlers } from './ipc/handlers/dialog'
 
+if (is.dev) {
+  app.commandLine.appendSwitch('disable-http-cache')
+  app.commandLine.appendSwitch('disable-gpu-shader-disk-cache')
+}
+
 // Register privileged custom media scheme before app is ready
 protocol.registerSchemesAsPrivileged([
   {
@@ -37,6 +42,7 @@ const isProd = !is.dev
 
 let kioskWin: BrowserWindow | null = null
 let adminWin: BrowserWindow | null = null
+let presenterWin: BrowserWindow | null = null
 
 function createWindows(): void {
   kioskWin = new BrowserWindow(kioskWindowOptions(isProd))
@@ -114,6 +120,87 @@ app.whenReady().then(async () => {
     // Register dialog (file picker) handlers — no DB dependency
     registerDialogHandlers()
 
+    // Register system:secondDisplay IPC handler for presenter console
+    ipcMain.handle('system:secondDisplay', async (_, data: any) => {
+      const { action, projectId, moduleId, moduleType } = data || {}
+
+      if (action === 'open') {
+        if (presenterWin) {
+          presenterWin.focus()
+          return { success: true, alreadyOpen: true }
+        }
+
+        const displays = screen.getAllDisplays()
+        const externalDisplay = displays.find((display) => {
+          return display.bounds.x !== 0 || display.bounds.y !== 0
+        })
+
+        // Create presenter console window
+        presenterWin = new BrowserWindow({
+          width: 1100,
+          height: 750,
+          autoHideMenuBar: true,
+          title: 'Sales Presenter Control Console',
+          webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: join(__dirname, '../preload/index.js'),
+          }
+        })
+
+        // If an external display is detected, put the Kiosk window on it fullscreen
+        // and keep the presenter console on the laptop (primary display)
+        if (externalDisplay && kioskWin) {
+          kioskWin.setFullScreen(false)
+          kioskWin.setBounds(externalDisplay.bounds)
+          kioskWin.setFullScreen(true)
+
+          const primaryDisplay = screen.getPrimaryDisplay()
+          presenterWin.setBounds({
+            x: primaryDisplay.bounds.x + 100,
+            y: primaryDisplay.bounds.y + 100,
+            width: 1100,
+            height: 750
+          })
+        }
+
+        presenterWin.on('closed', () => {
+          presenterWin = null
+          // Return kiosk window to primary monitor when presenter window closes
+          if (kioskWin) {
+            const primaryDisplay = screen.getPrimaryDisplay()
+            kioskWin.setFullScreen(false)
+            kioskWin.setBounds(primaryDisplay.bounds)
+            kioskWin.setFullScreen(true)
+          }
+        })
+
+        if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+          presenterWin.loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/kiosk/presenter/${projectId}`)
+        } else {
+          presenterWin.loadFile(join(__dirname, '../renderer/index.html'), { hash: `/kiosk/presenter/${projectId}` })
+        }
+
+        return { success: true }
+      }
+
+      if (action === 'navigate') {
+        if (kioskWin && moduleId) {
+          kioskWin.webContents.send('system:navigateToModule', moduleId)
+        }
+        return { success: true }
+      }
+
+      if (action === 'sync') {
+        if (presenterWin && moduleType) {
+          presenterWin.webContents.send('system:kioskNavigated', moduleType)
+        }
+        return { success: true }
+      }
+
+      return { success: false, reason: 'Invalid action' }
+    })
+
     // Register file protocol handler for local media loading.
     protocol.handle('media', (request) => {
       const parsed = new URL(request.url)
@@ -128,9 +215,7 @@ app.whenReady().then(async () => {
       }
 
       const normalizedPath = path.normalize(filePath)
-      if (!fs.existsSync(normalizedPath)) {
-        console.warn(`[Media Protocol] WARNING: File does not exist at: ${normalizedPath}`)
-      }
+      if (!fs.existsSync(normalizedPath)) { console.warn(`[Media Protocol] WARNING: File does not exist at: ${normalizedPath}`); return new Response("File not found", { status: 404 }); }
       return net.fetch(pathToFileURL(normalizedPath).toString())
     })
 
@@ -151,3 +236,6 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+
+

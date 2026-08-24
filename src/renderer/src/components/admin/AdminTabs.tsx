@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 
 const cardStyle: React.CSSProperties = { backgroundColor: 'var(--color-surface-raised)', padding: 24, borderRadius: 8, border: '1px solid var(--color-border)' }
@@ -154,10 +154,12 @@ export function AnalyticsTab({ sessions }: { sessions: SessionLog[] }) {
 export function BackupSyncTab() {
   const [syncStatus, setSyncStatus] = useState<{ configured: boolean; lastSyncedAt?: string | null; contentVersion?: string } | null>(null)
   const [syncing, setSyncing] = useState(false)
+  const [publishing, setPublishing] = useState(false)
   const [syncResult, setSyncResult] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
-  useEffect(() => { (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => setSyncStatus(s)).catch(() => {}) }, [])
+  const loadStatus = () => { (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => setSyncStatus(s)).catch(() => {}) }
+  useEffect(() => { loadStatus() }, [])
   const handleExport = async () => {
     setExporting(true)
     try { const r = await (window as any).api.invoke(IPC_CHANNELS.EXPORT_USB_PACKAGE) as any; if (r.success) alert('Backup saved to: ' + r.filePath); else if (r.reason !== 'Cancelled') alert('Export failed: ' + r.reason) }
@@ -171,8 +173,19 @@ export function BackupSyncTab() {
   }
   const handleSync = async () => {
     setSyncing(true); setSyncResult(null)
-    try { const r = await (window as any).api.invoke(IPC_CHANNELS.SYNC_NOW) as any; setSyncResult(r.success ? 'Sync complete: ' + (r.message || '') : 'Error: ' + r.reason); if (r.success) { const s = await (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS) as any; setSyncStatus(s) } }
-    finally { setSyncing(false) }
+    try {
+      const r = await (window as any).api.invoke(IPC_CHANNELS.SYNC_NOW) as any
+      setSyncResult(r.success ? '\u2713 Sync complete: ' + (r.message || '') : '\u26A0 Sync failed: ' + r.reason)
+      loadStatus()
+    } finally { setSyncing(false) }
+  }
+  const handlePublish = async () => {
+    setPublishing(true); setSyncResult(null)
+    try {
+      const r = await (window as any).api.invoke(IPC_CHANNELS.SYNC_PUBLISH_NOW) as any
+      setSyncResult(r.success ? '\u2713 Cloud publish complete. Version: ' + r.contentVersion : '\u26A0 Publish failed: ' + r.reason)
+      loadStatus()
+    } finally { setPublishing(false) }
   }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -185,15 +198,18 @@ export function BackupSyncTab() {
         </div>
       </div>
       <div style={cardStyle}>
-        <h3 style={{ margin: '0 0 8px' }}>Cloud Sync</h3>
+        <h3 style={{ margin: '0 0 8px' }}>Cloud Sync & Publishing</h3>
         {syncStatus != null && (
           <div style={{ fontSize: 13, marginBottom: 16, padding: '10px 14px', borderRadius: 8, background: syncStatus.configured ? 'rgba(34,197,94,0.08)' : 'rgba(245,158,11,0.08)', border: '1px solid ' + (syncStatus.configured ? 'rgba(34,197,94,0.3)' : 'rgba(245,158,11,0.3)') }}>
             {syncStatus.configured ? (<span style={{ color: '#16a34a' }}>VPS Configured. Version: {syncStatus.contentVersion || '0'}. Last synced: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleString() : 'Never'}</span>) : (<span style={{ color: '#d97706' }}>Cloud sync not configured. Add VPS URL in Settings to enable.</span>)}
           </div>
         )}
         {syncResult && <div style={{ fontSize: 13, marginBottom: 12, padding: '8px 12px', borderRadius: 6, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>{syncResult}</div>}
-        <button onClick={handleSync} disabled={syncing} style={{ padding: '12px 24px', background: syncStatus?.configured ? 'var(--color-accent)' : 'var(--color-surface)', color: syncStatus?.configured ? '#fff' : 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: 8, fontWeight: 700, cursor: syncing ? 'not-allowed' : 'pointer', fontSize: 14, fontFamily: 'var(--font-sans)' }}>{syncing ? 'Syncing...' : 'Sync Now'}</button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button onClick={handleSync} disabled={syncing || !syncStatus?.configured} style={{ padding: '12px 24px', background: syncStatus?.configured ? 'var(--color-accent)' : 'var(--color-surface)', color: syncStatus?.configured ? '#fff' : 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: 8, fontWeight: 700, cursor: (syncing || !syncStatus?.configured) ? 'not-allowed' : 'pointer', fontSize: 14, fontFamily: 'var(--font-sans)' }}>{syncing ? 'Syncing...' : 'Sync (Pull Client)'}</button>
+          <button onClick={handlePublish} disabled={publishing || !syncStatus?.configured} style={{ padding: '12px 24px', background: syncStatus?.configured ? 'var(--color-accent)' : 'var(--color-surface)', color: syncStatus?.configured ? '#fff' : 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: 8, fontWeight: 700, cursor: (publishing || !syncStatus?.configured) ? 'not-allowed' : 'pointer', fontSize: 14, fontFamily: 'var(--font-sans)' }}>{publishing ? 'Publishing...' : 'Publish (Push Admin)'}</button>
+        </div>
       </div>
     </div>
-  )
+)
 }

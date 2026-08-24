@@ -10,19 +10,19 @@ interface Props {
 const PERSONAS: { id: Persona; emoji: string; title: string; subtitle: string }[] = [
   {
     id: 'END_USE',
-    emoji: '??',
+    emoji: '\uD83C\uDFE0',
     title: 'Own Home',
     subtitle: 'Looking for a home for my family to live in',
   },
   {
     id: 'INVESTMENT',
-    emoji: '??',
+    emoji: '\uD83D\uDCC8',
     title: 'Investment',
     subtitle: 'Exploring for rental income or capital appreciation',
   },
   {
     id: 'NRI',
-    emoji: '??',
+    emoji: '\uD83C\uDF10',
     title: 'NRI Buyer',
     subtitle: 'Based abroad, investing back home',
   },
@@ -46,7 +46,7 @@ export function PersonaSelector({ onSelect, onSkip }: Props) {
         boxShadow: 'var(--shadow-xl)',
       }}>
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>??</div>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>\uD83D\uDC4B</div>
           <h2 style={{
             fontSize: 'var(--font-size-2xl)', fontWeight: 800,
             color: 'var(--color-text-primary)', letterSpacing: '-0.03em', marginBottom: 8,
@@ -106,7 +106,7 @@ export function PersonaSelector({ onSelect, onSkip }: Props) {
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text-primary)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
           >
-            Skip — general browse
+            Skip \u2014 general browse
           </button>
         </div>
       </div>
