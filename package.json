@@ -78,6 +78,11 @@
     "directories": {
       "output": "dist"
     },
+    "files": [
+      "out/**/*",
+      "node_modules/**/*",
+      "node_modules/.prisma/**/*"
+    ],
     "extraResources": [
       "dev.db"
     ],
