@@ -1,96 +1,100 @@
 {
-  "name": "showcaseos",
-  "version": "0.0.1",
-  "description": "Offline-first real estate project showcase desktop app",
-  "main": "./out/main/index.js",
-  "author": "Nirav Real Estate",
-  "homepage": ".",
-  "scripts": {
-    "dev": "electron-vite dev",
-    "build": "electron-vite build",
-    "preview": "electron-vite preview",
-    "package": "electron-vite build && electron-builder",
-    "test": "vitest run",
-    "test:ui": "vitest --ui",
-    "test:watch": "vitest",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node --project tsconfig.node.json prisma/seed.ts",
-    "prisma:studio": "prisma studio"
-  },
-  "dependencies": {
-    "@electron-toolkit/preload": "^3.0.0",
-    "@electron-toolkit/utils": "^3.0.0",
-    "@libsql/client": "^0.17.4",
-    "@prisma/adapter-libsql": "^5.22.0",
-    "@prisma/client": "^5.22.0",
-    "archiver": "^7.0.1",
-    "extract-zip": "^2.0.1",
-    "fluent-ffmpeg": "^2.1.3",
-    "pdf-lib": "^1.17.1",
-    "qrcode": "^1.5.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.27.0",
-    "zustand": "^5.0.1"
-  },
-  "devDependencies": {
-    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
-    "@electron-toolkit/eslint-config-ts": "^2.0.0",
-    "@electron-toolkit/tsconfig": "^1.0.1",
-    "@hookform/resolvers": "^3.9.1",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.0.1",
-    "@types/adm-zip": "^0.5.8",
-    "@types/archiver": "^6.0.4",
-    "@types/extract-zip": "^2.0.0",
-    "@types/fluent-ffmpeg": "^2.1.27",
-    "@types/node": "^22.9.0",
-    "@types/qrcode": "^1.5.6",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.3",
-    "adm-zip": "^0.5.18",
-    "csv-parse": "^5.5.6",
-    "electron": "^33.4.11",
-    "electron-builder": "^25.1.8",
-    "electron-vite": "^2.3.0",
-    "ffmpeg-static": "^5.2.0",
-    "happy-dom": "^20.11.2",
-    "jsdom": "^25.0.1",
-    "pdf-parse": "^1.1.1",
-    "prisma": "^5.22.0",
-    "react-hook-form": "^7.53.2",
-    "sharp": "^0.33.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.11",
-    "vitest": "^2.1.5",
-    "zod": "^3.23.8"
-  },
-  "prisma": {
-    "seed": "ts-node --project tsconfig.node.json prisma/seed.ts"
-  },
-  "build": {
-    "appId": "com.nirav.showcaseos",
-    "productName": "ShowcaseOS",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "out/**/*",
-      "node_modules/**/*",
-      "node_modules/.prisma/**/*"
-    ],
-    "extraResources": [
-      "dev.db"
-    ],
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
-    }
-  }
+    "name":  "showcaseos",
+    "version":  "0.0.1",
+    "description":  "Offline-first real estate project showcase desktop app",
+    "main":  "./out/main/index.js",
+    "author":  "Nirav Real Estate",
+    "homepage":  ".",
+    "scripts":  {
+                    "dev":  "electron-vite dev",
+                    "build":  "electron-vite build",
+                    "preview":  "electron-vite preview",
+                    "package":  "electron-vite build \u0026\u0026 electron-builder",
+                    "test":  "vitest run",
+                    "test:ui":  "vitest --ui",
+                    "test:watch":  "vitest",
+                    "prisma:generate":  "prisma generate",
+                    "prisma:migrate":  "prisma migrate dev",
+                    "prisma:seed":  "ts-node --project tsconfig.node.json prisma/seed.ts",
+                    "prisma:studio":  "prisma studio"
+                },
+    "dependencies":  {
+                         "@electron-toolkit/preload":  "^3.0.0",
+                         "@electron-toolkit/utils":  "^3.0.0",
+                         "@libsql/client":  "^0.17.4",
+                         "@prisma/adapter-libsql":  "^5.22.0",
+                         "@prisma/client":  "^5.22.0",
+                         "archiver":  "^7.0.1",
+                         "extract-zip":  "^2.0.1",
+                         "fluent-ffmpeg":  "^2.1.3",
+                         "pdf-lib":  "^1.17.1",
+                         "qrcode":  "^1.5.4",
+                         "react":  "^18.3.1",
+                         "react-dom":  "^18.3.1",
+                         "react-router-dom":  "^6.27.0",
+                         "zustand":  "^5.0.1"
+                     },
+    "devDependencies":  {
+                            "@electron-toolkit/eslint-config-prettier":  "^2.0.0",
+                            "@electron-toolkit/eslint-config-ts":  "^2.0.0",
+                            "@electron-toolkit/tsconfig":  "^1.0.1",
+                            "@hookform/resolvers":  "^3.9.1",
+                            "@testing-library/dom":  "^10.4.1",
+                            "@testing-library/jest-dom":  "^6.6.3",
+                            "@testing-library/react":  "^16.0.1",
+                            "@types/adm-zip":  "^0.5.8",
+                            "@types/archiver":  "^6.0.4",
+                            "@types/extract-zip":  "^2.0.0",
+                            "@types/fluent-ffmpeg":  "^2.1.27",
+                            "@types/node":  "^22.9.0",
+                            "@types/qrcode":  "^1.5.6",
+                            "@types/react":  "^18.3.12",
+                            "@types/react-dom":  "^18.3.1",
+                            "@vitejs/plugin-react":  "^4.3.3",
+                            "adm-zip":  "^0.5.18",
+                            "csv-parse":  "^5.5.6",
+                            "electron":  "^33.4.11",
+                            "electron-builder":  "^25.1.8",
+                            "electron-vite":  "^2.3.0",
+                            "ffmpeg-static":  "^5.2.0",
+                            "happy-dom":  "^20.11.2",
+                            "jsdom":  "^25.0.1",
+                            "pdf-parse":  "^1.1.1",
+                            "prisma":  "^5.22.0",
+                            "react-hook-form":  "^7.53.2",
+                            "sharp":  "^0.33.5",
+                            "ts-node":  "^10.9.2",
+                            "typescript":  "^5.6.3",
+                            "vite":  "^5.4.11",
+                            "vitest":  "^2.1.5",
+                            "zod":  "^3.23.8"
+                        },
+    "prisma":  {
+                   "seed":  "ts-node --project tsconfig.node.json prisma/seed.ts"
+               },
+    "build":  {
+                  "appId":  "com.nirav.showcaseos",
+                  "productName":  "ShowcaseOS",
+                  "directories":  {
+                                      "output":  "dist"
+                                  },
+                  "files":  [
+                                "out/**/*",
+                                "node_modules/**/*"
+                            ],
+                  "asarUnpack":  [
+                                     "node_modules/.prisma/**/*",
+                                     "node_modules/@prisma/client/**/*"
+                                 ],
+                  "extraResources":  [
+                                         "dev.db",
+                                         "node_modules/.prisma/**/*"
+                                     ],
+                  "win":  {
+                              "target":  "nsis"
+                          },
+                  "mac":  {
+                              "target":  "dmg"
+                          }
+              }
 }
