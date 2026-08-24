@@ -449,17 +449,15 @@ export default function ProjectShowcase(): JSX.Element {
     if (!el) return
 
     let isDown = false
+    let moved = false
     let startX: number
     let scrollLeft: number
 
     const onMouseDown = (e: MouseEvent) => {
       isDown = true
+      moved = false
       startX = e.pageX - el.offsetLeft
       scrollLeft = el.scrollLeft
-    }
-
-    const onMouseLeave = () => {
-      isDown = false
     }
 
     const onMouseUp = () => {
@@ -468,9 +466,11 @@ export default function ProjectShowcase(): JSX.Element {
 
     const onMouseMove = (e: MouseEvent) => {
       if (!isDown) return
-      e.preventDefault()
       const x = e.pageX - el.offsetLeft
       const walk = (x - startX) * 1.5 // Speed multiplier
+      if (Math.abs(walk) > 5) {
+        moved = true
+      }
       el.scrollLeft = scrollLeft - walk
     }
 
@@ -479,18 +479,26 @@ export default function ProjectShowcase(): JSX.Element {
       e.preventDefault()
     }
 
+    // Intercept and suppress mouse clicks if the user was actively dragging/scrolling
+    const onClick = (e: MouseEvent) => {
+      if (moved) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+    }
+
     el.addEventListener('mousedown', onMouseDown)
-    el.addEventListener('mouseleave', onMouseLeave)
-    el.addEventListener('mouseup', onMouseUp)
-    el.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    window.addEventListener('mousemove', onMouseMove)
     el.addEventListener('dragstart', onDragStart)
+    el.addEventListener('click', onClick, { capture: true })
 
     return () => {
       el.removeEventListener('mousedown', onMouseDown)
-      el.removeEventListener('mouseleave', onMouseLeave)
-      el.removeEventListener('mouseup', onMouseUp)
-      el.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('mousemove', onMouseMove)
       el.removeEventListener('dragstart', onDragStart)
+      el.removeEventListener('click', onClick, { capture: true })
     }
   }, [])
 
