@@ -107,6 +107,30 @@ function LauncherPinModal({
     }
   }
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (checking) return
+      
+      // Support numeric key entries (0-9)
+      if (/^[0-9]$/.test(e.key)) {
+        handleKey(e.key)
+      }
+      // Support Backspace
+      else if (e.key === 'Backspace') {
+        handleKey('⌫')
+      }
+      // Support Escape to close
+      else if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [digits, checking, onClose])
+
   return (
     <div className="pin-backdrop" role="dialog" aria-label="Admin PIN entry">
       <div className="pin-modal">
