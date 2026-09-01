@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom'
 import KioskRoute from './routes/KioskRoute'
 import AdminRoute from './routes/AdminRoute'
 import './assets/index.css'
+import './assets/accessibility-fixes.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

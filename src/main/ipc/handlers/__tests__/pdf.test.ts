@@ -45,6 +45,13 @@ describe('PdfHandlers brochure compiler', () => {
           },
         ]),
       },
+      settings: {
+        findUnique: vi.fn(() => ({
+          id: 1,
+          firmName: 'Test Firm',
+          firmLogo: null,
+        })),
+      },
     }
     handlers = new PdfHandlers(mockDb)
 

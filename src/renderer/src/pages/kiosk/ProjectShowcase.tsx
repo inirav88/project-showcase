@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, Suspense } from 'react'
+import { useEffect, useState, useRef, Suspense, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useKioskExit } from '../../hooks/useKioskExit'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
@@ -53,9 +53,9 @@ function PinModal({
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
 
-  const handleKey = async (d: string) => {
+  const handleKey = useCallback(async (d: string) => {
     if (checking) return
-    if (d === '⌫') {
+    if (d === '⌫' || d === 'Backspace') {
       setDigits((prev) => prev.slice(0, -1))
       setError('')
       return
@@ -71,20 +71,58 @@ function PinModal({
       }
       setChecking(false)
     }
-  }
+  }, [checking, digits, onVerify])
+
+  // Keyboard event handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      console.log('Key pressed:', e.key) // Debug log
+
+      if (checking) return
+
+      // Handle number keys (0-9)
+      if (e.key >= '0' && e.key <= '9') {
+        e.preventDefault()
+        e.stopPropagation()
+        handleKey(e.key)
+      }
+      // Handle backspace/delete
+      else if (e.key === 'Backspace' || e.key === 'Delete') {
+        e.preventDefault()
+        e.stopPropagation()
+        handleKey('⌫')
+      }
+      // Handle escape to close
+      else if (e.key === 'Escape') {
+        e.preventDefault()
+        e.stopPropagation()
+        onClose()
+      }
+    }
+
+    console.log('Keyboard listener attached') // Debug log
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      console.log('Keyboard listener removed') // Debug log
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [checking, handleKey, onClose])
 
   return (
-    <div className="pin-backdrop" role="dialog" aria-label="Admin PIN entry">
+    <div className="pin-backdrop" role="dialog" aria-label="Admin PIN entry" aria-modal="true">
       <div className="pin-modal">
         <div style={{ textAlign: 'center' }}>
-          <div style={{
-            fontSize: '13px', fontWeight: 700, color: 'var(--color-text-muted)',
+          <div className="text-min-readable" style={{
+            fontWeight: 700, color: 'var(--color-text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8
           }}>
             Admin Access
           </div>
           <div style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)', fontWeight: 600 }}>
             Enter 4-digit PIN
+          </div>
+          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginTop: 4 }}>
+            Use keyboard or click buttons below
           </div>
         </div>
 
@@ -95,10 +133,7 @@ function PinModal({
         </div>
 
         {error && (
-          <div style={{
-            fontSize: 'var(--font-size-xs)', color: 'var(--color-error)',
-            textAlign: 'center', fontWeight: 600
-          }}>
+          <div className="error-message-accessible" role="alert">
             {error}
           </div>
         )}
@@ -110,9 +145,10 @@ function PinModal({
             ) : (
               <button
                 key={key + i}
-                className="pin-key"
+                className={`pin-key${checking ? ' btn-loading' : ''}`}
                 onClick={() => handleKey(key)}
                 disabled={checking}
+                aria-label={key === '⌫' ? 'Delete' : `Number ${key}`}
               >
                 {key}
               </button>
@@ -231,15 +267,8 @@ function ShortlistDrawer({
           </div>
           <button
             onClick={onClose}
-            style={{
-              all: 'unset', cursor: 'pointer', width: 36, height: 36,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              borderRadius: '50%', background: 'var(--color-surface-raised)',
-              border: '1px solid var(--color-border)', fontSize: 20, color: 'var(--color-text-secondary)',
-              transition: 'all var(--transition-fast)',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-hover)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--color-surface-raised)' }}
+            className="close-btn-accessible"
+            aria-label="Close shortlist"
           >
             ×
           </button>
@@ -273,16 +302,10 @@ function ShortlistDrawer({
                 </div>
                 <button
                   onClick={() => removeItem(item.unitId)}
-                  style={{
-                    all: 'unset', cursor: 'pointer', padding: '6px 10px',
-                    borderRadius: 'var(--radius-sm)', border: '1px solid rgba(248,113,113,0.3)',
-                    color: 'var(--color-sold)', fontSize: '18px',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(248,113,113,0.1)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                  className="shortlist-remove-btn"
+                  aria-label={`Remove ${item.unitNumber} from shortlist`}
                 >
-                  ✕
+                  ×
                 </button>
               </div>
             ))
@@ -517,6 +540,8 @@ export default function ProjectShowcase(): JSX.Element {
   const [leadPhone, setLeadPhone] = useState('')
   const [leadEmail, setLeadEmail] = useState('')
   const [submittingLead, setSubmittingLead] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [phoneError, setPhoneError] = useState('')
   const [settings, setSettings] = useState<any>(null)
   const [narrationMuted, setNarrationMuted] = useState(false)
 
@@ -532,7 +557,7 @@ export default function ProjectShowcase(): JSX.Element {
     : null
   const { muted, toggleMute, hasAudio } = useAmbientAudio(ambientAudioPath)
 
-  const { startHold, endHold } = useKioskExit({
+  const { startHold, endHold, isHolding, progress } = useKioskExit({
     onExit: () => setShowPinModal(true),
   })
 
@@ -611,7 +636,7 @@ export default function ProjectShowcase(): JSX.Element {
   // 2. Voice Narration effect (FR-20) using Web Speech API
   useEffect(() => {
     if (!project || !activeModule) return
-    window.speechSynthesis.cancel()
+    window.speechSynthesis?.cancel()
     if (narrationMuted) return
 
     let narrationText = ''
@@ -639,13 +664,13 @@ export default function ProjectShowcase(): JSX.Element {
         const utterance = new SpeechSynthesisUtterance(narrationText)
         utterance.rate = 0.95
         utterance.pitch = 1.0
-        window.speechSynthesis.speak(utterance)
+        window.speechSynthesis?.speak(utterance)
       }, 500)
       return () => clearTimeout(timer)
     }
 
     return () => {
-      window.speechSynthesis.cancel()
+      window.speechSynthesis?.cancel()
     }
   }, [activeModuleId, project, narrationMuted])
   if (!project) return <div className="loading">Loading project…</div>
@@ -686,9 +711,40 @@ export default function ProjectShowcase(): JSX.Element {
     }
   }
 
+  const validateEmail = (email: string): boolean => {
+    if (!email) return true // Optional field
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const validatePhone = (phone: string): boolean => {
+    if (!phone) return false // Required field
+    const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/
+    return phoneRegex.test(phone)
+  }
+
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!leadName || !leadPhone) return
+
+    // Validate fields
+    let hasErrors = false
+
+    if (leadEmail && !validateEmail(leadEmail)) {
+      setEmailError('Please enter a valid email address')
+      hasErrors = true
+    } else {
+      setEmailError('')
+    }
+
+    if (!validatePhone(leadPhone)) {
+      setPhoneError('Please enter a valid phone number (minimum 10 digits)')
+      hasErrors = true
+    } else {
+      setPhoneError('')
+    }
+
+    if (hasErrors || !leadName) return
+
     setSubmittingLead(true)
     try {
       await window.api.invoke(IPC_CHANNELS.LEAD_CREATE, {
@@ -726,15 +782,26 @@ export default function ProjectShowcase(): JSX.Element {
       )}
       {/* Corner hold zone for admin PIN */}
       <div
-        className="kiosk-exit-corner"
+        className={`kiosk-exit-corner${isHolding ? ' holding' : ''}`}
         onPointerDown={startHold}
         onPointerUp={endHold}
         onPointerLeave={endHold}
+        style={{ '--hold-progress': `${progress}%` } as React.CSSProperties}
+        role="button"
+        aria-label="Hold to access admin panel"
       />
 
       {/* Header */}
       <header className="showcase-header">
-        <button className="back-btn" onClick={handleBack}>
+        <button
+          className="back-btn"
+          onClick={handleBack}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            handleBack();
+          }}
+          aria-label="Go back to project selection"
+        >
           {String.fromCharCode(8592)} Back
         </button>
         <div className="showcase-header-info">
@@ -783,12 +850,13 @@ export default function ProjectShowcase(): JSX.Element {
           <button
             onClick={toggleMute}
             title={muted ? "Unmute ambient audio" : "Mute ambient audio"}
+            aria-label={muted ? "Unmute ambient audio" : "Mute ambient audio"}
+            className="btn-hover-effect"
             style={{
-              all: "unset", cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+              cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
               padding: "10px 14px", borderRadius: "var(--radius-sm)",
-              background: "var(--color-surface-raised)", border: "1px solid var(--color-border)",
+              border: "1px solid var(--color-border)",
               fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)",
-              transition: "all var(--transition-fast)",
             }}
           >
             {muted ? String.fromCodePoint(128263) : String.fromCodePoint(128266)}
@@ -800,15 +868,16 @@ export default function ProjectShowcase(): JSX.Element {
             onClick={() => {
               const nextVal = !narrationMuted
               setNarrationMuted(nextVal)
-              if (nextVal) window.speechSynthesis.cancel()
+              if (nextVal) window.speechSynthesis?.cancel()
             }}
             title={narrationMuted ? 'Unmute voice narration' : 'Mute voice narration'}
+            aria-label={narrationMuted ? 'Unmute voice narration' : 'Mute voice narration'}
+            className="btn-hover-effect"
             style={{
-              all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
               padding: '10px 14px', borderRadius: 'var(--radius-sm)',
-              background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)',
+              border: '1px solid var(--color-border)',
               fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)',
-              transition: 'all var(--transition-fast)',
             }}
           >
             {narrationMuted ? String.fromCodePoint(128263) + ' Narration' : String.fromCodePoint(128483) + ' Narration'}
@@ -911,26 +980,50 @@ export default function ProjectShowcase(): JSX.Element {
             </div>
 
             {[
-              { label: 'Full Name *', value: leadName, setter: setLeadName, placeholder: 'e.g. Nirav Patel', required: true, type: 'text' },
-              { label: 'Mobile Number *', value: leadPhone, setter: setLeadPhone, placeholder: 'e.g. +91 98765 43210', required: true, type: 'tel' },
-              { label: 'Email Address', value: leadEmail, setter: setLeadEmail, placeholder: 'Optional', required: false, type: 'email' },
-            ].map(({ label, value, setter, placeholder, required, type }) => (
-              <div key={label}>
+              { label: 'Full Name *', value: leadName, setter: setLeadName, placeholder: 'e.g. Nirav Patel', required: true, type: 'text', error: '' },
+              { label: 'Mobile Number *', value: leadPhone, setter: setLeadPhone, placeholder: 'e.g. +91 98765 43210', required: true, type: 'tel', error: phoneError },
+              { label: 'Email Address', value: leadEmail, setter: setLeadEmail, placeholder: 'Optional', required: false, type: 'email', error: emailError },
+            ].map(({ label, value, setter, placeholder, required, type, error }) => (
+              <div key={label} className="form-field-wrapper">
                 <label style={{ display: 'block', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   {label}
                 </label>
                 <input
                   type={type}
                   value={value}
-                  onChange={(e) => setter(e.target.value)}
+                  onChange={(e) => {
+                    setter(e.target.value)
+                    // Clear error on change
+                    if (label === 'Email Address' && emailError) setEmailError('')
+                    if (label === 'Mobile Number *' && phoneError) setPhoneError('')
+                  }}
+                  onBlur={() => {
+                    // Validate on blur
+                    if (label === 'Email Address' && value && !validateEmail(value)) {
+                      setEmailError('Please enter a valid email address')
+                    }
+                    if (label === 'Mobile Number *' && value && !validatePhone(value)) {
+                      setPhoneError('Please enter a valid phone number (minimum 10 digits)')
+                    }
+                  }}
                   placeholder={placeholder}
                   required={required}
+                  className={error ? 'form-field-error' : ''}
+                  aria-invalid={error ? 'true' : 'false'}
+                  aria-describedby={error ? `${label}-error` : undefined}
                   style={{
                     width: '100%', padding: '12px 14px', borderRadius: 10,
-                    border: '1px solid var(--color-border)', background: 'var(--color-surface-raised)',
-                    color: 'var(--color-text-primary)', fontSize: 'var(--font-size-base)', fontFamily: 'var(--font-sans)', outline: 'none'
+                    border: `1px solid ${error ? 'var(--color-error)' : 'var(--color-border)'}`,
+                    background: 'var(--color-surface-raised)',
+                    color: 'var(--color-text-primary)', fontSize: 'var(--font-size-base)', fontFamily: 'var(--font-sans)', outline: 'none',
+                    transition: 'border-color var(--transition-fast)'
                   }}
                 />
+                {error && (
+                  <div id={`${label}-error`} className="field-validation-message error" role="alert">
+                    {error}
+                  </div>
+                )}
               </div>
             ))}
 
@@ -951,11 +1044,13 @@ export default function ProjectShowcase(): JSX.Element {
               <button
                 type="submit"
                 disabled={submittingLead}
+                className={submittingLead ? 'btn-loading' : ''}
                 style={{
                   flex: 1, padding: '14px', background: 'var(--color-accent)', color: 'var(--color-bg)',
                   border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 'var(--font-size-base)',
-                  cursor: 'pointer', fontFamily: 'var(--font-sans)',
-                  transition: 'opacity var(--transition-fast)', opacity: submittingLead ? 0.7 : 1
+                  cursor: submittingLead ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-sans)',
+                  transition: 'opacity var(--transition-fast)', opacity: submittingLead ? 0.7 : 1,
+                  position: 'relative'
                 }}
               >
                 {submittingLead ? 'Loading…' : 'Start Presentation →'}

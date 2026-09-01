@@ -5,3 +5,6 @@ out
 *.db
 *.db-journal
 src/main/db/generated
+scratch/
+.claude/
+electron.vite.config.*.mjs

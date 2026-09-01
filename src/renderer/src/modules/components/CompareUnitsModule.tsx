@@ -79,7 +79,7 @@ export default function CompareUnitsModule({ config: _config, projectId }: { con
     }
   }
 
-  const renderSlot = (slotValue: string, setSlot: (val: string) => void, slotLabel: string) => {
+  const renderSlot = (slotValue: string, setSlot: (val: string) => void, _slotLabel: string) => {
     const u = getUnit(slotValue)
     
     return (

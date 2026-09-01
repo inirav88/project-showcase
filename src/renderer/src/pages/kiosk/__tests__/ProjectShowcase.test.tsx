@@ -18,6 +18,8 @@ const mockProject = {
   name: 'Skyline Residences',
   developer: 'Ahmedabad Builders Ltd',
   reraNumber: 'RAJ/P/2024/001234',
+  location: 'Ahmedabad',
+  type: 'Residential',
   themeAccentColor: '#1B4FFF',
   themeFontPairing: 'Outfit',
   modules: [
@@ -51,8 +53,8 @@ describe('ProjectShowcase Page Navigation and Theme Integration', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText('Skyline Residences')).toBeInTheDocument()
-      expect(screen.getByText('RERA: RAJ/P/2024/001234')).toBeInTheDocument()
+      expect(screen.getAllByText('Skyline Residences')[0]).toBeInTheDocument()
+      expect(screen.getByText(/RAJ\/P\/2024\/001234/)).toBeInTheDocument()
       expect(screen.getByTestId('module-OVERVIEW')).toBeInTheDocument()
     })
 

@@ -17,6 +17,7 @@ export const ProjectCreateSchema = z.object({
   priceRangeMin: z.number().nonnegative().default(0),
   priceRangeMax: z.number().nonnegative().default(0),
   isFeatured: z.boolean().default(false),
+  sortOrder: z.number().int().default(0),
   themeAccentColor: z.string().default('#1A73E8'),
   themeFontPairing: z.string().default('Inter'),
   logoPath: z.string().optional().default(''),
@@ -56,14 +57,14 @@ export class ProjectHandlers {
   }
 
   async create(data: unknown) {
-    const parsed = ProjectCreateSchema.parse(data)
+    const parsed = ProjectCreateSchema.parse(data) as any
     return this.db.project.create({
       data: parsed,
     })
   }
 
   async update(id: string, data: unknown) {
-    const parsed = ProjectUpdateSchema.parse(data)
+    const parsed = ProjectUpdateSchema.parse(data) as any
     return this.db.project.update({
       where: { id },
       data: parsed,

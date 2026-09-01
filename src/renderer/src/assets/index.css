@@ -707,26 +707,46 @@ input, textarea, select, [contenteditable="true"] {
 }
 
 .back-btn {
-  all: unset;
+  /* Removed all:unset - it breaks touch handling on kiosk devices */
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  padding: 12px 20px; /* Increased from 8px 16px for better touch target */
+  min-height: 44px; /* Ensure minimum touch target size */
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-family: var(--font-sans);
   font-weight: 500;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation; /* Removes 300ms tap delay on mobile */
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 100; /* Increased to be above kiosk-exit-corner */
+  margin-left: 80px; /* Offset from corner to avoid overlap */
+}
+
+.back-btn:active {
+  transform: scale(0.97);
+  background: var(--color-surface-hover);
 }
 
 .back-btn:hover {
   border-color: var(--color-accent-border);
   color: var(--color-accent);
   background: var(--color-accent-dim);
+}
+
+.back-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-accent-dim);
 }
 
 .showcase-header-info {
@@ -1322,16 +1342,8 @@ input, textarea, select, [contenteditable="true"] {
   overflow: hidden;
 }
 
-/* ─── Kiosk Exit Corner ──────────────────────────────────────────────────────── */
-.kiosk-exit-corner {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: 80px;
-  height: 80px;
-  z-index: var(--z-supreme);
-  cursor: pointer;
-}
+/* ─── Kiosk Exit Corner - Moved to accessibility-fixes.css ──────────────────── */
+/* See src/renderer/src/assets/accessibility-fixes.css for kiosk-exit-corner styles */
 
 /* ─── Empty State ────────────────────────────────────────────────────────────── */
 .empty-state {

@@ -1,0 +1,402 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCESSIBILITY & UI/UX FIXES - Applied to ProjectShowcase
+   Based on ui-ux-pro-max skill recommendations
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. REDUCED MOTION SUPPORT (CRITICAL) ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── 2. FOCUS INDICATORS (CRITICAL) ───────────────────────────────────────── */
+/* Visible focus rings for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px var(--color-accent-dim) !important;
+}
+
+/* High contrast focus for better visibility */
+@media (prefers-contrast: high) {
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline-width: 3px !important;
+    outline-offset: 3px !important;
+  }
+}
+
+/* ─── 3. TOUCH TARGET SIZES (CRITICAL) ─────────────────────────────────────── */
+/* Ensure all interactive elements meet 44×44px minimum */
+.touch-target-fix {
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+/* Close buttons */
+.close-btn-accessible {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 22px;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.close-btn-accessible:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-accent);
+}
+
+.close-btn-accessible:active {
+  transform: scale(0.95);
+}
+
+/* PIN keypad buttons */
+.pin-key {
+  min-width: 72px !important;
+  min-height: 72px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.pin-key:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent-border);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.pin-key:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.pin-key:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.pin-key:disabled::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    var(--color-border) 4px,
+    var(--color-border) 5px
+  );
+  pointer-events: none;
+}
+
+/* ─── 4. IMPROVED HOVER STATES (HIGH) ──────────────────────────────────────── */
+/* Convert JavaScript hover to CSS for better touch support */
+.btn-hover-effect {
+  background: var(--color-surface-raised);
+  transition: all var(--transition-fast);
+}
+
+.btn-hover-effect:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent-border);
+}
+
+.btn-hover-effect:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* ─── 5. LONG-PRESS VISUAL FEEDBACK ────────────────────────────────────────── */
+.kiosk-exit-corner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 60px; /* Reduced from 80px to avoid blocking back button */
+  height: 60px; /* Reduced from 80px */
+  z-index: var(--z-supreme);
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto; /* Only capture events in the small corner area */
+}
+
+.kiosk-exit-corner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 180deg at 0% 0%,
+    var(--color-accent) 0%,
+    var(--color-accent) var(--hold-progress, 0%),
+    transparent var(--hold-progress, 0%)
+  );
+  opacity: 0;
+  transition: opacity 150ms ease;
+  border-radius: 0 0 60px 0; /* Adjusted to match new size */
+  pointer-events: none; /* Don't block touches */
+}
+
+.kiosk-exit-corner.holding::before {
+  opacity: 0.6;
+}
+
+.kiosk-exit-corner::after {
+  content: '🔓';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none; /* Don't block touches */
+}
+
+.kiosk-exit-corner.holding::after {
+  opacity: 0.7;
+}
+
+/* ─── 6. ERROR MESSAGE IMPROVEMENTS ────────────────────────────────────────── */
+.error-message-accessible {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--color-error) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  animation: slideInLeft 0.3s var(--ease-out);
+}
+
+.error-message-accessible::before {
+  content: '⚠';
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ─── 7. TYPOGRAPHY FIXES (MEDIUM) ──────────────────────────────────────────── */
+/* Ensure minimum readable font sizes */
+.text-min-readable {
+  font-size: max(14px, var(--font-size-sm)) !important;
+}
+
+.caption-text {
+  font-size: max(12px, var(--font-size-xs)) !important;
+  line-height: 1.5;
+}
+
+/* ─── 8. LOADING STATES (MEDIUM) ───────────────────────────────────────────── */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: rotateSpin 0.6s linear infinite;
+}
+
+/* ─── 9. FORM VALIDATION FEEDBACK ──────────────────────────────────────────── */
+.form-field-wrapper {
+  position: relative;
+}
+
+.form-field-error {
+  border-color: var(--color-error) !important;
+  background: color-mix(in srgb, var(--color-error) 5%, transparent) !important;
+}
+
+.form-field-success {
+  border-color: var(--color-success) !important;
+}
+
+.field-validation-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: max(12px, var(--font-size-xs));
+  font-weight: 500;
+  animation: slideInLeft 0.2s ease;
+}
+
+.field-validation-message.error {
+  color: var(--color-error);
+}
+
+.field-validation-message.success {
+  color: var(--color-success);
+}
+
+.field-validation-message::before {
+  content: '•';
+  font-size: 16px;
+}
+
+/* ─── 10. IMPROVED MODAL BACKDROP ──────────────────────────────────────────── */
+.modal-backdrop-accessible {
+  position: fixed;
+  inset: 0;
+  background: var(--backdrop-modal);
+  backdrop-filter: blur(8px);
+  z-index: var(--z-modal);
+  animation: fadeIn 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop-accessible {
+    backdrop-filter: none;
+  }
+}
+
+/* ─── 11. SKIP LINKS (ACCESSIBILITY) ───────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  padding: 8px 16px;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 0 0 var(--radius-sm) 0;
+  z-index: var(--z-supreme);
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ─── 12. HIGH CONTRAST MODE SUPPORT ───────────────────────────────────────── */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: rgba(255, 255, 255, 0.3);
+    --color-text-secondary: rgba(242, 242, 250, 0.85);
+    --color-text-muted: rgba(242, 242, 250, 0.65);
+  }
+
+  button,
+  .btn,
+  [role="button"] {
+    border-width: 2px !important;
+  }
+}
+
+/* ─── 13. SCREEN READER ONLY UTILITY ───────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ─── 14. SHORTLIST REMOVE BUTTON FIX ──────────────────────────────────────── */
+.shortlist-remove-btn {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(248,113,113,0.3);
+  background: transparent;
+  color: var(--color-sold);
+  font-size: 18px;
+  transition: all var(--transition-fast);
+}
+
+.shortlist-remove-btn:hover {
+  background: rgba(248,113,113,0.1);
+  border-color: var(--color-sold);
+  transform: scale(1.05);
+}
+
+.shortlist-remove-btn:active {
+  transform: scale(0.95);
+}
+
+/* ─── 15. TOOLTIP ACCESSIBILITY ────────────────────────────────────────────── */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  padding: 6px 12px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: var(--z-toast);
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tooltip]::after {
+    transition: opacity 0.01ms;
+    transform: translateX(-50%) translateY(-4px);
+  }
+}

@@ -94,7 +94,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
         
         {/* Abstract Tower Overlay Hotspots */}
         <div style={{ position: 'absolute', inset: 0, padding: 'var(--space-8)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', alignContent: 'flex-start', background: 'rgba(0,0,0,0.2)' }}>
-           {project.towers.map((tower, i) => (
+           {project.towers.map((tower) => (
              <button
                 key={tower.id}
                 onClick={() => setSelectedTower(tower)}

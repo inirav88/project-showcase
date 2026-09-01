@@ -10,7 +10,7 @@ export class BackupHandlers {
   private mediaDir: string
   private dbPath: string
 
-  constructor(private db: PrismaClient, appDataPath: string) {
+  constructor(_db: PrismaClient, appDataPath: string) {
     this.mediaDir = path.join(appDataPath, 'media')
     
     // Determine the path to the database

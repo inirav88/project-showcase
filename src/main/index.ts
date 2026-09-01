@@ -1,7 +1,6 @@
-import { app, BrowserWindow, shell, protocol, net, Menu, MenuItemConstructorOptions, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, shell, protocol, Menu, MenuItemConstructorOptions, ipcMain, screen } from 'electron'
 import path, { join } from 'path'
 import fs from 'fs'
-import { pathToFileURL } from 'url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { kioskWindowOptions } from './windows/kioskWindow'
 import { getDb } from './db/client'
@@ -67,31 +66,27 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // Set custom application menu (disabled in production so Alt key does not trigger menu bar)
-  if (isProd) {
-    Menu.setApplicationMenu(null)
-  } else {
-    const template: MenuItemConstructorOptions[] = [
-      {
-        label: 'Showcase OS',
-        submenu: [
-          { role: 'quit', label: 'Exit Showcase OS' }
-        ]
-      },
-      {
-        label: 'View',
-        submenu: [
-          { role: 'reload' },
-          { role: 'forceReload' },
-          { role: 'toggleDevTools' },
-          { type: 'separator' },
-          { role: 'togglefullscreen' }
-        ]
-      }
-    ]
-    const menu = Menu.buildFromTemplate(template)
-    Menu.setApplicationMenu(menu)
-  }
+  // Enable custom application menu with DevTools for debugging
+  const template: MenuItemConstructorOptions[] = [
+    {
+      label: 'Showcase OS',
+      submenu: [
+        { role: 'quit', label: 'Exit Showcase OS' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    }
+  ]
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 
   // Initialize DB and register IPC handlers
   try {

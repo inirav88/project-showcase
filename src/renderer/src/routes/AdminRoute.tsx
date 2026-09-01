@@ -979,6 +979,16 @@ interface Settings {
 
 export default function AdminRoute(): JSX.Element {
   const navigate = useNavigate()
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 4000)
+  }
+  const alert = (msg: string) => {
+    const isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('fail') || msg.toLowerCase().includes('invalid')
+    showToast(msg, isError ? 'error' : 'success')
+  }
+
   const [activeTab, setActiveTab] = useState<'projects' | 'modules' | 'media' | 'units' | 'sessions' | 'leads' | 'staff' | 'appointments' | 'analytics' | 'backup' | 'settings'>('projects')
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string>('')
@@ -2707,6 +2717,29 @@ export default function AdminRoute(): JSX.Element {
 
         </div>
       </main>
+      {toast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          backgroundColor: toast.type === 'error' ? 'var(--color-error)' : toast.type === 'success' ? 'var(--color-success)' : 'var(--color-accent)',
+          color: toast.type === 'error' ? '#fff' : '#000',
+          padding: '14px 28px',
+          borderRadius: '8px',
+          boxShadow: 'var(--shadow-lg)',
+          zIndex: 9999,
+          fontSize: '14px',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          pointerEvents: 'none',
+          animation: 'slideInRight 0.3s ease-out forwards'
+        }}>
+          <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   )
 }
