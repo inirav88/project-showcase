@@ -160,7 +160,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                   }}>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 'var(--font-size-base)' }}>Unit {u.unitNumber} <span style={{ color: 'var(--color-text-muted)', fontSize: '12px' }}>| Fl {u.floor}</span></div>
-                      <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 2 }}>{u.configuration} · {u.carpetArea} sqft</div>
+                      <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 2 }}>{u.configuration} · {u.carpetArea} sqft ({(u.carpetArea / 9).toFixed(1)} sqyd)</div>
                       <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 600, color: 'var(--color-accent)', marginTop: 4 }}>
                         {formatPrice(u.price)}
                       </div>

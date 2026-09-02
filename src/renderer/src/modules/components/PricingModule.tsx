@@ -40,6 +40,7 @@ export default function PricingModule({ projectId }: { config: Record<string, an
   const [selectedTower, setSelectedTower] = useState<string>('ALL')
   const [selectedConfig, setSelectedConfig] = useState<string>('ALL')
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL')
+  const [areaUnit, setAreaUnit] = useState<'SQFT' | 'SQYD'>('SQFT')
 
   const { addItem, removeItem, isInShortlist } = useShortlistStore()
 
@@ -112,7 +113,7 @@ export default function PricingModule({ projectId }: { config: Record<string, an
         <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600 }}>Pricing & Inventory</h3>
         
         {/* Filters bar */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div>
             <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>Tower</label>
             <select
@@ -164,6 +165,36 @@ export default function PricingModule({ projectId }: { config: Record<string, an
               {statusList.map((s) => <option key={s} value={s}>{s.toLowerCase()}</option>)}
             </select>
           </div>
+
+          <div>
+            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>Area Unit</label>
+            <div style={{ display: 'flex', background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '2px' }}>
+              <button
+                type="button"
+                onClick={() => setAreaUnit('SQFT')}
+                style={{
+                  padding: '4px 8px', fontSize: '11px', fontWeight: areaUnit === 'SQFT' ? 600 : 400,
+                  borderRadius: '3px', border: 'none',
+                  backgroundColor: areaUnit === 'SQFT' ? 'var(--color-accent)' : 'transparent',
+                  color: areaUnit === 'SQFT' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                }}
+              >
+                Sq. Ft.
+              </button>
+              <button
+                type="button"
+                onClick={() => setAreaUnit('SQYD')}
+                style={{
+                  padding: '4px 8px', fontSize: '11px', fontWeight: areaUnit === 'SQYD' ? 600 : 400,
+                  borderRadius: '3px', border: 'none',
+                  backgroundColor: areaUnit === 'SQYD' ? 'var(--color-accent)' : 'transparent',
+                  color: areaUnit === 'SQYD' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                }}
+              >
+                Sq. Yd.
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -180,7 +211,7 @@ export default function PricingModule({ projectId }: { config: Record<string, an
                 <th style={{ padding: '12px 8px' }}>Unit</th>
                 <th style={{ padding: '12px 8px' }}>Floor</th>
                 <th style={{ padding: '12px 8px' }}>Config</th>
-                <th style={{ padding: '12px 8px' }}>Carpet Area</th>
+                <th style={{ padding: '12px 8px' }}>Carpet Area ({areaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})</th>
                 <th style={{ padding: '12px 8px' }}>Price</th>
                 <th style={{ padding: '12px 8px' }}>Status</th>
                 <th style={{ padding: '12px 8px', textAlign: 'center' }}>Shortlist</th>
@@ -190,13 +221,16 @@ export default function PricingModule({ projectId }: { config: Record<string, an
               {filteredUnits.map((u) => {
                 const isSaved = isInShortlist(u.id)
                 const statusColor = u.status === 'AVAILABLE' ? 'var(--color-available)' : u.status === 'HELD' ? 'var(--color-held)' : 'var(--color-sold)'
+                const displayArea = areaUnit === 'SQYD'
+                  ? `${(u.carpetArea / 9).toFixed(1)} sqyd`
+                  : `${u.carpetArea} sqft`
                 return (
                   <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)', transition: 'background-color var(--transition-fast)' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}>
                     <td style={{ padding: '12px 8px', fontWeight: 500 }}>{u.towerName}</td>
                     <td style={{ padding: '12px 8px' }}>{u.unitNumber}</td>
                     <td style={{ padding: '12px 8px' }}>{u.floor}</td>
                     <td style={{ padding: '12px 8px' }}>{u.configuration}</td>
-                    <td style={{ padding: '12px 8px' }}>{u.carpetArea} sqft</td>
+                    <td style={{ padding: '12px 8px' }}>{displayArea}</td>
                     <td style={{ padding: '12px 8px', fontWeight: 600 }}>{formatPrice(u.price)}</td>
                     <td style={{ padding: '12px 8px' }}>
                       <span style={{

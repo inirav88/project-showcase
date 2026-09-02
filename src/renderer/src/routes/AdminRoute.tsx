@@ -1055,6 +1055,8 @@ export default function AdminRoute(): JSX.Element {
   const [unitSearchQuery, setUnitSearchQuery] = useState<string>('')
   const [editingUnit, setEditingUnit] = useState<any | null>(null)
   const [useExistingTower, setUseExistingTower] = useState(true)
+  const [areaDisplayUnit, setAreaDisplayUnit] = useState<'SQFT' | 'SQYD'>('SQFT')
+  const [formAreaUnit, setFormAreaUnit] = useState<'SQFT' | 'SQYD'>('SQFT')
 
   // Session & Lead list state
   const [sessions, setSessions] = useState<SessionLog[]>([])
@@ -1463,14 +1465,15 @@ export default function AdminRoute(): JSX.Element {
         await loadTowers(selectedProjectId) // refresh panel
       }
 
+      const areaMultiplier = formAreaUnit === 'SQYD' ? 9 : 1
       const payload: any = {
         towerId,
         floor: Number(floorNumber),
         unitNumber,
         configuration: unitConfig,
-        carpetArea: Number(carpetArea),
-        builtUpArea: Number(builtUpArea),
-        superBuiltUpArea: Number(superBuiltUpArea),
+        carpetArea: Number(carpetArea) * areaMultiplier,
+        builtUpArea: Number(builtUpArea) * areaMultiplier,
+        superBuiltUpArea: Number(superBuiltUpArea) * areaMultiplier,
         facing: unitFacing,
         price: Number(unitPrice),
         priceLabel,
@@ -1504,6 +1507,20 @@ export default function AdminRoute(): JSX.Element {
     }
   }
 
+  const handleFormAreaUnitChange = (newUnit: 'SQFT' | 'SQYD') => {
+    if (newUnit === formAreaUnit) return
+    if (newUnit === 'SQYD') {
+      setCarpetArea(prev => Math.round((prev / 9) * 100) / 100)
+      setBuiltUpArea(prev => Math.round((prev / 9) * 100) / 100)
+      setSuperBuiltUpArea(prev => Math.round((prev / 9) * 100) / 100)
+    } else {
+      setCarpetArea(prev => Math.round(prev * 9))
+      setBuiltUpArea(prev => Math.round(prev * 9))
+      setSuperBuiltUpArea(prev => Math.round(prev * 9))
+    }
+    setFormAreaUnit(newUnit)
+  }
+
   const startEditUnit = (u: any) => {
     setEditingUnit(u)
     const tName = u.tower?.name || ''
@@ -1513,9 +1530,10 @@ export default function AdminRoute(): JSX.Element {
     setFloorNumber(u.floor)
     setUnitNumber(u.unitNumber)
     setUnitConfig(u.configuration)
-    setCarpetArea(u.carpetArea)
-    setBuiltUpArea(u.builtUpArea)
-    setSuperBuiltUpArea(u.superBuiltUpArea || 0)
+    const divider = formAreaUnit === 'SQYD' ? 9 : 1
+    setCarpetArea(Math.round((u.carpetArea / divider) * 100) / 100)
+    setBuiltUpArea(Math.round((u.builtUpArea / divider) * 100) / 100)
+    setSuperBuiltUpArea(Math.round(((u.superBuiltUpArea || 0) / divider) * 100) / 100)
     setUnitFacing(u.facing || '')
     setUnitPrice(u.price)
     setPriceLabel(u.priceLabel)
@@ -2237,7 +2255,7 @@ export default function AdminRoute(): JSX.Element {
                     </div>
 
                     {/* Search & Filters */}
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', alignItems: 'center' }}>
                       <input
                         value={unitSearchQuery}
                         onChange={e => setUnitSearchQuery(e.target.value)}
@@ -2247,13 +2265,49 @@ export default function AdminRoute(): JSX.Element {
                       <select
                         value={filterTowerId}
                         onChange={e => setFilterTowerId(e.target.value)}
-                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px', minWidth: '150px' }}
+                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px', minWidth: '130px' }}
                       >
                         <option value="ALL">All Towers</option>
                         {towers.map((t: any) => (
                           <option key={t.id} value={t.id}>{t.name}</option>
                         ))}
                       </select>
+
+                      {/* Area Display Unit Toggle */}
+                      <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--color-bg)', padding: '3px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+                        <button
+                          type="button"
+                          onClick={() => setAreaDisplayUnit('SQFT')}
+                          style={{
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            fontWeight: areaDisplayUnit === 'SQFT' ? 600 : 400,
+                            borderRadius: '4px',
+                            border: 'none',
+                            backgroundColor: areaDisplayUnit === 'SQFT' ? 'var(--color-accent)' : 'transparent',
+                            color: areaDisplayUnit === 'SQFT' ? '#fff' : 'var(--color-text-muted)',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Sq. Ft.
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAreaDisplayUnit('SQYD')}
+                          style={{
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            fontWeight: areaDisplayUnit === 'SQYD' ? 600 : 400,
+                            borderRadius: '4px',
+                            border: 'none',
+                            backgroundColor: areaDisplayUnit === 'SQYD' ? 'var(--color-accent)' : 'transparent',
+                            color: areaDisplayUnit === 'SQYD' ? '#fff' : 'var(--color-text-muted)',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Sq. Yd.
+                        </button>
+                      </div>
                     </div>
 
                     {/* Table View */}
@@ -2265,7 +2319,7 @@ export default function AdminRoute(): JSX.Element {
                             <th style={{ padding: '10px 12px' }}>Floor</th>
                             <th style={{ padding: '10px 12px' }}>Unit No.</th>
                             <th style={{ padding: '10px 12px' }}>Config</th>
-                            <th style={{ padding: '10px 12px' }}>Area</th>
+                            <th style={{ padding: '10px 12px' }}>Area ({areaDisplayUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})</th>
                             <th style={{ padding: '10px 12px' }}>Price</th>
                             <th style={{ padding: '10px 12px' }}>Status</th>
                             <th style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
@@ -2297,13 +2351,16 @@ export default function AdminRoute(): JSX.Element {
 
                             return filtered.map((u: any) => {
                               const statusColor = u.status === 'AVAILABLE' ? 'var(--color-available)' : u.status === 'HELD' ? 'var(--color-held)' : 'var(--color-sold)'
+                              const displayArea = areaDisplayUnit === 'SQYD'
+                                ? `${(u.carpetArea / 9).toFixed(1)} sqyd`
+                                : `${u.carpetArea} sqft`
                               return (
                                 <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                                   <td style={{ padding: '10px 12px', fontWeight: 600 }}>{u.tower?.name}</td>
                                   <td style={{ padding: '10px 12px' }}>{u.floor}</td>
                                   <td style={{ padding: '10px 12px', fontWeight: 700 }}>{u.unitNumber}</td>
                                   <td style={{ padding: '10px 12px' }}>{u.configuration}</td>
-                                  <td style={{ padding: '10px 12px' }}>{u.carpetArea} sqft</td>
+                                  <td style={{ padding: '10px 12px' }}>{displayArea}</td>
                                   <td style={{ padding: '10px 12px', color: 'var(--color-accent)', fontWeight: 600 }}>{formatPrice(u.price)}</td>
                                   <td style={{ padding: '10px 12px' }}>
                                     <span style={{
@@ -2333,12 +2390,12 @@ export default function AdminRoute(): JSX.Element {
                   <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                     <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>Bulk Unit CSV Import</h3>
                     <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', fontSize: '12px' }}>
-                      Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes</code>
+                      Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes,areaUnit</code>
                     </p>
                     <textarea
                       value={csvContent}
                       onChange={(e) => setCsvContent(e.target.value)}
-                      placeholder="Tower A,5,A-501,4BHK,2450,4050,0,East,16500000,OFFICIAL,AVAILABLE,Luxury pool view"
+                      placeholder="Tower A,5,A-501,4BHK,2450,4050,0,East,16500000,OFFICIAL,AVAILABLE,Luxury pool view,SQFT&#10;Tower A,6,A-601,4BHK,272.2,450,0,East,16500000,OFFICIAL,AVAILABLE,Sky villa,SQYD"
                       rows={6}
                       style={{
                         width: '100%', padding: '12px', borderRadius: '6px',
@@ -2358,9 +2415,42 @@ export default function AdminRoute(): JSX.Element {
 
                 {/* Right Side: Form (Single Unit Entry or Edit) */}
                 <form onSubmit={handleSingleUnitSubmit} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '12px', height: 'fit-content' }}>
-                  <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>
-                    {editingUnit ? 'Edit Unit Record' : 'Create Single Unit Record'}
-                  </h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>
+                      {editingUnit ? 'Edit Unit Record' : 'Create Single Unit Record'}
+                    </h4>
+                    
+                    {/* Area Unit Picker */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Input Unit:</span>
+                      <div style={{ display: 'flex', backgroundColor: 'var(--color-bg)', padding: '2px', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleFormAreaUnitChange('SQFT')}
+                          style={{
+                            padding: '2px 6px', fontSize: '10px', fontWeight: formAreaUnit === 'SQFT' ? 600 : 400,
+                            borderRadius: '3px', border: 'none',
+                            backgroundColor: formAreaUnit === 'SQFT' ? 'var(--color-accent)' : 'transparent',
+                            color: formAreaUnit === 'SQFT' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                          }}
+                        >
+                          Sq. Ft.
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleFormAreaUnitChange('SQYD')}
+                          style={{
+                            padding: '2px 6px', fontSize: '10px', fontWeight: formAreaUnit === 'SQYD' ? 600 : 400,
+                            borderRadius: '3px', border: 'none',
+                            backgroundColor: formAreaUnit === 'SQYD' ? 'var(--color-accent)' : 'transparent',
+                            color: formAreaUnit === 'SQYD' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                          }}
+                        >
+                          Sq. Yd.
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Tower Name *</label>
@@ -2417,16 +2507,22 @@ export default function AdminRoute(): JSX.Element {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Carpet Area</label>
-                      <input type="number" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Carpet ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
+                      </label>
+                      <input type="number" step="any" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Built Up Area</label>
-                      <input type="number" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Built Up ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
+                      </label>
+                      <input type="number" step="any" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Super Area</label>
-                      <input type="number" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Super ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
+                      </label>
+                      <input type="number" step="any" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>

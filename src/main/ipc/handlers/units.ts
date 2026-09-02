@@ -71,15 +71,25 @@ export class UnitHandlers {
           })
         }
 
-        // 2. Parse and validate record fields
+        let carpetArea = parseFloat(record.carpetArea || '0')
+        let builtUpArea = parseFloat(record.builtUpArea || '0')
+        let superBuiltUpArea = parseFloat(record.superBuiltUpArea || '0')
+
+        const unitType = (record.areaUnit || record.unit || '').toString().trim().toUpperCase()
+        if (unitType === 'SQYD' || unitType === 'SQ YD' || unitType === 'GAJ') {
+          carpetArea = carpetArea * 9
+          builtUpArea = builtUpArea * 9
+          superBuiltUpArea = superBuiltUpArea * 9
+        }
+
         const payload = {
           towerId: tower.id,
           floor: parseInt(record.floor, 10),
           unitNumber: record.unitNumber?.trim(),
           configuration: record.configuration?.trim() || '2BHK',
-          carpetArea: parseFloat(record.carpetArea || '0'),
-          builtUpArea: parseFloat(record.builtUpArea || '0'),
-          superBuiltUpArea: parseFloat(record.superBuiltUpArea || '0'),
+          carpetArea,
+          builtUpArea,
+          superBuiltUpArea,
           facing: record.facing?.trim() || '',
           price: parseFloat(record.price || '0'),
           priceLabel: (record.priceLabel?.toUpperCase() || 'OFFICIAL') as any,

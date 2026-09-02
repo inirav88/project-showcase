@@ -133,7 +133,7 @@ export default function CompareUnitsModule({ config: _config, projectId }: { con
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}>
               <SpecRow label="Price" value={formatPrice(u.price)} highlight />
               <SpecRow label="Floor" value={`Floor ${u.floor}`} />
-              <SpecRow label="Carpet Area" value={`${u.carpetArea} sqft`} />
+              <SpecRow label="Carpet Area" value={`${u.carpetArea} sqft (${(u.carpetArea / 9).toFixed(1)} sqyd)`} />
               <SpecRow label="Status" value={u.status} isStatus />
             </div>
             
