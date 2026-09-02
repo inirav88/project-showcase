@@ -308,7 +308,12 @@ export function AnalyticsTab({ sessions }: { sessions: SessionLog[] }) {
         <div style={cardStyle}><h3 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600 }}>Most Shortlisted Units</h3>
           {topUnits.map(([unitId, count]) => (<div key={unitId} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--color-border)', fontSize: 13 }}><span style={{ color: 'var(--color-text-muted)', fontSize: 11 }}>{unitId.slice(0, 24)}...</span><span style={{ fontWeight: 700, color: 'var(--color-accent)' }}>{count}x</span></div>))}
         </div>
-      )// ---- BACKUP AND SYNC TAB ----
+      )}
+    </div>
+  )
+}
+
+// ---- BACKUP AND SYNC TAB ----
 export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
   const [syncStatus, setSyncStatus] = useState<{ configured: boolean; lastSyncedAt?: string | null; contentVersion?: string } | null>(null)
   const [syncing, setSyncing] = useState(false)
@@ -397,7 +402,4 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
       </div>
     </div>
   )
-} </div>
-    </div>
-)
 }
