@@ -2582,13 +2582,24 @@ export default function AdminRoute(): JSX.Element {
                         <option value="ESTIMATED">Estimated</option>
                         <option value="INDICATIVE">Indicative</option>
                         <option value="SUBJECT_TO_CONFIRMATION">Subject to Confirmation</option>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Unit Facing</label>
+                      <input value={unitFacing} onChange={(e) => setUnitFacing(e.target.value)} placeholder="East" style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Status</label>
+                      <select value={unitStatus} onChange={(e) => setUnitStatus(e.target.value)} style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
+                        <option value="AVAILABLE">Available</option>
+                        <option value="HELD">Held</option>
+                        <option value="SOLD">Sold</option>
                       </select>
                     </div>
                   </div>
-                  </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Notes</label>
-                    <input value={unitNotes} onChange={(e) => setUnitNotes(e.target.value)} placeholder="E.g. Pool view" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Notes</label>
+                    <input value={unitNotes} onChange={(e) => setUnitNotes(e.target.value)} placeholder="E.g. Pool view" style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
                   
                   <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
