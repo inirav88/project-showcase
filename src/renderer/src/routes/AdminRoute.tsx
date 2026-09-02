@@ -1080,6 +1080,23 @@ export default function AdminRoute(): JSX.Element {
   })
   const [adminPinInput, setAdminPinInput] = useState('')
 
+  // Active User session state
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: 'SUPERADMIN' | 'ADMIN' | 'AGENT' } | null>(() => {
+    try {
+      const saved = localStorage.getItem('showcaseos_current_user')
+      return saved ? JSON.parse(saved) : null
+    } catch { return null }
+  })
+  const [showUserLoginModal, setShowUserLoginModal] = useState(false)
+
+  const handleSelectUser = (user: any) => {
+    const userSession = { id: user.id, name: user.name, role: user.role || 'AGENT' }
+    setCurrentUser(userSession)
+    localStorage.setItem('showcaseos_current_user', JSON.stringify(userSession))
+    setShowUserLoginModal(false)
+    showToast(`Logged in as ${user.name} (${user.role || 'AGENT'})`, 'success')
+  }
+
   const handleCompanyLogoUpload = async () => {
     try {
       const filePath = await (window as any).api.invoke(IPC_CHANNELS.DIALOG_OPEN_FILE, {
@@ -1725,16 +1742,36 @@ export default function AdminRoute(): JSX.Element {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Active Role Indicator */}
+            {/* Active User Session Pill */}
             <div style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              padding: '6px 12px', borderRadius: '20px',
-              backgroundColor: 'rgba(234, 179, 8, 0.12)',
-              border: '1px solid rgba(234, 179, 8, 0.3)',
-              color: '#d97706', fontSize: '12px', fontWeight: 700
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '4px 12px', borderRadius: '20px',
+              backgroundColor: 'var(--color-bg)',
+              border: '1px solid var(--color-border)'
             }}>
-              <span>👑</span>
-              <span>SUPERADMIN</span>
+              <span style={{
+                padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700,
+                backgroundColor: (currentUser?.role || 'SUPERADMIN') === 'SUPERADMIN' ? 'rgba(234, 179, 8, 0.15)' : currentUser?.role === 'ADMIN' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(107, 114, 128, 0.15)',
+                color: (currentUser?.role || 'SUPERADMIN') === 'SUPERADMIN' ? '#d97706' : currentUser?.role === 'ADMIN' ? '#2563eb' : 'var(--color-text-secondary)'
+              }}>
+                {(currentUser?.role || 'SUPERADMIN') === 'SUPERADMIN' ? '👑 SUPERADMIN' : currentUser?.role === 'ADMIN' ? '🛡️ ADMIN' : '👤 AGENT'}
+              </span>
+              <span style={{ fontSize: '13px', fontWeight: 600 }}>{currentUser?.name || 'Super Admin'}</span>
+              <button
+                type="button"
+                onClick={() => setShowUserLoginModal(true)}
+                style={{
+                  padding: '4px 10px', borderRadius: '6px',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-surface-hover)',
+                  color: 'var(--color-text-primary)',
+                  cursor: 'pointer', fontSize: '11px', fontWeight: 600,
+                  marginLeft: '4px'
+                }}
+                title="Switch user account or log in with another profile"
+              >
+                🚪 Switch User / Logout
+              </button>
             </div>
 
             {/* Launch Kiosk button — switches back to the client-facing kiosk view */}
@@ -2770,7 +2807,7 @@ export default function AdminRoute(): JSX.Element {
 
           {/* TAB: BACKUP & SYNC */}
           {activeTab === 'backup' && (
-            <BackupSyncTab />
+            <BackupSyncTab currentUser={currentUser} />
           )}
 
           {/* TAB 7: SETTINGS */}
@@ -3000,9 +3037,113 @@ export default function AdminRoute(): JSX.Element {
           animation: 'slideInRight 0.3s ease-out forwards'
         }}>
           <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
-          <span>{toast.message}</span>
         </div>
       )}
+
+      {/* USER LOGIN / SWITCH MODAL */}
+      {showUserLoginModal && (
+        <AdminUserLoginModal
+          onSelectUser={handleSelectUser}
+          onClose={() => setShowUserLoginModal(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function AdminUserLoginModal({
+  onSelectUser,
+  onClose
+}: {
+  onSelectUser: (user: any) => void
+  onClose: () => void
+}) {
+  const [users, setUsers] = useState<any[]>([])
+  const [selectedUserId, setSelectedUserId] = useState<string>('')
+  const [pinInput, setPinInput] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [verifying, setVerifying] = useState(false)
+
+  useEffect(() => {
+    ;(window as any).api.invoke(IPC_CHANNELS.STAFF_LIST).then((list: any[]) => {
+      if (list && list.length > 0) {
+        const activeUsers = list.filter((u) => u.isActive !== false)
+        setUsers(activeUsers)
+        if (activeUsers.length > 0) setSelectedUserId(activeUsers[0].id)
+      }
+    }).catch(console.error)
+  }, [])
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedUserId) { setErrorMsg('Please select a user account'); return }
+    if (pinInput.length !== 4) { setErrorMsg('PIN must be 4 digits'); return }
+    setVerifying(true)
+    setErrorMsg('')
+    try {
+      const res = await (window as any).api.invoke(IPC_CHANNELS.STAFF_VERIFY_PIN, { id: selectedUserId, pin: pinInput })
+      if (res && res.valid && res.staff) {
+        onSelectUser(res.staff)
+      } else {
+        setErrorMsg('Invalid 4-digit PIN for selected user.')
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Verification failed')
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, backdropFilter: 'blur(4px)' }}>
+      <form onSubmit={handleVerify} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '28px', borderRadius: '12px', width: '380px', border: '1px solid var(--color-border)', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div>
+          <h3 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 700 }}>Switch User / Login</h3>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-muted)' }}>Select your profile and enter your 4-digit security PIN.</p>
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '6px', fontWeight: 600 }}>Select User Profile</label>
+          <select
+            value={selectedUserId}
+            onChange={(e) => { setSelectedUserId(e.target.value); setPinInput(''); setErrorMsg('') }}
+            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '14px', fontWeight: 600 }}
+          >
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.role === 'SUPERADMIN' ? '👑' : u.role === 'ADMIN' ? '🛡️' : '👤'} {u.name} ({u.role || 'AGENT'})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '6px', fontWeight: 600 }}>Enter 4-Digit Security PIN</label>
+          <input
+            type="password"
+            maxLength={4}
+            value={pinInput}
+            onChange={(e) => setPinInput(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            placeholder="- - - -"
+            required
+            autoFocus
+            style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '20px', letterSpacing: '12px', textAlign: 'center', boxSizing: 'border-box' }}
+          />
+        </div>
+
+        {errorMsg && (
+          <div style={{ color: 'var(--color-error)', fontSize: '12px', fontWeight: 600, textAlign: 'center' }}>
+            ⚠️ {errorMsg}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '6px' }}>
+          <button type="button" onClick={onClose} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'transparent', color: 'var(--color-text-secondary)', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+          <button type="submit" disabled={verifying} style={{ padding: '10px 20px', borderRadius: '6px', border: 'none', backgroundColor: 'var(--color-accent)', color: '#fff', fontWeight: 700, cursor: verifying ? 'not-allowed' : 'pointer' }}>
+            {verifying ? 'Verifying...' : 'Login User'}
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

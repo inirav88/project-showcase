@@ -308,13 +308,8 @@ export function AnalyticsTab({ sessions }: { sessions: SessionLog[] }) {
         <div style={cardStyle}><h3 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600 }}>Most Shortlisted Units</h3>
           {topUnits.map(([unitId, count]) => (<div key={unitId} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--color-border)', fontSize: 13 }}><span style={{ color: 'var(--color-text-muted)', fontSize: 11 }}>{unitId.slice(0, 24)}...</span><span style={{ fontWeight: 700, color: 'var(--color-accent)' }}>{count}x</span></div>))}
         </div>
-      )}
-    </div>
-  )
-}
-
-// ---- BACKUP AND SYNC TAB ----
-export function BackupSyncTab() {
+      )// ---- BACKUP AND SYNC TAB ----
+export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
   const [syncStatus, setSyncStatus] = useState<{ configured: boolean; lastSyncedAt?: string | null; contentVersion?: string } | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [publishing, setPublishing] = useState(false)
@@ -323,6 +318,9 @@ export function BackupSyncTab() {
   const [importing, setImporting] = useState(false)
   const loadStatus = () => { (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => setSyncStatus(s)).catch(() => {}) }
   useEffect(() => { loadStatus() }, [])
+
+  const isSuperadmin = !currentUser || currentUser.role === 'SUPERADMIN'
+
   const handleExport = async () => {
     setExporting(true)
     try { const r = await (window as any).api.invoke(IPC_CHANNELS.EXPORT_USB_PACKAGE) as any; if (r.success) alert('Backup saved to: ' + r.filePath); else if (r.reason !== 'Cancelled') alert('Export failed: ' + r.reason) }
@@ -343,6 +341,10 @@ export function BackupSyncTab() {
     } finally { setSyncing(false) }
   }
   const handlePublish = async () => {
+    if (!isSuperadmin) {
+      alert('👑 Superadmin role is required to publish updates to the cloud VPS server.')
+      return
+    }
     setPublishing(true); setSyncResult(null)
     try {
       const r = await (window as any).api.invoke(IPC_CHANNELS.SYNC_PUBLISH_NOW) as any
@@ -367,12 +369,35 @@ export function BackupSyncTab() {
             {syncStatus.configured ? (<span style={{ color: '#16a34a' }}>VPS Configured. Version: {syncStatus.contentVersion || '0'}. Last synced: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleString() : 'Never'}</span>) : (<span style={{ color: '#d97706' }}>Cloud sync not configured. Add VPS URL in Settings to enable.</span>)}
           </div>
         )}
+        {!isSuperadmin && (
+          <div style={{ fontSize: 12, marginBottom: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(234, 179, 8, 0.12)', border: '1px solid rgba(234, 179, 8, 0.3)', color: '#d97706', fontWeight: 600 }}>
+            👑 Note: You are logged in as {currentUser?.role || 'User'}. Only a <b>SUPERADMIN</b> account can publish updates to the central cloud VPS.
+          </div>
+        )}
         {syncResult && <div style={{ fontSize: 13, marginBottom: 12, padding: '8px 12px', borderRadius: 6, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>{syncResult}</div>}
         <div style={{ display: 'flex', gap: 12 }}>
           <button onClick={handleSync} disabled={syncing || !syncStatus?.configured} style={{ padding: '12px 24px', background: syncStatus?.configured ? 'var(--color-accent)' : 'var(--color-surface)', color: syncStatus?.configured ? '#fff' : 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: 8, fontWeight: 700, cursor: (syncing || !syncStatus?.configured) ? 'not-allowed' : 'pointer', fontSize: 14, fontFamily: 'var(--font-sans)' }}>{syncing ? 'Syncing...' : 'Sync (Pull Client)'}</button>
-          <button onClick={handlePublish} disabled={publishing || !syncStatus?.configured} style={{ padding: '12px 24px', background: syncStatus?.configured ? 'var(--color-accent)' : 'var(--color-surface)', color: syncStatus?.configured ? '#fff' : 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: 8, fontWeight: 700, cursor: (publishing || !syncStatus?.configured) ? 'not-allowed' : 'pointer', fontSize: 14, fontFamily: 'var(--font-sans)' }}>{publishing ? 'Publishing...' : 'Publish (Push Admin)'}</button>
+          <button
+            onClick={handlePublish}
+            disabled={publishing || !syncStatus?.configured || !isSuperadmin}
+            title={!isSuperadmin ? '👑 Superadmin role required to publish updates to cloud VPS' : 'Publish updates to cloud VPS'}
+            style={{
+              padding: '12px 24px',
+              background: (syncStatus?.configured && isSuperadmin) ? 'var(--color-accent)' : 'var(--color-surface)',
+              color: (syncStatus?.configured && isSuperadmin) ? '#fff' : 'var(--color-text-muted)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 8, fontWeight: 700,
+              cursor: (publishing || !syncStatus?.configured || !isSuperadmin) ? 'not-allowed' : 'pointer',
+              fontSize: 14, fontFamily: 'var(--font-sans)'
+            }}
+          >
+            {publishing ? 'Publishing...' : 'Publish (Push Admin)'}
+          </button>
         </div>
       </div>
+    </div>
+  )
+} </div>
     </div>
 )
 }
