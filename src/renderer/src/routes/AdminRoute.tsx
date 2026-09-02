@@ -1055,7 +1055,7 @@ export default function AdminRoute(): JSX.Element {
   const [unitSearchQuery, setUnitSearchQuery] = useState<string>('')
   const [editingUnit, setEditingUnit] = useState<any | null>(null)
   const [useExistingTower, setUseExistingTower] = useState(true)
-  const [areaDisplayUnit, setAreaDisplayUnit] = useState<'SQFT' | 'SQYD'>('SQFT')
+  const [areaDisplayMode, setAreaDisplayMode] = useState<'SQFT' | 'SQYD' | 'DUAL'>('DUAL')
   const [formAreaUnit, setFormAreaUnit] = useState<'SQFT' | 'SQYD'>('SQFT')
 
   // Session & Lead list state
@@ -2273,19 +2273,19 @@ export default function AdminRoute(): JSX.Element {
                         ))}
                       </select>
 
-                      {/* Area Display Unit Toggle */}
+                      {/* Area Display Unit Mode Toggle */}
                       <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--color-bg)', padding: '3px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
                         <button
                           type="button"
-                          onClick={() => setAreaDisplayUnit('SQFT')}
+                          onClick={() => setAreaDisplayMode('SQFT')}
                           style={{
                             padding: '4px 10px',
                             fontSize: '11px',
-                            fontWeight: areaDisplayUnit === 'SQFT' ? 600 : 400,
+                            fontWeight: areaDisplayMode === 'SQFT' ? 600 : 400,
                             borderRadius: '4px',
                             border: 'none',
-                            backgroundColor: areaDisplayUnit === 'SQFT' ? 'var(--color-accent)' : 'transparent',
-                            color: areaDisplayUnit === 'SQFT' ? '#fff' : 'var(--color-text-muted)',
+                            backgroundColor: areaDisplayMode === 'SQFT' ? 'var(--color-accent)' : 'transparent',
+                            color: areaDisplayMode === 'SQFT' ? '#fff' : 'var(--color-text-muted)',
                             cursor: 'pointer'
                           }}
                         >
@@ -2293,19 +2293,35 @@ export default function AdminRoute(): JSX.Element {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setAreaDisplayUnit('SQYD')}
+                          onClick={() => setAreaDisplayMode('SQYD')}
                           style={{
                             padding: '4px 10px',
                             fontSize: '11px',
-                            fontWeight: areaDisplayUnit === 'SQYD' ? 600 : 400,
+                            fontWeight: areaDisplayMode === 'SQYD' ? 600 : 400,
                             borderRadius: '4px',
                             border: 'none',
-                            backgroundColor: areaDisplayUnit === 'SQYD' ? 'var(--color-accent)' : 'transparent',
-                            color: areaDisplayUnit === 'SQYD' ? '#fff' : 'var(--color-text-muted)',
+                            backgroundColor: areaDisplayMode === 'SQYD' ? 'var(--color-accent)' : 'transparent',
+                            color: areaDisplayMode === 'SQYD' ? '#fff' : 'var(--color-text-muted)',
                             cursor: 'pointer'
                           }}
                         >
                           Sq. Yd.
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAreaDisplayMode('DUAL')}
+                          style={{
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            fontWeight: areaDisplayMode === 'DUAL' ? 600 : 400,
+                            borderRadius: '4px',
+                            border: 'none',
+                            backgroundColor: areaDisplayMode === 'DUAL' ? 'var(--color-accent)' : 'transparent',
+                            color: areaDisplayMode === 'DUAL' ? '#fff' : 'var(--color-text-muted)',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Dual
                         </button>
                       </div>
                     </div>
@@ -2319,7 +2335,7 @@ export default function AdminRoute(): JSX.Element {
                             <th style={{ padding: '10px 12px' }}>Floor</th>
                             <th style={{ padding: '10px 12px' }}>Unit No.</th>
                             <th style={{ padding: '10px 12px' }}>Config</th>
-                            <th style={{ padding: '10px 12px' }}>Area ({areaDisplayUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})</th>
+                            <th style={{ padding: '10px 12px' }}>Area</th>
                             <th style={{ padding: '10px 12px' }}>Price</th>
                             <th style={{ padding: '10px 12px' }}>Status</th>
                             <th style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
@@ -2351,8 +2367,10 @@ export default function AdminRoute(): JSX.Element {
 
                             return filtered.map((u: any) => {
                               const statusColor = u.status === 'AVAILABLE' ? 'var(--color-available)' : u.status === 'HELD' ? 'var(--color-held)' : 'var(--color-sold)'
-                              const displayArea = areaDisplayUnit === 'SQYD'
+                              const displayArea = areaDisplayMode === 'SQYD'
                                 ? `${(u.carpetArea / 9).toFixed(1)} sqyd`
+                                : areaDisplayMode === 'DUAL'
+                                ? `${u.carpetArea} sqft (${(u.carpetArea / 9).toFixed(1)} sqyd)`
                                 : `${u.carpetArea} sqft`
                               return (
                                 <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
