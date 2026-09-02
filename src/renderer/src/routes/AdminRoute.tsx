@@ -2582,6 +2582,8 @@ export default function AdminRoute(): JSX.Element {
                         <option value="ESTIMATED">Estimated</option>
                         <option value="INDICATIVE">Indicative</option>
                         <option value="SUBJECT_TO_CONFIRMATION">Subject to Confirmation</option>
+                      </select>
+                    </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                     <div>
