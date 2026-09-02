@@ -50,25 +50,66 @@ export class SyncHandlers {
 
       const delta = (await syncRes.json()) as {
         projects?: any[]
+        towers?: any[]
         units?: any[]
         modules?: any[]
+        highlights?: any[]
+        amenities?: any[]
       }
 
-      // Apply delta in a transaction
+      const cleanObj = (obj: any, keys: string[]) => {
+        const cleaned = { ...obj }
+        for (const k of keys) delete cleaned[k]
+        return cleaned
+      }
+
+      // Apply in proper dependency order within transaction
       await this.db.$transaction(async (tx) => {
+        // 1. Projects
         if (delta.projects) {
-          for (const p of delta.projects) {
+          for (const raw of delta.projects) {
+            const p = cleanObj(raw, ['modules', 'highlightCards', 'media', 'towers', 'amenities', 'sessions', 'leads'])
+            if (p.createdAt) p.createdAt = new Date(p.createdAt)
+            if (p.updatedAt) p.updatedAt = new Date(p.updatedAt)
             await tx.project.upsert({ where: { id: p.id }, update: p, create: p })
           }
         }
+        // 2. Towers (Must be created BEFORE units due to towerId foreign key!)
+        if (delta.towers) {
+          for (const raw of delta.towers) {
+            const t = cleanObj(raw, ['project', 'units'])
+            await tx.tower.upsert({ where: { id: t.id }, update: t, create: t })
+          }
+        }
+        // 3. Units
         if (delta.units) {
-          for (const u of delta.units) {
+          for (const raw of delta.units) {
+            const u = cleanObj(raw, ['tower', 'floorPlanMedia'])
+            if (u.updatedAt) u.updatedAt = new Date(u.updatedAt)
             await tx.unit.upsert({ where: { id: u.id }, update: u, create: u })
           }
         }
+        // 4. Modules
         if (delta.modules) {
-          for (const m of delta.modules) {
+          for (const raw of delta.modules) {
+            const m = cleanObj(raw, ['project'])
+            if (m.createdAt) m.createdAt = new Date(m.createdAt)
+            if (m.updatedAt) m.updatedAt = new Date(m.updatedAt)
             await tx.projectModule.upsert({ where: { id: m.id }, update: m, create: m })
+          }
+        }
+        // 5. Highlights
+        if (delta.highlights) {
+          for (const raw of delta.highlights) {
+            const h = cleanObj(raw, ['project'])
+            await tx.highlightCard.upsert({ where: { id: h.id }, update: h, create: h })
+          }
+        }
+        // 6. Amenities
+        if (delta.amenities) {
+          for (const raw of delta.amenities) {
+            const a = cleanObj(raw, ['project'])
+            await tx.amenity.upsert({ where: { id: a.id }, update: a, create: a })
           }
         }
       })
@@ -81,7 +122,6 @@ export class SyncHandlers {
 
       return { success: true, message: 'Sync complete', contentVersion: manifest.contentVersion }
     } catch (err: any) {
-      // Sync failures must NEVER crash — they are invisible in presentation mode
       console.error('[Sync] Error:', err?.message)
       return { success: false, reason: err?.message || 'Unknown error' }
     }
@@ -100,13 +140,19 @@ export class SyncHandlers {
 
       // Gather all local data to publish
       const projects = await this.db.project.findMany()
+      const towers = await this.db.tower.findMany()
       const units = await this.db.unit.findMany()
       const modules = await this.db.projectModule.findMany()
+      const highlights = await this.db.highlightCard.findMany()
+      const amenities = await this.db.amenity.findMany()
 
       const payload = {
         projects,
+        towers,
         units,
         modules,
+        highlights,
+        amenities,
         contentVersion: Date.now().toString()
       }
 
@@ -142,5 +188,3 @@ export class SyncHandlers {
     ipcMain.handle(IPC_CHANNELS.SYNC_PUBLISH_NOW, () => this.publishNow())
   }
 }
-
-

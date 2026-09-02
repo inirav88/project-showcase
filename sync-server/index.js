@@ -34,8 +34,11 @@ function loadStore() {
     contentVersion: '0',
     changedSince: new Date().toISOString(),
     projects: [],
+    towers: [],
     units: [],
-    modules: []
+    modules: [],
+    highlights: [],
+    amenities: []
   }
 }
 
@@ -58,22 +61,28 @@ app.get('/api/manifest', authMiddleware, (req, res) => {
 app.get('/api/sync', authMiddleware, (req, res) => {
   res.json({
     projects: store.projects || [],
+    towers: store.towers || [],
     units: store.units || [],
-    modules: store.modules || []
+    modules: store.modules || [],
+    highlights: store.highlights || [],
+    amenities: store.amenities || []
   })
 })
 
 // 3. POST /api/publish -> Master admin pushes new catalog updates
 app.post('/api/publish', authMiddleware, (req, res) => {
-  const { projects, units, modules, contentVersion } = req.body
+  const { projects, towers, units, modules, highlights, amenities, contentVersion } = req.body
   const newVersion = contentVersion || Date.now().toString()
 
   store = {
     contentVersion: newVersion,
     changedSince: new Date().toISOString(),
     projects: projects || [],
+    towers: towers || [],
     units: units || [],
-    modules: modules || []
+    modules: modules || [],
+    highlights: highlights || [],
+    amenities: amenities || []
   }
 
   saveStore(store)
