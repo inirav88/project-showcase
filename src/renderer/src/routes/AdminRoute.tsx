@@ -969,6 +969,7 @@ interface Lead {
 }
 interface Settings {
   firmName: string
+  firmLogoPath?: string
   firmContactPhone: string
   firmContactEmail: string
   firmWebsite: string
@@ -1065,6 +1066,7 @@ export default function AdminRoute(): JSX.Element {
   // Global settings state
   const [settings, setSettings] = useState<Settings>({
     firmName: '',
+    firmLogoPath: '',
     firmContactPhone: '',
     firmContactEmail: '',
     firmWebsite: '',
@@ -1073,6 +1075,56 @@ export default function AdminRoute(): JSX.Element {
     watermarkEnabled: true
   })
   const [adminPinInput, setAdminPinInput] = useState('')
+
+  const handleCompanyLogoUpload = async () => {
+    try {
+      const filePath = await (window as any).api.invoke(IPC_CHANNELS.DIALOG_OPEN_FILE, {
+        title: 'Select Company Logo Image',
+        filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'svg'] }]
+      }) as string | null
+
+      if (filePath) {
+        const mediaRecord = await (window as any).api.invoke(IPC_CHANNELS.MEDIA_UPLOAD, {
+          projectId: selectedProjectId || 'GLOBAL',
+          category: 'LOGO',
+          filePath
+        }) as any
+
+        if (mediaRecord?.filePath) {
+          setSettings(prev => ({ ...prev, firmLogoPath: mediaRecord.filePath }))
+          alert('Company logo uploaded! Click "Save branding Settings" below to persist changes.')
+        }
+      }
+    } catch (err: any) {
+      alert(`Failed to upload company logo: ${err.message}`)
+    }
+  }
+
+  // Settings action
+  const handleSettingsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const payload: any = {
+        firmName: settings.firmName,
+        firmLogoPath: settings.firmLogoPath || '',
+        firmContactPhone: settings.firmContactPhone,
+        firmContactEmail: settings.firmContactEmail,
+        firmWebsite: settings.firmWebsite,
+        disclaimerText: settings.disclaimerText,
+        narrationEnabled: settings.narrationEnabled,
+        watermarkEnabled: settings.watermarkEnabled
+      }
+      if (adminPinInput) {
+        payload.adminPin = adminPinInput
+      }
+      await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_SET, payload)
+      alert('Branding configurations saved!')
+      setAdminPinInput('')
+      loadSettings()
+    } catch (err: any) {
+      alert(`Settings update error: ${err.message}`)
+    }
+  }
 
   useEffect(() => {
     loadProjects()
@@ -1558,29 +1610,6 @@ export default function AdminRoute(): JSX.Element {
     setUnitNotes('')
   }
 
-  // Settings action
-  const handleSettingsSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const payload: any = {
-        firmName: settings.firmName,
-        firmContactPhone: settings.firmContactPhone,
-        firmContactEmail: settings.firmContactEmail,
-        firmWebsite: settings.firmWebsite,
-        disclaimerText: settings.disclaimerText,
-        narrationEnabled: settings.narrationEnabled,
-        watermarkEnabled: settings.watermarkEnabled
-      }
-      if (adminPinInput) {
-        payload.adminPin = adminPinInput
-      }
-      await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_SET, payload)
-      alert('Branding configurations saved!')
-      setAdminPinInput('')
-      loadSettings()
-    } catch (err: any) {
-      alert(`Settings update error: ${err.message}`)
-    }
   }
 
   return (
@@ -2734,8 +2763,52 @@ export default function AdminRoute(): JSX.Element {
               <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>Global Firm Configuration</h3>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Company Name</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Company Name</label>
                 <input value={settings.firmName} onChange={(e) => setSettings({ ...settings, firmName: e.target.value })} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Company Logo</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', backgroundColor: 'var(--color-bg)', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                  {settings.firmLogoPath ? (
+                    <div style={{ position: 'relative', width: '120px', height: '60px', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <img
+                        src={toMediaUrl(settings.firmLogoPath)}
+                        alt="Company Logo Preview"
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                      />
+                    </div>
+                  ) : (
+                    <div style={{ width: '120px', height: '60px', borderRadius: '6px', border: '1px dashed var(--color-border)', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)', fontSize: '11px', flexShrink: 0 }}>
+                      <span style={{ fontSize: '18px', marginBottom: '2px' }}>&#x1F5BC;</span>
+                      <span>No Logo</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={handleCompanyLogoUpload}
+                        style={{ padding: '8px 16px', backgroundColor: 'var(--color-surface-hover)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                      >
+                        &#x1F5BC; {settings.firmLogoPath ? 'Change Company Logo' : 'Upload Company Logo'}
+                      </button>
+                      {settings.firmLogoPath && (
+                        <button
+                          type="button"
+                          onClick={() => setSettings({ ...settings, firmLogoPath: '' })}
+                          style={{ padding: '8px 14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          Remove Logo
+                        </button>
+                      )}
+                    </div>
+                    <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                      Appears on Kiosk launcher header, PDFs, and exported brochures (PNG, SVG, or WebP recommended).
+                    </span>
+                  </div>
+                </div>
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
