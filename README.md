@@ -145,6 +145,14 @@ To deploy the standalone sync server on CloudPanel or Ubuntu VPS:
 
 ---
 
+## 🔄 Client Operations & Multi-Laptop Workflow
+
+1. **One-Time Client Setup:** Run `npm run package` on main laptop -> Install `ShowcaseOS Setup 0.0.1.exe` on client laptop -> Configure VPS Base URL (`https://showcase.salesstudio.in`) and API Key in Admin Settings -> Create `AGENT` user account for sales reps.
+2. **Publishing Updates (Superadmin Main Laptop):** Edit catalog/prices on main laptop -> Go to **Backup & Sync** -> Click **Publish (Push Admin)**.
+3. **Syncing Updates (Client Laptops / Kiosks):** Client opens ShowcaseOS -> Go to **Backup & Sync** -> Click **Sync (Pull Client)**. Updates download in seconds!
+
+---
+
 ## 🛡️ Git & Contribution Policy
 
 - **Default Branch:** All local changes must be committed and pushed to the **`dev`** branch.

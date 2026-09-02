@@ -68,3 +68,31 @@ When you launch ShowcaseOS for the first time:
 4. To export leads for CRM integration:
    - Go to Admin -> **Leads** tab.
    - Click **Export CSV** to download a spreadsheet of all customer contacts.
+
+---
+
+## 🔄 7. Master Client Management & Multi-Laptop Deployment Workflow
+
+Since **YOU (Superadmin)** are the sole administrator updating property catalogs, towers, prices, and media, follow this step-by-step workflow:
+
+### Phase 1: One-Time Client Installation (Setup)
+1. **Build Installer:** On your main laptop, run `npm run package`. Copy `ShowcaseOS Setup 0.0.1.exe` from `dist/` onto a USB drive.
+2. **Install on Client Laptop:** Plug the USB drive into the client system and run the installer.
+3. **Configure VPS Connection (One-Time):**
+   - Open ShowcaseOS on client laptop -> Admin -> **Settings**.
+   - Set **VPS Base URL:** `https://showcase.salesstudio.in`
+   - Set **VPS API Secret Key:** `salesstudio-secret-key-2026`
+   - Click **Save Configuration**.
+4. **Create Sales Rep Account:**
+   - Go to **Staff Profiles** -> create account for showroom staff (Role: `AGENT / STAFF`, PIN: e.g. `1234`). Sales reps present safely without admin rights.
+
+### Phase 2: Updating Projects & Prices (From Your Main Laptop)
+1. Add new projects, create towers, or update unit status/prices in ShowcaseOS Admin on your main laptop.
+2. Go to **Backup & Sync** tab -> Click **Publish (Push Admin)**.
+3. Your latest catalog payload is securely pushed to `https://showcase.salesstudio.in`.
+
+### Phase 3: Client Updating (On Their Laptops / Kiosks)
+1. Client opens ShowcaseOS -> **Backup & Sync** tab.
+2. Click **Sync (Pull Client)**.
+3. All updated projects, towers, units, and pricing automatically download in seconds!
+
