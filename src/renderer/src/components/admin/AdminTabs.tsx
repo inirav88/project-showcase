@@ -3,55 +3,215 @@ import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 
 const cardStyle: React.CSSProperties = { backgroundColor: 'var(--color-surface-raised)', padding: 24, borderRadius: 8, border: '1px solid var(--color-border)' }
 
-// ---- STAFF TAB ----
-interface StaffMember { id: string; name: string; isActive: boolean; createdAt: string }
+// ---- STAFF & USER ROLES TAB ----
+interface StaffMember { id: string; name: string; email?: string; phone?: string; role?: string; isActive: boolean; createdAt: string }
 export function StaffTab() {
   const [staff, setStaff] = useState<StaffMember[]>([])
   const [newName, setNewName] = useState('')
+  const [newEmail, setNewEmail] = useState('')
+  const [newPhone, setNewPhone] = useState('')
+  const [newRole, setNewRole] = useState<'SUPERADMIN' | 'ADMIN' | 'AGENT'>('AGENT')
   const [newPin, setNewPin] = useState('')
+  const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null)
+  const [editRole, setEditRole] = useState<string>('AGENT')
+  const [editPin, setEditPin] = useState<string>('')
   const [saving, setSaving] = useState(false)
+
   const load = async () => { const list = await (window as any).api.invoke(IPC_CHANNELS.STAFF_LIST); setStaff((list as StaffMember[]) || []) }
   useEffect(() => { load() }, [])
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newName || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) { alert('Name required and PIN must be exactly 4 digits'); return }
     setSaving(true)
-    try { await (window as any).api.invoke(IPC_CHANNELS.STAFF_CREATE, { name: newName, pin: newPin }); setNewName(''); setNewPin(''); await load() }
-    finally { setSaving(false) }
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.STAFF_CREATE, {
+        name: newName,
+        email: newEmail,
+        phone: newPhone,
+        role: newRole,
+        pin: newPin
+      })
+      setNewName('')
+      setNewEmail('')
+      setNewPhone('')
+      setNewRole('AGENT')
+      setNewPin('')
+      await load()
+    } finally { setSaving(false) }
   }
+
+  const handleUpdateRole = async (s: StaffMember, role: string) => {
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.STAFF_UPDATE, { id: s.id, role })
+      await load()
+    } catch (err: any) {
+      alert(`Failed to update user role: ${err.message}`)
+    }
+  }
+
+  const handleResetPin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingStaff) return
+    if (editPin.length !== 4 || !/^\d{4}$/.test(editPin)) { alert('PIN must be exactly 4 digits'); return }
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.STAFF_UPDATE, { id: editingStaff.id, pin: editPin })
+      alert(`PIN updated successfully for ${editingStaff.name}!`)
+      setEditingStaff(null)
+      setEditPin('')
+      await load()
+    } catch (err: any) {
+      alert(`Failed to reset PIN: ${err.message}`)
+    }
+  }
+
   const inputStyle: React.CSSProperties = { width: '100%', padding: 10, borderRadius: 6, border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }
+  const roleBadgeStyle = (role?: string): React.CSSProperties => {
+    if (role === 'SUPERADMIN') return { padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: 'rgba(234, 179, 8, 0.15)', color: '#d97706', border: '1px solid rgba(234, 179, 8, 0.4)' }
+    if (role === 'ADMIN') return { padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: 'rgba(59, 130, 246, 0.15)', color: '#2563eb', border: '1px solid rgba(59, 130, 246, 0.4)' }
+    return { padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: 'rgba(107, 114, 128, 0.15)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* USER LIST CARD */}
       <div style={cardStyle}>
-        <h3 style={{ margin: '0 0 16px' }}>Staff Members</h3>
-        {staff.length === 0 ? <p style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>No staff added yet.</p> : (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div>
+            <h3 style={{ margin: 0 }}>System Users & Staff Profiles</h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: 12, color: 'var(--color-text-muted)' }}>
+              Manage access permissions. Only <b>SUPERADMIN</b> can configure global firm settings & publish catalog updates to the Cloud VPS.
+            </p>
+          </div>
+        </div>
+
+        {staff.length === 0 ? <p style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>No users found.</p> : (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead><tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
-              <th style={{ padding: 10, textAlign: 'left' }}>Name</th>
-              <th style={{ padding: 10, textAlign: 'left' }}>Status</th>
-              <th style={{ padding: 10, textAlign: 'left' }}>Added</th>
-              <th style={{ padding: 10 }}>Actions</th>
-            </tr></thead>
-            <tbody>{staff.map((s) => (
-              <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                <td style={{ padding: 10, fontWeight: 600 }}>{s.name}</td>
-                <td style={{ padding: 10 }}><span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: s.isActive ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)', color: s.isActive ? '#16a34a' : '#dc2626' }}>{s.isActive ? 'Active' : 'Inactive'}</span></td>
-                <td style={{ padding: 10, color: 'var(--color-text-muted)' }}>{new Date(s.createdAt).toLocaleDateString()}</td>
-                <td style={{ padding: 10, display: 'flex', gap: 8, justifyContent: 'center' }}>
-                  <button onClick={async () => { await (window as any).api.invoke(IPC_CHANNELS.STAFF_TOGGLE_ACTIVE, s.id); load() }} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--color-border)', background: 'transparent', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: 12 }}>{s.isActive ? 'Deactivate' : 'Activate'}</button>
-                  <button onClick={async () => { if (!confirm('Delete this staff member?')) return; await (window as any).api.invoke(IPC_CHANNELS.STAFF_DELETE, s.id); load() }} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.4)', background: 'transparent', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
-                </td>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
+                <th style={{ padding: 10, textAlign: 'left' }}>User Name</th>
+                <th style={{ padding: 10, textAlign: 'left' }}>System Role</th>
+                <th style={{ padding: 10, textAlign: 'left' }}>Status</th>
+                <th style={{ padding: 10, textAlign: 'left' }}>Added On</th>
+                <th style={{ padding: 10, textAlign: 'center' }}>Actions</th>
               </tr>
-            ))}</tbody>
+            </thead>
+            <tbody>
+              {staff.map((s) => (
+                <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                  <td style={{ padding: 10, fontWeight: 600 }}>
+                    <div>{s.name}</div>
+                    {s.email && <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 400 }}>{s.email}</div>}
+                  </td>
+                  <td style={{ padding: 10 }}>
+                    <select
+                      value={s.role || 'AGENT'}
+                      onChange={(e) => handleUpdateRole(s, e.target.value)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid var(--color-border)',
+                        backgroundColor: 'var(--color-bg)',
+                        color: 'var(--color-text-primary)',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="SUPERADMIN">👑 SUPERADMIN</option>
+                      <option value="ADMIN">🛡️ ADMIN</option>
+                      <option value="AGENT">👤 AGENT</option>
+                    </select>
+                  </td>
+                  <td style={{ padding: 10 }}>
+                    <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: s.isActive ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)', color: s.isActive ? '#16a34a' : '#dc2626' }}>
+                      {s.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td style={{ padding: 10, color: 'var(--color-text-muted)' }}>{new Date(s.createdAt).toLocaleDateString()}</td>
+                  <td style={{ padding: 10, display: 'flex', gap: 8, justifyContent: 'center' }}>
+                    <button
+                      onClick={() => setEditingStaff(s)}
+                      style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--color-border)', background: 'var(--color-surface-hover)', color: 'var(--color-text-primary)', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                    >
+                      🔑 Reset PIN
+                    </button>
+                    <button
+                      onClick={async () => { await (window as any).api.invoke(IPC_CHANNELS.STAFF_TOGGLE_ACTIVE, s.id); load() }}
+                      style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--color-border)', background: 'transparent', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: 12 }}
+                    >
+                      {s.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button
+                      onClick={async () => { if (!confirm(`Delete user ${s.name}?`)) return; await (window as any).api.invoke(IPC_CHANNELS.STAFF_DELETE, s.id); load() }}
+                      style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.4)', background: 'transparent', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         )}
       </div>
+
+      {/* RESET PIN MODAL */}
+      {editingStaff && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <form onSubmit={handleResetPin} style={{ backgroundColor: 'var(--color-surface-raised)', padding: 24, borderRadius: 10, width: 340, border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <h4 style={{ margin: 0, fontSize: 16 }}>Reset PIN for {editingStaff.name}</h4>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>New 4-Digit Security PIN</label>
+              <input
+                value={editPin}
+                onChange={(e) => setEditPin(e.target.value.replace(/\D/g,'').slice(0,4))}
+                required
+                type="password"
+                maxLength={4}
+                placeholder="- - - -"
+                style={{ ...inputStyle, letterSpacing: 8, textAlign: 'center', fontSize: 18 }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 6 }}>
+              <button type="button" onClick={() => setEditingStaff(null)} style={{ padding: '8px 14px', borderRadius: 6, border: '1px solid var(--color-border)', background: 'transparent', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>Cancel</button>
+              <button type="submit" style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--color-accent)', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Update PIN</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* ADD USER CARD */}
       <div style={cardStyle}>
-        <h3 style={{ margin: '0 0 16px' }}>Add Staff Member</h3>
-        <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 420 }}>
-          <div><label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Full Name *</label><input value={newName} onChange={(e) => setNewName(e.target.value)} required placeholder='e.g. Raj Patel' style={inputStyle} /></div>
-          <div><label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>4-Digit Staff PIN *</label><input value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/\D/g,'').slice(0,4))} required type='password' maxLength={4} placeholder='- - - -' style={{ ...inputStyle, letterSpacing: 8 }} /></div>
-          <button type='submit' disabled={saving} style={{ padding: '10px 20px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', alignSelf: 'flex-start', fontFamily: 'var(--font-sans)' }}>{saving ? 'Saving...' : 'Add Staff Member'}</button>
+        <h3 style={{ margin: '0 0 16px' }}>Create New User Account</h3>
+        <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, maxWidth: 650 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Full Name *</label>
+            <input value={newName} onChange={(e) => setNewName(e.target.value)} required placeholder="e.g. Nirav Sales Admin" style={inputStyle} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>User Role *</label>
+            <select value={newRole} onChange={(e) => setNewRole(e.target.value as any)} style={inputStyle}>
+              <option value="SUPERADMIN">👑 SUPERADMIN (Full Access + VPS Push)</option>
+              <option value="ADMIN">🛡️ ADMIN (Catalog & Inventory Edit)</option>
+              <option value="AGENT">👤 AGENT / STAFF (Presentation Only)</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Email Address</label>
+            <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email" placeholder="admin@salesstudio.in" style={inputStyle} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Contact Phone</label>
+            <input value={newPhone} onChange={(e) => setNewPhone(e.target.value)} placeholder="+91 9904033395" style={inputStyle} />
+          </div>
+          <div style={{ gridColumn: 'span 2' }}>
+            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>4-Digit Security PIN *</label>
+            <input value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/\D/g,'').slice(0,4))} required type="password" maxLength={4} placeholder="- - - -" style={{ ...inputStyle, letterSpacing: 8, maxWidth: 200 }} />
+          </div>
+          <button type="submit" disabled={saving} style={{ padding: '10px 20px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', justifySelf: 'start', fontFamily: 'var(--font-sans)', gridColumn: 'span 2' }}>
+            {saving ? 'Creating User...' : 'Create User Account'}
+          </button>
         </form>
       </div>
     </div>

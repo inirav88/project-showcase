@@ -48,6 +48,7 @@ export const IPC_CHANNELS = {
   // Staff
   STAFF_LIST:               'staff:list',
   STAFF_CREATE:             'staff:create',
+  STAFF_UPDATE:             'staff:update',
   STAFF_TOGGLE_ACTIVE:      'staff:toggleActive',
   STAFF_VERIFY_PIN:         'staff:verifyPin',
   STAFF_DELETE:             'staff:delete',

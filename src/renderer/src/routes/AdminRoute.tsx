@@ -1725,6 +1725,18 @@ export default function AdminRoute(): JSX.Element {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Active Role Indicator */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '6px 12px', borderRadius: '20px',
+              backgroundColor: 'rgba(234, 179, 8, 0.12)',
+              border: '1px solid rgba(234, 179, 8, 0.3)',
+              color: '#d97706', fontSize: '12px', fontWeight: 700
+            }}>
+              <span>👑</span>
+              <span>SUPERADMIN</span>
+            </div>
+
             {/* Launch Kiosk button — switches back to the client-facing kiosk view */}
             <button
               onClick={() => navigate('/')}
