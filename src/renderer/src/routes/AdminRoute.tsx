@@ -976,6 +976,8 @@ interface Settings {
   disclaimerText: string
   narrationEnabled: boolean
   watermarkEnabled: boolean
+  vpsBaseUrl?: string
+  vpsApiKey?: string
 }
 
 export default function AdminRoute(): JSX.Element {
@@ -1072,7 +1074,9 @@ export default function AdminRoute(): JSX.Element {
     firmWebsite: '',
     disclaimerText: '',
     narrationEnabled: true,
-    watermarkEnabled: true
+    watermarkEnabled: true,
+    vpsBaseUrl: '',
+    vpsApiKey: ''
   })
   const [adminPinInput, setAdminPinInput] = useState('')
 
@@ -1112,7 +1116,9 @@ export default function AdminRoute(): JSX.Element {
         firmWebsite: settings.firmWebsite,
         disclaimerText: settings.disclaimerText,
         narrationEnabled: settings.narrationEnabled,
-        watermarkEnabled: settings.watermarkEnabled
+        watermarkEnabled: settings.watermarkEnabled,
+        vpsBaseUrl: settings.vpsBaseUrl || '',
+        vpsApiKey: settings.vpsApiKey || ''
       }
       if (adminPinInput) {
         payload.adminPin = adminPinInput
@@ -2911,6 +2917,35 @@ export default function AdminRoute(): JSX.Element {
                       boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
                     }} />
                   </button>
+                </div>
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)' }}>Cloud Sync & VPS Configuration</h4>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>VPS Server Base URL</label>
+                  <input
+                    type="url"
+                    placeholder="e.g. https://api.yourdomain.com or http://vps-ip:3000"
+                    value={settings.vpsBaseUrl || ''}
+                    onChange={(e) => setSettings({ ...settings, vpsBaseUrl: e.target.value })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}
+                  />
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginTop: '4px' }}>
+                    Central server URL used by Backup & Sync to publish updates and synchronize remote kiosks.
+                  </span>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>VPS API Secret Key</label>
+                  <input
+                    type="password"
+                    placeholder="Enter secret authentication key"
+                    value={settings.vpsApiKey || ''}
+                    onChange={(e) => setSettings({ ...settings, vpsApiKey: e.target.value })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}
+                  />
                 </div>
               </div>
 
