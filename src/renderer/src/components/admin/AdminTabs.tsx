@@ -32,12 +32,15 @@ export function StaffTab() {
         role: newRole,
         pin: newPin
       })
+      alert(`User account for ${newName} created successfully!`)
       setNewName('')
       setNewEmail('')
       setNewPhone('')
       setNewRole('AGENT')
       setNewPin('')
       await load()
+    } catch (err: any) {
+      alert(`Failed to create user account: ${err.message}`)
     } finally { setSaving(false) }
   }
 

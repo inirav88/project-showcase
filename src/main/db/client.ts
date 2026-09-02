@@ -31,6 +31,21 @@ export function getDb(): PrismaClient {
     const libsql = createClient({
       url: `file:${dbPath}`,
     })
+
+    // Execute automatic schema column migrations for installed app database
+    try {
+      libsql.execute(`ALTER TABLE StaffProfile ADD COLUMN email TEXT NOT NULL DEFAULT ''`).catch(() => {})
+      libsql.execute(`ALTER TABLE StaffProfile ADD COLUMN phone TEXT NOT NULL DEFAULT ''`).catch(() => {})
+      libsql.execute(`ALTER TABLE StaffProfile ADD COLUMN role TEXT NOT NULL DEFAULT 'AGENT'`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN firmLogoPath TEXT NOT NULL DEFAULT ''`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN vpsBaseUrl TEXT NOT NULL DEFAULT ''`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN vpsApiKey TEXT NOT NULL DEFAULT ''`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN narrationEnabled BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN watermarkEnabled BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
+    } catch (e) {
+      console.warn('[DB Migration] Schema column migration notice:', e)
+    }
+
     const adapter = new PrismaLibSQL(libsql)
     _client = new PrismaClient({ adapter })
   }
