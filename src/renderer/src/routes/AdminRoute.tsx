@@ -2148,7 +2148,7 @@ export default function AdminRoute(): JSX.Element {
                     No towers yet. Create one below or import via CSV.
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px', marginBottom: '20px' }}>
                     {towers.map((tower: any) => {
                       const unitCount = tower.units?.length || 0
                       const available = tower.units?.filter((u: any) => u.status === 'AVAILABLE').length || 0
@@ -2162,10 +2162,17 @@ export default function AdminRoute(): JSX.Element {
                           borderRadius: '8px', border: '1px solid var(--color-border)'
                         }}>
                           {/* Tower icon */}
-                          <div style={{ fontSize: '22px', lineHeight: 1 }}>&#x1F3E2;</div>
+                          <div style={{
+                            width: '36px', height: '36px', borderRadius: '6px',
+                            backgroundColor: 'rgba(201, 168, 76, 0.12)', color: 'var(--color-accent)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '18px', flexShrink: 0
+                          }}>
+                            &#x1F3E2;
+                          </div>
 
                           {/* Name / inline rename */}
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             {isRenaming ? (
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <input
@@ -2180,14 +2187,14 @@ export default function AdminRoute(): JSX.Element {
                               </div>
                             ) : (
                               <>
-                                <div style={{ fontWeight: 700, fontSize: '14px' }}>{tower.name}</div>
-                                <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                                  {unitCount} unit{unitCount !== 1 ? 's' : ''}
+                                <div style={{ fontWeight: 700, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tower.name}</div>
+                                <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                  <span>{unitCount} unit{unitCount !== 1 ? 's' : ''}</span>
                                   {unitCount > 0 && (
-                                    <span style={{ marginLeft: '8px' }}>
-                                      <span style={{ color: 'var(--color-available)' }}>&#x25CF; {available} avail</span>
-                                      {held > 0 && <span style={{ color: 'var(--color-held)', marginLeft: '8px' }}>&#x25CF; {held} held</span>}
-                                      {sold > 0 && <span style={{ color: 'var(--color-sold)', marginLeft: '8px' }}>&#x25CF; {sold} sold</span>}
+                                    <span style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                                      <span style={{ color: 'var(--color-available)', fontWeight: 600 }}>&#x25CF; {available} avail</span>
+                                      {held > 0 && <span style={{ color: 'var(--color-held)', fontWeight: 600 }}>&#x25CF; {held} held</span>}
+                                      {sold > 0 && <span style={{ color: 'var(--color-sold)', fontWeight: 600 }}>&#x25CF; {sold} sold</span>}
                                     </span>
                                   )}
                                 </div>
@@ -2197,18 +2204,18 @@ export default function AdminRoute(): JSX.Element {
 
                           {/* Actions */}
                           {!isRenaming && (
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                            <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                               <button
                                 onClick={() => { setRenamingTowerId(tower.id); setRenamingTowerValue(tower.name) }}
-                                style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '12px' }}
+                                style={{ padding: '5px 10px', borderRadius: '5px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '11px', fontWeight: 500 }}
                               >
-                                &#x270E; Rename
+                                Rename
                               </button>
                               <button
                                 onClick={() => handleDeleteTower(tower.id, tower.name, unitCount)}
-                                style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #f87171', background: 'none', color: '#f87171', cursor: 'pointer', fontSize: '12px', fontWeight: 600 }}
+                                style={{ padding: '5px 10px', borderRadius: '5px', border: '1px solid rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', cursor: 'pointer', fontSize: '11px', fontWeight: 600 }}
                               >
-                                &#x1F5D1; Delete
+                                Delete
                               </button>
                             </div>
                           )}
@@ -2225,11 +2232,11 @@ export default function AdminRoute(): JSX.Element {
                     onChange={e => setNewTowerName(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleCreateTower() }}
                     placeholder="New tower name, e.g. Tower C or Block 3"
-                    style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px' }}
+                    style={{ flex: 1, padding: '9px 14px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px' }}
                   />
                   <button
                     onClick={handleCreateTower}
-                    style={{ padding: '8px 20px', borderRadius: '6px', border: 'none', background: 'var(--color-accent)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
+                    style={{ padding: '9px 20px', borderRadius: '6px', border: 'none', background: 'var(--color-accent)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
                   >
                     + Add Tower
                   </button>
@@ -2255,12 +2262,12 @@ export default function AdminRoute(): JSX.Element {
                     </div>
 
                     {/* Search & Filters */}
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                       <input
                         value={unitSearchQuery}
                         onChange={e => setUnitSearchQuery(e.target.value)}
                         placeholder="Search unit number (e.g. 501)..."
-                        style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px' }}
+                        style={{ flex: 1, minWidth: '180px', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '13px' }}
                       />
                       <select
                         value={filterTowerId}
@@ -2274,19 +2281,21 @@ export default function AdminRoute(): JSX.Element {
                       </select>
 
                       {/* Area Display Unit Mode Toggle */}
-                      <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--color-bg)', padding: '3px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--color-bg)', padding: '3px', borderRadius: '6px', border: '1px solid var(--color-border)', gap: '2px' }}>
                         <button
                           type="button"
                           onClick={() => setAreaDisplayMode('SQFT')}
                           style={{
-                            padding: '4px 10px',
+                            padding: '5px 12px',
                             fontSize: '11px',
-                            fontWeight: areaDisplayMode === 'SQFT' ? 600 : 400,
+                            fontWeight: areaDisplayMode === 'SQFT' ? 700 : 500,
                             borderRadius: '4px',
                             border: 'none',
+                            whiteSpace: 'nowrap',
                             backgroundColor: areaDisplayMode === 'SQFT' ? 'var(--color-accent)' : 'transparent',
                             color: areaDisplayMode === 'SQFT' ? '#fff' : 'var(--color-text-muted)',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           Sq. Ft.
@@ -2295,14 +2304,16 @@ export default function AdminRoute(): JSX.Element {
                           type="button"
                           onClick={() => setAreaDisplayMode('SQYD')}
                           style={{
-                            padding: '4px 10px',
+                            padding: '5px 12px',
                             fontSize: '11px',
-                            fontWeight: areaDisplayMode === 'SQYD' ? 600 : 400,
+                            fontWeight: areaDisplayMode === 'SQYD' ? 700 : 500,
                             borderRadius: '4px',
                             border: 'none',
+                            whiteSpace: 'nowrap',
                             backgroundColor: areaDisplayMode === 'SQYD' ? 'var(--color-accent)' : 'transparent',
                             color: areaDisplayMode === 'SQYD' ? '#fff' : 'var(--color-text-muted)',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           Sq. Yd.
@@ -2311,14 +2322,16 @@ export default function AdminRoute(): JSX.Element {
                           type="button"
                           onClick={() => setAreaDisplayMode('DUAL')}
                           style={{
-                            padding: '4px 10px',
+                            padding: '5px 12px',
                             fontSize: '11px',
-                            fontWeight: areaDisplayMode === 'DUAL' ? 600 : 400,
+                            fontWeight: areaDisplayMode === 'DUAL' ? 700 : 500,
                             borderRadius: '4px',
                             border: 'none',
+                            whiteSpace: 'nowrap',
                             backgroundColor: areaDisplayMode === 'DUAL' ? 'var(--color-accent)' : 'transparent',
                             color: areaDisplayMode === 'DUAL' ? '#fff' : 'var(--color-text-muted)',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           Dual
@@ -2373,13 +2386,13 @@ export default function AdminRoute(): JSX.Element {
                                 ? `${u.carpetArea} sqft (${(u.carpetArea / 9).toFixed(1)} sqyd)`
                                 : `${u.carpetArea} sqft`
                               return (
-                                <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                                <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)', transition: 'background-color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                                   <td style={{ padding: '10px 12px', fontWeight: 600 }}>{u.tower?.name}</td>
                                   <td style={{ padding: '10px 12px' }}>{u.floor}</td>
                                   <td style={{ padding: '10px 12px', fontWeight: 700 }}>{u.unitNumber}</td>
                                   <td style={{ padding: '10px 12px' }}>{u.configuration}</td>
-                                  <td style={{ padding: '10px 12px' }}>{displayArea}</td>
-                                  <td style={{ padding: '10px 12px', color: 'var(--color-accent)', fontWeight: 600 }}>{formatPrice(u.price)}</td>
+                                  <td style={{ padding: '10px 12px', fontVariantNumeric: 'tabular-nums' }}>{displayArea}</td>
+                                  <td style={{ padding: '10px 12px', color: 'var(--color-accent)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{formatPrice(u.price)}</td>
                                   <td style={{ padding: '10px 12px' }}>
                                     <span style={{
                                       display: 'inline-block', padding: '2px 8px', borderRadius: '99px',
@@ -2406,7 +2419,7 @@ export default function AdminRoute(): JSX.Element {
 
                   {/* 2. CSV Import */}
                   <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-                    <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>Bulk Unit CSV Import</h3>
+                    <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 700 }}>Bulk Unit CSV Import</h3>
                     <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', fontSize: '12px' }}>
                       Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes,areaUnit</code>
                     </p>
@@ -2423,7 +2436,7 @@ export default function AdminRoute(): JSX.Element {
                     />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-secondary)' }}>{importStatus}</span>
-                      <button onClick={handleCsvImport} style={{ padding: '10px 20px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                      <button onClick={handleCsvImport} style={{ padding: '10px 20px', backgroundColor: 'var(--color-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '6px', fontWeight: 700, cursor: 'pointer' }}>
                         Bulk Import
                       </button>
                     </div>
@@ -2432,43 +2445,13 @@ export default function AdminRoute(): JSX.Element {
                 </div>
 
                 {/* Right Side: Form (Single Unit Entry or Edit) */}
-                <form onSubmit={handleSingleUnitSubmit} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '12px', height: 'fit-content' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>
+                <form onSubmit={handleSingleUnitSubmit} style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '14px', height: 'fit-content' }}>
+                  <div style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '12px' }}>
+                    <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>
                       {editingUnit ? 'Edit Unit Record' : 'Create Single Unit Record'}
                     </h4>
-                    
-                    {/* Area Unit Picker */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Input Unit:</span>
-                      <div style={{ display: 'flex', backgroundColor: 'var(--color-bg)', padding: '2px', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
-                        <button
-                          type="button"
-                          onClick={() => handleFormAreaUnitChange('SQFT')}
-                          style={{
-                            padding: '2px 6px', fontSize: '10px', fontWeight: formAreaUnit === 'SQFT' ? 600 : 400,
-                            borderRadius: '3px', border: 'none',
-                            backgroundColor: formAreaUnit === 'SQFT' ? 'var(--color-accent)' : 'transparent',
-                            color: formAreaUnit === 'SQFT' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
-                          }}
-                        >
-                          Sq. Ft.
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleFormAreaUnitChange('SQYD')}
-                          style={{
-                            padding: '2px 6px', fontSize: '10px', fontWeight: formAreaUnit === 'SQYD' ? 600 : 400,
-                            borderRadius: '3px', border: 'none',
-                            backgroundColor: formAreaUnit === 'SQYD' ? 'var(--color-accent)' : 'transparent',
-                            color: formAreaUnit === 'SQYD' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
-                          }}
-                        >
-                          Sq. Yd.
-                        </button>
-                      </div>
-                    </div>
                   </div>
+
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Tower Name *</label>
@@ -2483,7 +2466,7 @@ export default function AdminRoute(): JSX.Element {
                               setTowerName(towers[0]?.name || '')
                             }
                           }}
-                          style={{ background: 'none', border: 'none', color: 'var(--color-accent)', cursor: 'pointer', fontSize: '11px', padding: 0 }}
+                          style={{ background: 'none', border: 'none', color: 'var(--color-accent)', cursor: 'pointer', fontSize: '11px', padding: 0, whiteSpace: 'nowrap' }}
                         >
                           {useExistingTower ? 'Create new tower' : 'Choose existing'}
                         </button>
@@ -2494,7 +2477,7 @@ export default function AdminRoute(): JSX.Element {
                         value={towerName}
                         onChange={(e) => setTowerName(e.target.value)}
                         required
-                        style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
                       >
                         <option value="">-- Select Tower --</option>
                         {towers.map((t: any) => (
@@ -2507,50 +2490,94 @@ export default function AdminRoute(): JSX.Element {
                         onChange={(e) => setTowerName(e.target.value)}
                         placeholder="E.g. Tower C"
                         required
-                        style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
                       />
                     )}
                   </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Floor Number *</label>
+                      <input type="number" value={floorNumber} onChange={(e) => setFloorNumber(Number(e.target.value))} required style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Unit Number *</label>
+                      <input value={unitNumber} onChange={(e) => setUnitNumber(e.target.value)} placeholder="A-101" required style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    </div>
+                  </div>
+
                   <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Floor Number *</label>
-                    <input type="number" value={floorNumber} onChange={(e) => setFloorNumber(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Configuration</label>
+                    <input value={unitConfig} onChange={(e) => setUnitConfig(e.target.value)} placeholder="3BHK" style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                   </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Number *</label>
-                    <input value={unitNumber} onChange={(e) => setUnitNumber(e.target.value)} placeholder="A-101" required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+
+                  {/* Area Dimensions Header + Input Unit Picker */}
+                  <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '10px', marginTop: '2px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)' }}>
+                        Area Dimensions
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Input Unit:</span>
+                        <div style={{ display: 'flex', backgroundColor: 'var(--color-bg)', padding: '2px', borderRadius: '4px', border: '1px solid var(--color-border)', gap: '2px' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleFormAreaUnitChange('SQFT')}
+                            style={{
+                              padding: '3px 8px', fontSize: '10px', fontWeight: formAreaUnit === 'SQFT' ? 700 : 500,
+                              borderRadius: '3px', border: 'none', whiteSpace: 'nowrap',
+                              backgroundColor: formAreaUnit === 'SQFT' ? 'var(--color-accent)' : 'transparent',
+                              color: formAreaUnit === 'SQFT' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                            }}
+                          >
+                            Sq. Ft.
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleFormAreaUnitChange('SQYD')}
+                            style={{
+                              padding: '3px 8px', fontSize: '10px', fontWeight: formAreaUnit === 'SQYD' ? 700 : 500,
+                              borderRadius: '3px', border: 'none', whiteSpace: 'nowrap',
+                              backgroundColor: formAreaUnit === 'SQYD' ? 'var(--color-accent)' : 'transparent',
+                              color: formAreaUnit === 'SQYD' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                            }}
+                          >
+                            Sq. Yd.
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '4px', fontSize: '10px', color: 'var(--color-text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                          Carpet ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
+                        </label>
+                        <input type="number" step="any" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '4px', fontSize: '10px', color: 'var(--color-text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                          Built Up ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
+                        </label>
+                        <input type="number" step="any" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '4px', fontSize: '10px', color: 'var(--color-text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                          Super ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
+                        </label>
+                        <input type="number" step="any" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Configuration</label>
-                    <input value={unitConfig} onChange={(e) => setUnitConfig(e.target.value)} placeholder="3BHK" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                        Carpet ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
-                      </label>
-                      <input type="number" step="any" value={carpetArea} onChange={(e) => setCarpetArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Price (INR) *</label>
+                      <input type="number" value={unitPrice} onChange={(e) => setUnitPrice(Number(e.target.value))} required style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                        Built Up ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
-                      </label>
-                      <input type="number" step="any" value={builtUpArea} onChange={(e) => setBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                        Super ({formAreaUnit === 'SQYD' ? 'Sq. Yd.' : 'Sq. Ft.'})
-                      </label>
-                      <input type="number" step="any" value={superBuiltUpArea} onChange={(e) => setSuperBuiltUpArea(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                    </div>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price (INR) *</label>
-                      <input type="number" value={unitPrice} onChange={(e) => setUnitPrice(Number(e.target.value))} required style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Price Label</label>
-                      <select value={priceLabel} onChange={(e) => setPriceLabel(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Price Label</label>
+                      <select value={priceLabel} onChange={(e) => setPriceLabel(e.target.value)} style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
                         <option value="OFFICIAL">Official</option>
                         <option value="ESTIMATED">Estimated</option>
                         <option value="INDICATIVE">Indicative</option>
@@ -2558,17 +2585,6 @@ export default function AdminRoute(): JSX.Element {
                       </select>
                     </div>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Unit Facing</label>
-                    <input value={unitFacing} onChange={(e) => setUnitFacing(e.target.value)} placeholder="East" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Status</label>
-                    <select value={unitStatus} onChange={(e) => setUnitStatus(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}>
-                      <option value="AVAILABLE">Available</option>
-                      <option value="HELD">Held</option>
-                      <option value="SOLD">Sold</option>
-                    </select>
                   </div>
                   <div>
                     <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>Notes</label>
