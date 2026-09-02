@@ -1610,8 +1610,6 @@ export default function AdminRoute(): JSX.Element {
     setUnitNotes('')
   }
 
-  }
-
   return (
     <div style={{
       display: 'flex',
