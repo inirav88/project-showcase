@@ -526,6 +526,8 @@ export default function ProjectShowcase(): JSX.Element {
   }, [])
 
   const [showPinModal, setShowPinModal] = useState(false)
+  const [pinPurpose, setPinPurpose] = useState<'admin' | 'exit'>('admin')
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
   const [showLeadModal, setShowLeadModal] = useState(true)
   const [showShortlist, setShowShortlist] = useState(false)
 
@@ -696,13 +698,17 @@ export default function ProjectShowcase(): JSX.Element {
       const isValid = await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_VERIFY_PIN, pin)
       if (isValid) {
         setShowPinModal(false)
-        if (sessionId) {
-          window.api.invoke(IPC_CHANNELS.SESSION_END, {
-            id: sessionId,
-            sectionsViewed: Array.from(sectionsViewed),
-          }).catch(console.error)
+        if (pinPurpose === 'exit') {
+          window.api.invoke(IPC_CHANNELS.EXIT_KIOSK)
+        } else {
+          if (sessionId) {
+            window.api.invoke(IPC_CHANNELS.SESSION_END, {
+              id: sessionId,
+              sectionsViewed: Array.from(sectionsViewed),
+            }).catch(console.error)
+          }
+          navigate('/admin')
         }
-        navigate('/admin')
         return true
       }
       return false
@@ -882,6 +888,37 @@ export default function ProjectShowcase(): JSX.Element {
           >
             {narrationMuted ? String.fromCodePoint(128263) + ' Narration' : String.fromCodePoint(128483) + ' Narration'}
           </button>
+          {settings?.showExitButton && (
+            <button
+              onClick={() => {
+                if (settings.exitRequiresPin) {
+                  setPinPurpose('exit')
+                  setShowPinModal(true)
+                } else {
+                  setShowExitConfirm(true)
+                }
+              }}
+              title="Exit Application"
+              aria-label="Exit Application"
+              className="btn-hover-effect"
+              style={{
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                padding: '10px 14px', borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border)',
+                fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-error, #ef4444)'
+                e.currentTarget.style.borderColor = 'var(--color-error, #ef4444)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-secondary)'
+                e.currentTarget.style.borderColor = 'var(--color-border)'
+              }}
+            >
+              <span>⏻</span> Exit
+            </button>
+          )}
         </div>
       </header>
 
@@ -948,6 +985,43 @@ export default function ProjectShowcase(): JSX.Element {
           onVerify={handlePinVerify}
           onClose={() => setShowPinModal(false)}
         />
+      )}
+
+      {/* Exit Confirmation Modal */}
+      {showExitConfirm && (
+        <div className="pin-backdrop" role="dialog" aria-label="Exit confirmation">
+          <div className="pin-modal" style={{ maxWidth: 360, textAlign: 'center', padding: '28px 24px' }}>
+            <div style={{ fontSize: 32, marginBottom: 8, color: 'var(--color-error, #ef4444)' }}>⏻</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 8 }}>
+              Exit Showcase OS?
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 24, lineHeight: 1.4 }}>
+              Are you sure you want to close the presentation application?
+            </div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                style={{
+                  flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface-raised)', color: 'var(--color-text-primary)',
+                  fontWeight: 600, fontSize: 13, cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => window.api.invoke(IPC_CHANNELS.EXIT_KIOSK)}
+                style={{
+                  flex: 1, padding: '10px 16px', borderRadius: 8, border: 'none',
+                  background: 'var(--color-error, #ef4444)', color: '#fff',
+                  fontWeight: 700, fontSize: 13, cursor: 'pointer'
+                }}
+              >
+                Exit Application
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Lead capture modal */}
