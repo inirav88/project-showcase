@@ -385,7 +385,7 @@ export default function ProjectLauncher(): JSX.Element {
           )}
           <AccessibilityToggle />
           <ThemeToggle />
-          {settings?.showExitButton && (
+          {(settings?.showExitButton ?? true) && (
             <button
               onClick={() => {
                 if (settings?.exitRequiresPin) {

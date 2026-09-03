@@ -7,15 +7,22 @@ export class SettingsHandlers {
   constructor(private db: PrismaClient) {}
 
   async get() {
-    return this.db.settings.upsert({
+    const res = await this.db.settings.upsert({
       where: { id: 1 },
       update: {},
       create: {
         id: 1,
         firmName: 'Nirav Real Estate',
         disclaimerText: 'RERA registered. Prices are indicative and subject to change. E&OE.',
+        showExitButton: true,
+        exitRequiresPin: false,
       },
     })
+    return {
+      ...res,
+      showExitButton: (res as any).showExitButton === false || (res as any).showExitButton === 0 ? false : true,
+      exitRequiresPin: Boolean((res as any).exitRequiresPin),
+    }
   }
 
   async set(data: any) {

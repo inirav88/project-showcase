@@ -888,7 +888,7 @@ export default function ProjectShowcase(): JSX.Element {
           >
             {narrationMuted ? String.fromCodePoint(128263) + ' Narration' : String.fromCodePoint(128483) + ' Narration'}
           </button>
-          {settings?.showExitButton && (
+          {(settings?.showExitButton ?? true) && (
             <button
               onClick={() => {
                 if (settings.exitRequiresPin) {
