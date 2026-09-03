@@ -978,6 +978,7 @@ interface Settings {
   watermarkEnabled: boolean
   showExitButton?: boolean
   exitRequiresPin?: boolean
+  startupSecurityMode?: string
   vpsBaseUrl?: string
   vpsApiKey?: string
 }
@@ -1138,6 +1139,7 @@ export default function AdminRoute(): JSX.Element {
         watermarkEnabled: settings.watermarkEnabled,
         showExitButton: settings.showExitButton ?? true,
         exitRequiresPin: settings.exitRequiresPin ?? false,
+        startupSecurityMode: settings.startupSecurityMode || 'DISABLED',
         vpsBaseUrl: settings.vpsBaseUrl || '',
         vpsApiKey: settings.vpsApiKey || ''
       }
@@ -3073,6 +3075,41 @@ export default function AdminRoute(): JSX.Element {
                       boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
                     }} />
                   </button>
+                </div>
+
+                {/* App Startup Protection Mode Choice */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px', backgroundColor: 'var(--color-bg)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>
+                      🔐 App Startup Protection Mode
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      Choose what security verification is required when launching Showcase OS.
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+                    {([
+                      { id: 'DISABLED', title: 'Disabled (Direct Kiosk Launch)', desc: 'App opens directly into presentation without any PIN prompt.' },
+                      { id: 'STAFF_PIN', title: 'Staff Profile PIN Login', desc: 'App opens with agent/admin profile picker + 4-digit PIN login.' },
+                      { id: 'MASTER_PIN', title: 'Master Kiosk Lock', desc: 'App requires entering the 4-digit Master Admin PIN on launch.' },
+                    ] as const).map(({ id, title, desc }) => (
+                      <label key={id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', borderRadius: 8, background: (settings.startupSecurityMode || 'DISABLED') === id ? 'var(--color-surface-raised)' : 'transparent', border: `1px solid ${(settings.startupSecurityMode || 'DISABLED') === id ? 'var(--color-accent)' : 'var(--color-border)'}`, cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="startupSecurityMode"
+                          value={id}
+                          checked={(settings.startupSecurityMode || 'DISABLED') === id}
+                          onChange={(e) => setSettings({ ...settings, startupSecurityMode: e.target.value })}
+                          style={{ marginTop: 2 }}
+                        />
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text-primary)' }}>{title}</div>
+                          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>{desc}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
 
