@@ -505,7 +505,7 @@ function ModuleConfigEditor({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
           <label style={labelStyle}>PDF Brochure File</label>
-          <FilePicker projectId={projectId} value={cfg.brochurePath || ''} onChange={v => set('brochurePath', v)} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file..." />
+          <FilePicker projectId={projectId} value={cfg.brochurePath || cfg.filePath || ''} onChange={v => { set('brochurePath', v); set('filePath', v) }} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file..." />
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Download Button Label</label>
