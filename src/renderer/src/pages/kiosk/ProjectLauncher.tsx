@@ -9,6 +9,7 @@ import { ProjectComparison } from '../../components/ProjectComparison'
 import { IdleOverlay } from '../../components/IdleOverlay'
 import { useIdleTimer } from '../../hooks/useIdleTimer'
 import { useKioskExit } from '../../hooks/useKioskExit'
+import SalesStudioLogo from '../../components/common/SalesStudioLogo'
 
 interface Unit { id: string; status: string }
 interface Tower { id: string; units: Unit[] }
@@ -328,7 +329,9 @@ export default function ProjectLauncher(): JSX.Element {
               style={{ height: 36, maxWidth: 180, objectFit: 'contain', marginBottom: 4 }}
             />
           ) : (
-            <h1>{settings?.firmName || 'ShowcaseOS'}</h1>
+            <div style={{ marginBottom: 4 }}>
+              <SalesStudioLogo height={36} />
+            </div>
           )}
           <p>Offline Real Estate Presentation Kiosk</p>
         </div>

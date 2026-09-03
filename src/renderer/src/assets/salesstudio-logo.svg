@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 156" width="540" height="156">
+  <g id="salesstudio-icon">
+    <!-- Top Blue Chevron -->
+    <polygon points="120,2 156,20 156,40 120,22 84,40 84,20" fill="#0099DE" />
+    <!-- Middle Green Chevron -->
+    <polygon points="120,34 156,52 156,72 120,54 84,72 84,54" fill="#00A859" />
+    <!-- Bottom Pillar -->
+    <polygon points="120,68 136,77 136,120 104,120 104,77" fill="#3D3D3D" />
+  </g>
+  <!-- Main Text: SalesStudio -->
+  <g id="salesstudio-text" fill="#3D3D3D">
+    <text x="172" y="104" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="92" letter-spacing="-2">
+      <tspan font-weight="800">Sales</tspan><tspan font-weight="400">Studio</tspan>
+    </text>
+    <!-- Tagline: Think Real Estate. Think Us. -->
+    <text x="4" y="148" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="25" font-weight="500" letter-spacing="5.2" text-transform="uppercase" opacity="0.85">Think Real Estate. Think Us.</text>
+  </g>
+</svg>

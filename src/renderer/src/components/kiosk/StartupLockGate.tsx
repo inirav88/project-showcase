@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
+import SalesStudioLogo from '../common/SalesStudioLogo'
 
 interface StaffMember {
   id: string
@@ -109,9 +110,11 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
       {securityMode === 'STAFF_PIN' ? (
         <form onSubmit={handleStaffLogin} style={{ backgroundColor: 'var(--color-surface)', padding: '36px 32px', borderRadius: 20, width: 380, border: '1px solid var(--color-border)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>👤</div>
-            <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)' }}>Welcome to Showcase OS</h2>
-            <p style={{ margin: 0, fontSize: 13, color: 'var(--color-text-muted)' }}>Select your profile and enter your PIN to start</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+              <SalesStudioLogo height={44} />
+            </div>
+            <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: 'var(--color-text-primary)' }}>Welcome to SalesStudio</h2>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>Select your profile and enter your PIN to start</p>
           </div>
 
           <div>
@@ -155,10 +158,13 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
         </form>
       ) : (
         <div className="pin-modal" style={{ maxWidth: 360, textAlign: 'center', padding: '32px 24px' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+            <SalesStudioLogo height={40} />
+          </div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
             Kiosk Startup Protection
           </div>
-          <div style={{ fontSize: 18, color: 'var(--color-text-primary)', fontWeight: 700, marginBottom: 16 }}>
+          <div style={{ fontSize: 16, color: 'var(--color-text-primary)', fontWeight: 700, marginBottom: 16 }}>
             Enter Master Admin PIN
           </div>
           <div className="pin-display">
