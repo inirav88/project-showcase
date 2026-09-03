@@ -214,4 +214,5 @@ model Settings {
   watermarkEnabled   Boolean  @default(true)
   showExitButton     Boolean  @default(true)
   exitRequiresPin   Boolean  @default(false)
+  startupSecurityMode String   @default("DISABLED")
 }
