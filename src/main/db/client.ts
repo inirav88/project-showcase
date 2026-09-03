@@ -42,6 +42,8 @@ export function getDb(): PrismaClient {
       libsql.execute(`ALTER TABLE Settings ADD COLUMN vpsApiKey TEXT NOT NULL DEFAULT ''`).catch(() => {})
       libsql.execute(`ALTER TABLE Settings ADD COLUMN narrationEnabled BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
       libsql.execute(`ALTER TABLE Settings ADD COLUMN watermarkEnabled BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN showExitButton BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN exitRequiresPin BOOLEAN NOT NULL DEFAULT 0`).catch(() => {})
     } catch (e) {
       console.warn('[DB Migration] Schema column migration notice:', e)
     }

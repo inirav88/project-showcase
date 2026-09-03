@@ -212,4 +212,6 @@ model Settings {
   vpsApiKey          String   @default("")
   narrationEnabled   Boolean  @default(true)
   watermarkEnabled   Boolean  @default(true)
+  showExitButton     Boolean  @default(true)
+  exitRequiresPin   Boolean  @default(false)
 }
