@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import SalesStudioLogo from '../common/SalesStudioLogo'
+import { toMediaUrl } from '../../utils/media'
 
 interface StaffMember {
   id: string
@@ -14,6 +15,7 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
   })
   const [loading, setLoading] = useState(true)
   const [securityMode, setSecurityMode] = useState<'DISABLED' | 'STAFF_PIN' | 'MASTER_PIN'>('DISABLED')
+  const [settings, setSettings] = useState<any>(null)
 
   // Staff Login State
   const [staffList, setStaffList] = useState<StaffMember[]>([])
@@ -33,6 +35,7 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
 
     window.api.invoke(IPC_CHANNELS.SETTINGS_GET)
       .then((s: any) => {
+        setSettings(s)
         const mode = (s?.startupSecurityMode as any) || 'DISABLED'
         setSecurityMode(mode)
 
@@ -111,9 +114,15 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
         <form onSubmit={handleStaffLogin} style={{ backgroundColor: 'var(--color-surface)', padding: '36px 32px', borderRadius: 20, width: 380, border: '1px solid var(--color-border)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-              <SalesStudioLogo height={44} />
+              {settings?.firmLogoPath ? (
+                <img src={toMediaUrl(settings.firmLogoPath)} alt="Company Logo" style={{ height: 44, maxWidth: 220, objectFit: 'contain' }} />
+              ) : (
+                <SalesStudioLogo height={44} />
+              )}
             </div>
-            <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: 'var(--color-text-primary)' }}>Welcome to SalesStudio</h2>
+            <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+              {settings?.firmName ? `Welcome to ${settings.firmName}` : 'Welcome to SalesStudio'}
+            </h2>
             <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>Select your profile and enter your PIN to start</p>
           </div>
 
@@ -159,7 +168,11 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
       ) : (
         <div className="pin-modal" style={{ maxWidth: 360, textAlign: 'center', padding: '32px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-            <SalesStudioLogo height={40} />
+            {settings?.firmLogoPath ? (
+              <img src={toMediaUrl(settings.firmLogoPath)} alt="Company Logo" style={{ height: 40, maxWidth: 200, objectFit: 'contain' }} />
+            ) : (
+              <SalesStudioLogo height={40} />
+            )}
           </div>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
             Kiosk Startup Protection
