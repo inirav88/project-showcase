@@ -186,10 +186,16 @@ export default function ProjectLauncher(): JSX.Element {
   const [showComparison, setShowComparison] = useState(false)
   const [isIdle, setIsIdle] = useState(false)
   const [showPinModal, setShowPinModal] = useState(false)
+  const [pinPurpose, setPinPurpose] = useState<'admin' | 'exit'>('admin')
+  const [settings, setSettings] = useState<{ showExitButton?: boolean; exitRequiresPin?: boolean }>({ showExitButton: true, exitRequiresPin: false })
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
   const navigate = useNavigate()
 
   const { startHold, endHold } = useKioskExit({
-    onExit: () => setShowPinModal(true),
+    onExit: () => {
+      setPinPurpose('admin')
+      setShowPinModal(true)
+    },
   })
 
   const handlePinVerify = async (pin: string): Promise<boolean> => {
@@ -197,7 +203,11 @@ export default function ProjectLauncher(): JSX.Element {
       const isValid = await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_VERIFY_PIN, pin)
       if (isValid) {
         setShowPinModal(false)
-        navigate('/admin')
+        if (pinPurpose === 'exit') {
+          window.api.invoke(IPC_CHANNELS.EXIT_KIOSK)
+        } else {
+          navigate('/admin')
+        }
         return true
       }
       return false
@@ -205,6 +215,12 @@ export default function ProjectLauncher(): JSX.Element {
       return false
     }
   }
+
+  useEffect(() => {
+    window.api.invoke(IPC_CHANNELS.SETTINGS_GET).then((s: any) => {
+      if (s) setSettings({ showExitButton: s.showExitButton ?? true, exitRequiresPin: s.exitRequiresPin ?? false })
+    }).catch(() => {})
+  }, [])
 
   useEffect(() => {
     window.api.invoke(IPC_CHANNELS.PROJECT_LIST)
@@ -375,12 +391,78 @@ export default function ProjectLauncher(): JSX.Element {
           )}
           <AccessibilityToggle />
           <ThemeToggle />
+          {settings.showExitButton && (
+            <button
+              onClick={() => {
+                if (settings.exitRequiresPin) {
+                  setPinPurpose('exit')
+                  setShowPinModal(true)
+                } else {
+                  setShowExitConfirm(true)
+                }
+              }}
+              title="Exit Application"
+              style={{
+                padding: '8px 14px', borderRadius: 8, border: '1px solid var(--color-border)',
+                background: 'var(--color-surface-raised)', color: 'var(--color-text-secondary)',
+                fontWeight: 600, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-sans)',
+                display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-error, #ef4444)'
+                e.currentTarget.style.borderColor = 'var(--color-error, #ef4444)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-secondary)'
+                e.currentTarget.style.borderColor = 'var(--color-border)'
+              }}
+            >
+              <span style={{ fontSize: 14 }}>⏻</span> Exit
+            </button>
+          )}
           <div className="launcher-status-pill">
             <span className="status-dot" />
             System Online
           </div>
         </div>
       </header>
+
+      {/* Exit Confirmation Modal */}
+      {showExitConfirm && (
+        <div className="pin-backdrop" role="dialog" aria-label="Exit confirmation">
+          <div className="pin-modal" style={{ maxWidth: 360, textAlign: 'center', padding: '28px 24px' }}>
+            <div style={{ fontSize: 32, marginBottom: 8, color: 'var(--color-error, #ef4444)' }}>⏻</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 8 }}>
+              Exit Showcase OS?
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 24, lineHeight: 1.4 }}>
+              Are you sure you want to close the presentation application?
+            </div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                style={{
+                  flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface-raised)', color: 'var(--color-text-primary)',
+                  fontWeight: 600, fontSize: 13, cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => window.api.invoke(IPC_CHANNELS.EXIT_KIOSK)}
+                style={{
+                  flex: 1, padding: '10px 16px', borderRadius: 8, border: 'none',
+                  background: 'var(--color-error, #ef4444)', color: '#fff',
+                  fontWeight: 700, fontSize: 13, cursor: 'pointer'
+                }}
+              >
+                Exit Application
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Compare mode banner */}
       {compareMode && (
