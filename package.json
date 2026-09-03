@@ -73,23 +73,26 @@
     "prisma":  {
                    "seed":  "ts-node --project tsconfig.node.json prisma/seed.ts"
                },
-    "build":  {
-                  "appId":  "com.nirav.showcaseos",
-                  "productName":  "ShowcaseOS",
-                  "directories":  {
-                                      "output":  "dist"
-                                  },
-                  "files":  [
-                                "out/**/*",
-                                "node_modules/**/*"
-                            ],
-                  "extraResources":  "dev.db",
-                  "win":  {
-                              "target":  "nsis"
-                          },
-                  "mac":  {
-                              "target":  "dmg"
-                          },
+    "build": {
+        "appId": "com.salesstudio.app",
+        "productName": "SalesStudio",
+        "icon": "build/icon.png",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "out/**/*",
+            "node_modules/**/*"
+        ],
+        "extraResources": "dev.db",
+        "win": {
+            "target": "nsis",
+            "icon": "build/icon.png"
+        },
+        "mac": {
+            "target": "dmg",
+            "icon": "build/icon.png"
+        },
                   "asarUnpack":  [
                                      "node_modules/@prisma/client/showcase-client/**/*",
                                      "node_modules/ffmpeg-static/**/*"

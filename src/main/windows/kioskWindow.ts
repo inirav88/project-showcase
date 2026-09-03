@@ -1,6 +1,8 @@
 import type { BrowserWindowConstructorOptions } from 'electron'
 import { join } from 'path'
 
+const iconPath = join(__dirname, '../../build/icon.png')
+
 export function kioskWindowOptions(isProduction: boolean): BrowserWindowConstructorOptions {
   return {
     fullscreen: true,
@@ -9,6 +11,7 @@ export function kioskWindowOptions(isProduction: boolean): BrowserWindowConstruc
     frame: !isProduction,
     resizable: false,
     show: false,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -27,6 +30,7 @@ export function adminWindowOptions(): BrowserWindowConstructorOptions {
     autoHideMenuBar: true,
     frame: true,
     show: false,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
