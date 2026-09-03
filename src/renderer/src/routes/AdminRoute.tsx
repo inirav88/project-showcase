@@ -3255,7 +3255,7 @@ function AdminUserLoginModal({
           >
             {users.map((u) => (
               <option key={u.id} value={u.id}>
-                {u.role === 'SUPERADMIN' ? '👑' : u.role === 'ADMIN' ? '🛡️' : '👤'} {u.name} ({u.role || 'AGENT'})
+                {u.name}
               </option>
             ))}
           </select>

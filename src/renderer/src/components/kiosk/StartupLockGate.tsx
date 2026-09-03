@@ -135,7 +135,7 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
             >
               {staffList.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.role === 'SUPERADMIN' ? '👑' : s.role === 'ADMIN' ? '🛡️' : '👤'} {s.name} ({s.role || 'AGENT'})
+                  {s.name}
                 </option>
               ))}
             </select>
