@@ -17,6 +17,7 @@ import { AppointmentHandlers } from './ipc/handlers/appointments'
 import { UsbHandlers } from './ipc/handlers/usb'
 import { SyncHandlers } from './ipc/handlers/sync'
 import { registerDialogHandlers } from './ipc/handlers/dialog'
+import { IPC_CHANNELS } from './ipc/channels'
 
 if (is.dev) {
   app.commandLine.appendSwitch('disable-http-cache')

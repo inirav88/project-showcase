@@ -33,6 +33,8 @@ interface Settings {
   firmLogoPath?: string
   disclaimerText: string
   idleTimeoutSeconds?: number
+  showExitButton?: boolean
+  exitRequiresPin?: boolean
 }
 
 function formatPrice(n: number): string {
@@ -187,10 +189,8 @@ export default function ProjectLauncher(): JSX.Element {
   const [isIdle, setIsIdle] = useState(false)
   const [showPinModal, setShowPinModal] = useState(false)
   const [pinPurpose, setPinPurpose] = useState<'admin' | 'exit'>('admin')
-  const [settings, setSettings] = useState<{ showExitButton?: boolean; exitRequiresPin?: boolean }>({ showExitButton: true, exitRequiresPin: false })
   const [showExitConfirm, setShowExitConfirm] = useState(false)
   const navigate = useNavigate()
-
   const { startHold, endHold } = useKioskExit({
     onExit: () => {
       setPinPurpose('admin')
@@ -215,12 +215,6 @@ export default function ProjectLauncher(): JSX.Element {
       return false
     }
   }
-
-  useEffect(() => {
-    window.api.invoke(IPC_CHANNELS.SETTINGS_GET).then((s: any) => {
-      if (s) setSettings({ showExitButton: s.showExitButton ?? true, exitRequiresPin: s.exitRequiresPin ?? false })
-    }).catch(() => {})
-  }, [])
 
   useEffect(() => {
     window.api.invoke(IPC_CHANNELS.PROJECT_LIST)
@@ -391,10 +385,10 @@ export default function ProjectLauncher(): JSX.Element {
           )}
           <AccessibilityToggle />
           <ThemeToggle />
-          {settings.showExitButton && (
+          {settings?.showExitButton && (
             <button
               onClick={() => {
-                if (settings.exitRequiresPin) {
+                if (settings?.exitRequiresPin) {
                   setPinPurpose('exit')
                   setShowPinModal(true)
                 } else {

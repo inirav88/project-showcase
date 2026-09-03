@@ -976,6 +976,8 @@ interface Settings {
   disclaimerText: string
   narrationEnabled: boolean
   watermarkEnabled: boolean
+  showExitButton?: boolean
+  exitRequiresPin?: boolean
   vpsBaseUrl?: string
   vpsApiKey?: string
 }

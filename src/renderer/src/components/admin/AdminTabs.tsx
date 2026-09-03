@@ -13,7 +13,7 @@ export function StaffTab() {
   const [newRole, setNewRole] = useState<'SUPERADMIN' | 'ADMIN' | 'AGENT'>('AGENT')
   const [newPin, setNewPin] = useState('')
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null)
-  const [editRole, setEditRole] = useState<string>('AGENT')
+  const [_editRole, _setEditRole] = useState<string>('AGENT')
   const [editPin, setEditPin] = useState<string>('')
   const [saving, setSaving] = useState(false)
 
@@ -69,11 +69,6 @@ export function StaffTab() {
   }
 
   const inputStyle: React.CSSProperties = { width: '100%', padding: 10, borderRadius: 6, border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }
-  const roleBadgeStyle = (role?: string): React.CSSProperties => {
-    if (role === 'SUPERADMIN') return { padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: 'rgba(234, 179, 8, 0.15)', color: '#d97706', border: '1px solid rgba(234, 179, 8, 0.4)' }
-    if (role === 'ADMIN') return { padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: 'rgba(59, 130, 246, 0.15)', color: '#2563eb', border: '1px solid rgba(59, 130, 246, 0.4)' }
-    return { padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700, background: 'rgba(107, 114, 128, 0.15)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' }
-  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
