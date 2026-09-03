@@ -111,8 +111,13 @@ app.whenReady().then(async () => {
     new UsbHandlers(db, appDataPath, dbPath).registerIpc()
     new SyncHandlers(db).registerIpc()
 
-    // Register dialog (file picker) handlers � no DB dependency
+    // Register dialog (file picker) handlers — no DB dependency
     registerDialogHandlers()
+
+    // Register system:exitKiosk IPC handler to quit application
+    ipcMain.handle(IPC_CHANNELS.EXIT_KIOSK, () => {
+      app.quit()
+    })
 
     // Register system:secondDisplay IPC handler for presenter console
     ipcMain.handle('system:secondDisplay', async (_, data: any) => {
