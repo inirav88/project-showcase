@@ -1134,6 +1134,8 @@ export default function AdminRoute(): JSX.Element {
         disclaimerText: settings.disclaimerText,
         narrationEnabled: settings.narrationEnabled,
         watermarkEnabled: settings.watermarkEnabled,
+        showExitButton: settings.showExitButton ?? true,
+        exitRequiresPin: settings.exitRequiresPin ?? false,
         vpsBaseUrl: settings.vpsBaseUrl || '',
         vpsApiKey: settings.vpsApiKey || ''
       }
@@ -1793,6 +1795,29 @@ export default function AdminRoute(): JSX.Element {
               {String.fromCodePoint(128250)} Launch Kiosk
             </button>
             <ThemeToggle />
+            <button
+              onClick={() => window.api.invoke(IPC_CHANNELS.EXIT_KIOSK)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '8px 14px', borderRadius: '8px',
+                background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444',
+                border: '1px solid rgba(239, 68, 68, 0.3)', cursor: 'pointer',
+                fontSize: '13px', fontWeight: 600,
+                fontFamily: 'var(--font-sans)',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#ef4444'
+                e.currentTarget.style.color = '#ffffff'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)'
+                e.currentTarget.style.color = '#ef4444'
+              }}
+              title="Close and exit application"
+            >
+              <span>⏻</span> Exit App
+            </button>
             
             {/* Project Selector (only for tabs that need a project context) */}
             {['projects', 'modules', 'media', 'units'].includes(activeTab) && (
@@ -2959,6 +2984,86 @@ export default function AdminRoute(): JSX.Element {
                       position: 'absolute',
                       top: '4px',
                       left: settings.watermarkEnabled ? '31px' : '4px',
+                      width: '20px', height: '20px',
+                      borderRadius: '50%',
+                      backgroundColor: '#fff',
+                      transition: 'left 0.25s ease',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+                    }} />
+                  </button>
+                </div>
+
+                {/* Show Exit Button Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', backgroundColor: 'var(--color-bg)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>
+                      ⏻ Show Exit Button in Kiosk Header
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      {(settings.showExitButton ?? true)
+                        ? 'Exit Button is VISIBLE — top header bar displays exit button for closing app.'
+                        : 'Exit Button is HIDDEN — top header bar stays completely clean without exit button.'}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, showExitButton: !(settings.showExitButton ?? true) })}
+                    style={{
+                      flexShrink: 0,
+                      width: '56px', height: '28px',
+                      borderRadius: '14px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: (settings.showExitButton ?? true) ? 'var(--color-accent)' : 'var(--color-border)',
+                      position: 'relative',
+                      transition: 'background-color 0.25s ease'
+                    }}
+                    title={(settings.showExitButton ?? true) ? 'Click to hide exit button' : 'Click to show exit button'}
+                  >
+                    <span style={{
+                      position: 'absolute',
+                      top: '4px',
+                      left: (settings.showExitButton ?? true) ? '31px' : '4px',
+                      width: '20px', height: '20px',
+                      borderRadius: '50%',
+                      backgroundColor: '#fff',
+                      transition: 'left 0.25s ease',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+                    }} />
+                  </button>
+                </div>
+
+                {/* Require PIN to Exit Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', backgroundColor: 'var(--color-bg)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>
+                      🔐 Require Admin PIN to Exit
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      {settings.exitRequiresPin
+                        ? 'PIN Protection is ON — exiting requires entering 4-digit Admin PIN.'
+                        : 'PIN Protection is OFF — clicking exit shows a direct exit confirmation prompt.'}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, exitRequiresPin: !settings.exitRequiresPin })}
+                    style={{
+                      flexShrink: 0,
+                      width: '56px', height: '28px',
+                      borderRadius: '14px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: settings.exitRequiresPin ? 'var(--color-accent)' : 'var(--color-border)',
+                      position: 'relative',
+                      transition: 'background-color 0.25s ease'
+                    }}
+                    title={settings.exitRequiresPin ? 'Click to disable PIN check on exit' : 'Click to require PIN check on exit'}
+                  >
+                    <span style={{
+                      position: 'absolute',
+                      top: '4px',
+                      left: settings.exitRequiresPin ? '31px' : '4px',
                       width: '20px', height: '20px',
                       borderRadius: '50%',
                       backgroundColor: '#fff',
