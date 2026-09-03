@@ -44,11 +44,11 @@ export class SettingsHandlers {
     const expectedHash = s.adminPinHash || crypto.createHash('sha256').update('0000').digest('hex')
     if (hash === expectedHash) return true
 
-    // Also check if PIN belongs to an active ADMIN or SUPERADMIN staff profile
-    const adminStaff = await this.db.staffProfile.findMany({
-      where: { isActive: true, role: { in: ['ADMIN', 'SUPERADMIN'] } }
+    // Check if PIN matches any active staff member's PIN
+    const activeStaff = await this.db.staffProfile.findMany({
+      where: { isActive: true }
     })
-    return adminStaff.some((staff) => staff.pinHash === hash)
+    return activeStaff.some((staff) => staff.pinHash === hash)
   }
 
   registerIpc() {
