@@ -1147,6 +1147,7 @@ export default function AdminRoute(): JSX.Element {
         payload.adminPin = adminPinInput
       }
       await (window as any).api.invoke(IPC_CHANNELS.SETTINGS_SET, payload)
+      try { localStorage.setItem('showcaseos_settings', JSON.stringify(payload)) } catch {}
       alert('Branding configurations saved!')
       setAdminPinInput('')
       loadSettings()
@@ -1238,6 +1239,7 @@ export default function AdminRoute(): JSX.Element {
           narrationEnabled: config.narrationEnabled !== false,
           watermarkEnabled: config.watermarkEnabled !== false
         } as Settings)
+        try { localStorage.setItem('showcaseos_settings', JSON.stringify(config)) } catch {}
       }
     } catch (e) {
       console.error(e)

@@ -187,13 +187,23 @@ function ShortlistDrawer({
   const [showExport, setShowExport] = useState(false)
 
   // QR Take-Away settings and state
-  const [settings, setSettings] = useState<any>(null)
+  const [settings, setSettings] = useState<any>(() => {
+    try {
+      const cached = localStorage.getItem('showcaseos_settings')
+      return cached ? JSON.parse(cached) : null
+    } catch {
+      return null
+    }
+  })
   const [qrUrl, setQrUrl] = useState<string>('')
   const [qrType, setQrType] = useState<'whatsapp' | 'vcard'>('whatsapp')
 
   useEffect(() => {
     window.api.invoke(IPC_CHANNELS.SETTINGS_GET)
-      .then((data) => setSettings(data as any))
+      .then((data) => {
+        setSettings(data as any)
+        try { localStorage.setItem('showcaseos_settings', JSON.stringify(data)) } catch {}
+      })
       .catch(console.error)
   }, [])
 

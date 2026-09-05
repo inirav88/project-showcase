@@ -177,7 +177,14 @@ function LauncherPinModal({
 
 export default function ProjectLauncher(): JSX.Element {
   const [projects, setProjects] = useState<Project[]>([])
-  const [settings, setSettings] = useState<Settings | null>(null)
+  const [settings, setSettings] = useState<Settings | null>(() => {
+    try {
+      const cached = localStorage.getItem('showcaseos_settings')
+      return cached ? JSON.parse(cached) : null
+    } catch {
+      return null
+    }
+  })
   const [query, setQuery] = useState('')
   const [selectedType, setSelectedType] = useState('ALL')
   const [selectedPossession, setSelectedPossession] = useState('ALL')
@@ -222,7 +229,11 @@ export default function ProjectLauncher(): JSX.Element {
       .then((data) => setProjects(data as Project[]))
       .catch(console.error)
     window.api.invoke(IPC_CHANNELS.SETTINGS_GET)
-      .then((data) => setSettings(data as Settings))
+      .then((data) => {
+        const s = data as Settings
+        setSettings(s)
+        try { localStorage.setItem('showcaseos_settings', JSON.stringify(s)) } catch {}
+      })
       .catch(() => {})
   }, [])
 
@@ -322,7 +333,9 @@ export default function ProjectLauncher(): JSX.Element {
       {/* Header */}
       <header className="launcher-header">
         <div className="launcher-brand">
-          {settings?.firmLogoPath ? (
+          {settings === null ? (
+            <div style={{ height: 36, width: 140, marginBottom: 4 }} />
+          ) : settings.firmLogoPath ? (
             <img
               src={toMediaUrl(settings.firmLogoPath)}
               alt="Firm Logo"

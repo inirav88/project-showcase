@@ -15,7 +15,14 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
   })
   const [loading, setLoading] = useState(true)
   const [securityMode, setSecurityMode] = useState<'DISABLED' | 'STAFF_PIN' | 'MASTER_PIN'>('DISABLED')
-  const [settings, setSettings] = useState<any>(null)
+  const [settings, setSettings] = useState<any>(() => {
+    try {
+      const cached = localStorage.getItem('showcaseos_settings')
+      return cached ? JSON.parse(cached) : null
+    } catch {
+      return null
+    }
+  })
 
   // Staff Login State
   const [staffList, setStaffList] = useState<StaffMember[]>([])
@@ -36,6 +43,7 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
     window.api.invoke(IPC_CHANNELS.SETTINGS_GET)
       .then((s: any) => {
         setSettings(s)
+        try { localStorage.setItem('showcaseos_settings', JSON.stringify(s)) } catch {}
         const mode = (s?.startupSecurityMode as any) || 'DISABLED'
         setSecurityMode(mode)
 
@@ -114,7 +122,9 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
         <form onSubmit={handleStaffLogin} style={{ backgroundColor: 'var(--color-surface)', padding: '36px 32px', borderRadius: 20, width: 380, border: '1px solid var(--color-border)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-              {settings?.firmLogoPath ? (
+              {settings === null ? (
+                <div style={{ height: 44, width: 160 }} />
+              ) : settings.firmLogoPath ? (
                 <img src={toMediaUrl(settings.firmLogoPath)} alt="Company Logo" style={{ height: 44, maxWidth: 220, objectFit: 'contain' }} />
               ) : (
                 <SalesStudioLogo height={44} />
@@ -168,7 +178,9 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
       ) : (
         <div className="pin-modal" style={{ maxWidth: 360, textAlign: 'center', padding: '32px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-            {settings?.firmLogoPath ? (
+            {settings === null ? (
+              <div style={{ height: 40, width: 150 }} />
+            ) : settings.firmLogoPath ? (
               <img src={toMediaUrl(settings.firmLogoPath)} alt="Company Logo" style={{ height: 40, maxWidth: 200, objectFit: 'contain' }} />
             ) : (
               <SalesStudioLogo height={40} />
