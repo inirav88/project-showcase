@@ -215,4 +215,15 @@ model Settings {
   showExitButton     Boolean  @default(true)
   exitRequiresPin   Boolean  @default(false)
   startupSecurityMode String   @default("DISABLED")
+
+  // WhatsApp Brochure Sharing Configuration
+  whatsappEnabled         Boolean  @default(true)
+  whatsappAllowDeepLink   Boolean  @default(true)
+  whatsappAllowQrCode     Boolean  @default(true)
+  whatsappAllowApiSend    Boolean  @default(false)
+  whatsappDefaultMode     String   @default("SHOW_CHOICE")
+  whatsappMessageTemplate String   @default("Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}")
+  whatsappApiProvider     String   @default("META_CLOUD")
+  whatsappApiToken        String   @default("")
+  whatsappApiPhoneNumberId String  @default("")
 }
