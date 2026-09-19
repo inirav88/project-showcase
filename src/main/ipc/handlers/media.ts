@@ -41,8 +41,9 @@ export class MediaHandlers {
     }
 
     const fileExt = path.extname(filePath).toLowerCase()
-    const fileBase = path.basename(filePath, fileExt)
-    const uniqueName = `${projectId}_${category}_${Date.now()}_${fileBase}`
+    const rawBase = path.basename(filePath, fileExt)
+    const cleanBase = rawBase.replace(/[^a-zA-Z0-9_-]/g, '_')
+    const uniqueName = `${projectId}_${category}_${Date.now()}_${cleanBase}`
     let targetFilePath = path.join(this.mediaDir, `${uniqueName}${fileExt}`)
 
     let thumbnailPath = ''
