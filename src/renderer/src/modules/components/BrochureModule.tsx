@@ -45,11 +45,6 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
     if (config.publicUrl && /^https?:\/\//i.test(config.publicUrl)) return config.publicUrl
     if (filePath && /^https?:\/\//i.test(filePath)) return filePath
 
-    if (settings?.vpsBaseUrl && /^https?:\/\//i.test(settings.vpsBaseUrl)) {
-      const fileName = filePath.split(/[/\\]/).pop() || ''
-      return `${settings.vpsBaseUrl.replace(/\/$/, '')}/media/${fileName}`
-    }
-
     if (settings?.firmWebsite && /^https?:\/\//i.test(settings.firmWebsite)) {
       return settings.firmWebsite
     }
@@ -361,6 +356,12 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
                 ×
               </button>
             </div>
+
+            {(!config.webUrl && !config.publicUrl) && (
+              <div style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
+                💡 <strong>Tip:</strong> Add a public PDF link in <em>Admin &gt; Modules &gt; Brochure (&quot;Online / Public Brochure Link&quot;)</em> so clients can open/download the brochure directly on their mobile phones.
+              </div>
+            )}
 
             {/* Client Inputs */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
