@@ -66,6 +66,8 @@ export const IPC_CHANNELS = {
   // Dialog
   DIALOG_OPEN_FILE:         'dialog:openFile',
   DIALOG_OPEN_FOLDER:       'dialog:openFolder',
+  // WhatsApp
+  WHATSAPP_SEND_API:        'whatsapp:sendApi',
 } as const
 
 export type IpcChannel = typeof IPC_CHANNELS[keyof typeof IPC_CHANNELS]
