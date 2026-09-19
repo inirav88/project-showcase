@@ -12,6 +12,12 @@ const DATA_FILE = path.join(__dirname, 'store.json')
 app.use(cors())
 app.use(express.json({ limit: '50mb' }))
 
+const MEDIA_DIR = path.join(__dirname, 'media')
+if (!fs.existsSync(MEDIA_DIR)) {
+  fs.mkdirSync(MEDIA_DIR, { recursive: true })
+}
+app.use('/media', express.static(MEDIA_DIR))
+
 // Middleware to verify API key
 function authMiddleware(req, res, next) {
   const reqKey = req.headers['x-api-key']
@@ -93,6 +99,27 @@ app.post('/api/publish', authMiddleware, (req, res) => {
     contentVersion: newVersion,
     message: 'Catalog published to VPS successfully'
   })
+// 4. POST /api/upload -> Upload media files (brochure PDFs, images) to VPS
+app.post('/api/upload', authMiddleware, (req, res) => {
+  const { fileName, fileData } = req.body
+  if (!fileName || !fileData) {
+    return res.status(400).json({ error: 'Missing fileName or fileData' })
+  }
+  try {
+    const buffer = Buffer.from(fileData, 'base64')
+    const safeName = path.basename(fileName)
+    const targetPath = path.join(MEDIA_DIR, safeName)
+    fs.writeFileSync(targetPath, buffer)
+    console.log(`[Media Upload] Saved media file on VPS: ${safeName} (${buffer.length} bytes)`)
+    res.json({
+      success: true,
+      fileName: safeName,
+      url: `/media/${encodeURIComponent(safeName)}`
+    })
+  } catch (err) {
+    console.error('[Media Upload] Failed to write file:', err.message)
+    res.status(500).json({ error: err.message })
+  }
 })
 
 // Health check

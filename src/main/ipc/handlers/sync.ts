@@ -2,6 +2,8 @@ import { ipcMain } from 'electron'
 import type { PrismaClient } from '@prisma/client/showcase-client'
 import { z } from 'zod'
 import { IPC_CHANNELS } from '../channels'
+import fs from 'fs'
+import path from 'path'
 
 const DeltaPayloadSchema = z.object({
   projects: z.array(z.record(z.any())).optional(),
@@ -172,6 +174,48 @@ export class SyncHandlers {
       }
 
       const reply = (await res.json()) as { success: boolean; contentVersion: string }
+
+      // Also upload physical brochure and media files to VPS /api/upload so they are available online
+      const uploadUrl = `${settings.vpsBaseUrl.replace(/\/$/, '')}/api/upload`
+      const mediaRecords = await this.db.media.findMany()
+      for (const m of mediaRecords) {
+        if (m.filePath && fs.existsSync(m.filePath)) {
+          try {
+            const fileName = path.basename(m.filePath)
+            const fileData = fs.readFileSync(m.filePath).toString('base64')
+            await fetch(uploadUrl, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ fileName, fileData }),
+              signal: AbortSignal.timeout(60000)
+            })
+          } catch (e: any) {
+            console.error(`[Sync] Media file publish failed for ${m.filePath}:`, e?.message)
+          }
+        }
+      }
+
+      // Check brochure modules for brochure PDF files
+      for (const mod of modules) {
+        if (mod.type === 'BROCHURE' && mod.config) {
+          try {
+            const cfg = typeof mod.config === 'string' ? JSON.parse(mod.config) : mod.config
+            const bPath = cfg.brochurePath || cfg.filePath
+            if (bPath && fs.existsSync(bPath)) {
+              const fileName = path.basename(bPath)
+              const fileData = fs.readFileSync(bPath).toString('base64')
+              await fetch(uploadUrl, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ fileName, fileData }),
+                signal: AbortSignal.timeout(60000)
+              })
+            }
+          } catch (e: any) {
+            console.error('[Sync] Brochure PDF upload error:', e?.message)
+          }
+        }
+      }
 
       // Update local content version to match the published version
       await this.db.settings.update({

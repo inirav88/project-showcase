@@ -45,6 +45,13 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
     if (config.publicUrl && /^https?:\/\//i.test(config.publicUrl)) return config.publicUrl
     if (filePath && /^https?:\/\//i.test(filePath)) return filePath
 
+    if (settings?.vpsBaseUrl && /^https?:\/\//i.test(settings.vpsBaseUrl) && filePath) {
+      const fileName = filePath.split(/[/\\]/).pop() || ''
+      if (fileName) {
+        return `${settings.vpsBaseUrl.replace(/\/$/, '')}/media/${encodeURIComponent(fileName)}`
+      }
+    }
+
     if (settings?.firmWebsite && /^https?:\/\//i.test(settings.firmWebsite)) {
       return settings.firmWebsite
     }
