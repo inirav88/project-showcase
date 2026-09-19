@@ -39,22 +39,43 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
     }
   }, [projectId])
 
+  // Helper to resolve a public web URL for mobile phone viewing (avoiding local media:/// paths)
+  const getPublicBrochureUrl = (): string => {
+    if (config.webUrl && /^https?:\/\//i.test(config.webUrl)) return config.webUrl
+    if (config.publicUrl && /^https?:\/\//i.test(config.publicUrl)) return config.publicUrl
+    if (filePath && /^https?:\/\//i.test(filePath)) return filePath
+
+    if (settings?.vpsBaseUrl && /^https?:\/\//i.test(settings.vpsBaseUrl)) {
+      const fileName = filePath.split(/[/\\]/).pop() || ''
+      return `${settings.vpsBaseUrl.replace(/\/$/, '')}/media/${fileName}`
+    }
+
+    if (settings?.firmWebsite && /^https?:\/\//i.test(settings.firmWebsite)) {
+      return settings.firmWebsite
+    }
+
+    return ''
+  }
+
   // Generate QR Code when QR mode or client info changes
   useEffect(() => {
     if (!showShareModal || !project) return
 
     const rawPhone = settings?.firmContactPhone || ''
     const salesPhone = rawPhone.replace(/\D/g, '')
-    const brochureAbsUrl = fileUrl ? new URL(fileUrl, window.location.href).href : ''
+    const publicBrochureUrl = getPublicBrochureUrl()
 
     let text = ''
     if (clientPhone) {
       const cleanClientPhone = clientPhone.replace(/\D/g, '')
       const msgTemplate = settings?.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'
-      const msg = msgTemplate
-        .replace(/{clientName}/g, clientName || 'Valued Client')
-        .replace(/{projectName}/g, project.name || 'Project')
-        .replace(/{brochureUrl}/g, brochureAbsUrl || fileUrl)
+      const msg = publicBrochureUrl
+        ? msgTemplate
+            .replace(/{clientName}/g, clientName || 'Valued Client')
+            .replace(/{projectName}/g, project.name || 'Project')
+            .replace(/{brochureUrl}/g, publicBrochureUrl)
+        : `Hi ${clientName || 'Valued Client'}, interested in ${project.name}. Please send me the project brochure.`
+
       text = `https://wa.me/${cleanClientPhone.length === 10 ? '91' + cleanClientPhone : cleanClientPhone}?text=${encodeURIComponent(msg)}`
     } else {
       const msg = `Hi, please send me the official brochure for ${project.name}`
@@ -64,10 +85,9 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
     QRCode.toDataURL(text, { width: 160, margin: 1 })
       .then(setQrUrl)
       .catch(console.error)
-  }, [showShareModal, clientPhone, clientName, project, settings, fileUrl])
+  }, [showShareModal, clientPhone, clientName, project, settings, filePath, config])
 
   const handleOpenShareModal = () => {
-    // Determine default mode based on admin settings
     const allowDeepLink = settings?.whatsappAllowDeepLink ?? true
     const allowQrCode = settings?.whatsappAllowQrCode ?? true
     const allowApiSend = settings?.whatsappAllowApiSend ?? false
@@ -85,12 +105,14 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
       return
     }
     const cleanPhone = clientPhone.replace(/\D/g, '')
-    const brochureAbsUrl = fileUrl ? new URL(fileUrl, window.location.href).href : ''
+    const publicBrochureUrl = getPublicBrochureUrl()
     const msgTemplate = settings?.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'
-    const msg = msgTemplate
-      .replace(/{clientName}/g, clientName || 'Valued Client')
-      .replace(/{projectName}/g, project?.name || 'Project')
-      .replace(/{brochureUrl}/g, brochureAbsUrl || fileUrl)
+    const msg = publicBrochureUrl
+      ? msgTemplate
+          .replace(/{clientName}/g, clientName || 'Valued Client')
+          .replace(/{projectName}/g, project?.name || 'Project')
+          .replace(/{brochureUrl}/g, publicBrochureUrl)
+      : `Hi ${clientName || 'Valued Client'}, interested in ${project?.name || 'Project'}. Please send me the project brochure.`
 
     const url = `https://wa.me/${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}?text=${encodeURIComponent(msg)}`
     window.open(url, '_blank')
@@ -105,12 +127,12 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
     setSendingApi(true)
     setApiFeedback('')
     try {
-      const brochureAbsUrl = fileUrl ? new URL(fileUrl, window.location.href).href : ''
+      const publicBrochureUrl = getPublicBrochureUrl()
       const res = await window.api.invoke(IPC_CHANNELS.WHATSAPP_SEND_API, {
         phone: clientPhone,
         clientName,
         projectName: project?.name || '',
-        brochureUrl: brochureAbsUrl || fileUrl,
+        brochureUrl: publicBrochureUrl,
       }) as any
 
       if (res.success) {

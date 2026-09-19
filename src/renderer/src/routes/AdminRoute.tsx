@@ -504,8 +504,15 @@ function ModuleConfigEditor({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>PDF Brochure File</label>
+          <label style={labelStyle}>PDF Brochure File (Local Kiosk File)</label>
           <FilePicker projectId={projectId} value={cfg.brochurePath || cfg.filePath || ''} onChange={v => { set('brochurePath', v); set('filePath', v) }} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file..." />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Online / Public Brochure Link (for WhatsApp Sharing)</label>
+          <input style={inputStyle} value={cfg.webUrl || cfg.publicUrl || ''} onChange={e => { set('webUrl', e.target.value); set('publicUrl', e.target.value) }} placeholder="e.g. https://yourdomain.com/brochures/avyanna.pdf or Google Drive link" />
+          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+            Enter a public web link so clients can open/download the brochure directly on their mobile phones when scanning the WhatsApp QR code.
+          </span>
         </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Download Button Label</label>
