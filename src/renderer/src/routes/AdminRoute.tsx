@@ -981,6 +981,15 @@ interface Settings {
   startupSecurityMode?: string
   vpsBaseUrl?: string
   vpsApiKey?: string
+  whatsappEnabled?: boolean
+  whatsappAllowDeepLink?: boolean
+  whatsappAllowQrCode?: boolean
+  whatsappAllowApiSend?: boolean
+  whatsappDefaultMode?: string
+  whatsappMessageTemplate?: string
+  whatsappApiProvider?: string
+  whatsappApiToken?: string
+  whatsappApiPhoneNumberId?: string
 }
 
 export default function AdminRoute(): JSX.Element {
@@ -3112,6 +3121,117 @@ export default function AdminRoute(): JSX.Element {
                       </label>
                     ))}
                   </div>
+                </div>
+
+                {/* WhatsApp Brochure Sharing Configuration */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '20px', backgroundColor: 'var(--color-bg)', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: 8 }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--color-accent)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span>📱</span> WhatsApp Brochure Sharing Options
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      Control which WhatsApp sharing modes are available on the Kiosk Brochure tab.
+                    </div>
+                  </div>
+
+                  {/* Mode Toggles */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {/* Option 1: Deep Link */}
+                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: 8, background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', cursor: 'pointer' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 13 }}>Option A: 1-Click WhatsApp Link (`wa.me`)</div>
+                        <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Opens WhatsApp Web / Desktop app pre-filled with client phone & brochure link.</div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settings.whatsappAllowDeepLink ?? true}
+                        onChange={(e) => setSettings({ ...settings, whatsappAllowDeepLink: e.target.checked })}
+                      />
+                    </label>
+
+                    {/* Option 2: QR Code */}
+                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: 8, background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', cursor: 'pointer' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 13 }}>Option B: Instant Client QR Code Modal</div>
+                        <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Displays live QR code for client to scan with their phone camera.</div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settings.whatsappAllowQrCode ?? true}
+                        onChange={(e) => setSettings({ ...settings, whatsappAllowQrCode: e.target.checked })}
+                      />
+                    </label>
+
+                    {/* Option 3: Cloud API */}
+                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: 8, background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', cursor: 'pointer' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 13 }}>Option C: Background WhatsApp Cloud API</div>
+                        <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Sends media message directly in background via Meta / Twilio API.</div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settings.whatsappAllowApiSend ?? false}
+                        onChange={(e) => setSettings({ ...settings, whatsappAllowApiSend: e.target.checked })}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Message Template */}
+                  <div style={{ marginTop: 4 }}>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                      WhatsApp Message Template
+                    </label>
+                    <textarea
+                      value={settings.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'}
+                      onChange={(e) => setSettings({ ...settings, whatsappMessageTemplate: e.target.value })}
+                      rows={3}
+                      style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-primary)', fontSize: 12 }}
+                    />
+                    <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 4 }}>
+                      Variables: <code>{'{clientName}'}</code>, <code>{'{projectName}'}</code>, <code>{'{brochureUrl}'}</code>
+                    </div>
+                  </div>
+
+                  {/* Cloud API Credentials (If Option C Enabled) */}
+                  {(settings.whatsappAllowApiSend) && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '14px', borderRadius: 8, background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}>
+                      <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--color-text-primary)' }}>WhatsApp API Credentials</div>
+                      
+                      <div>
+                        <label style={{ display: 'block', marginBottom: 4, fontSize: 11, color: 'var(--color-text-muted)' }}>API Provider</label>
+                        <select
+                          value={settings.whatsappApiProvider || 'META_CLOUD'}
+                          onChange={(e) => setSettings({ ...settings, whatsappApiProvider: e.target.value })}
+                          style={{ width: '100%', padding: '8px', borderRadius: 6, border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text-primary)' }}
+                        >
+                          <option value="META_CLOUD">Meta WhatsApp Cloud API</option>
+                          <option value="TWILIO">Twilio WhatsApp API</option>
+                        </select>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 11, color: 'var(--color-text-muted)' }}>Phone Number ID / Account SID</label>
+                          <input
+                            value={settings.whatsappApiPhoneNumberId || ''}
+                            onChange={(e) => setSettings({ ...settings, whatsappApiPhoneNumberId: e.target.value })}
+                            placeholder="e.g. 1092837465"
+                            style={{ width: '100%', padding: '8px', borderRadius: 6, border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: 12 }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 11, color: 'var(--color-text-muted)' }}>Secret Token / Auth Token</label>
+                          <input
+                            type="password"
+                            value={settings.whatsappApiToken || ''}
+                            onChange={(e) => setSettings({ ...settings, whatsappApiToken: e.target.value })}
+                            placeholder="Bearer Token"
+                            style={{ width: '100%', padding: '8px', borderRadius: 6, border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: 12 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
