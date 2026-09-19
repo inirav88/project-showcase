@@ -45,6 +45,15 @@ export function getDb(): PrismaClient {
       libsql.execute(`ALTER TABLE Settings ADD COLUMN showExitButton BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
       libsql.execute(`ALTER TABLE Settings ADD COLUMN exitRequiresPin BOOLEAN NOT NULL DEFAULT 0`).catch(() => {})
       libsql.execute(`ALTER TABLE Settings ADD COLUMN startupSecurityMode TEXT NOT NULL DEFAULT 'DISABLED'`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappEnabled BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappAllowDeepLink BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappAllowQrCode BOOLEAN NOT NULL DEFAULT 1`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappAllowApiSend BOOLEAN NOT NULL DEFAULT 0`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappDefaultMode TEXT NOT NULL DEFAULT 'SHOW_CHOICE'`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappMessageTemplate TEXT NOT NULL DEFAULT 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappApiProvider TEXT NOT NULL DEFAULT 'META_CLOUD'`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappApiToken TEXT NOT NULL DEFAULT ''`).catch(() => {})
+      libsql.execute(`ALTER TABLE Settings ADD COLUMN whatsappApiPhoneNumberId TEXT NOT NULL DEFAULT ''`).catch(() => {})
     } catch (e) {
       console.warn('[DB Migration] Schema column migration notice:', e)
     }

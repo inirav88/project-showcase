@@ -41,21 +41,21 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
 
   // Generate QR Code when QR mode or client info changes
   useEffect(() => {
-    if (!showShareModal || !project || !settings) return
+    if (!showShareModal || !project) return
 
-    const rawPhone = settings.firmContactPhone || ''
+    const rawPhone = settings?.firmContactPhone || ''
     const salesPhone = rawPhone.replace(/\D/g, '')
     const brochureAbsUrl = fileUrl ? new URL(fileUrl, window.location.href).href : ''
 
     let text = ''
     if (clientPhone) {
       const cleanClientPhone = clientPhone.replace(/\D/g, '')
-      const msgTemplate = settings.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'
+      const msgTemplate = settings?.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'
       const msg = msgTemplate
         .replace(/{clientName}/g, clientName || 'Valued Client')
         .replace(/{projectName}/g, project.name || 'Project')
         .replace(/{brochureUrl}/g, brochureAbsUrl || fileUrl)
-      text = `https://wa.me/${cleanClientPhone}?text=${encodeURIComponent(msg)}`
+      text = `https://wa.me/${cleanClientPhone.length === 10 ? '91' + cleanClientPhone : cleanClientPhone}?text=${encodeURIComponent(msg)}`
     } else {
       const msg = `Hi, please send me the official brochure for ${project.name}`
       text = `https://wa.me/${salesPhone}?text=${encodeURIComponent(msg)}`
