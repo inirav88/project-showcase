@@ -44,7 +44,7 @@ describe('ProjectShowcase Page Navigation and Theme Integration', () => {
   it('loads project details, applies custom themes, and renders visible modules', async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={['/kiosk/project/p1']}>
+        <MemoryRouter initialEntries={['/kiosk/project/p1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/kiosk/project/:projectId" element={<ProjectShowcase />} />
           </Routes>

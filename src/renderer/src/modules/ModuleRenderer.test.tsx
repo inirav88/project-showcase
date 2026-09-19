@@ -41,7 +41,7 @@ describe('ModuleRenderer', () => {
   it('renders standard visible modules and fallback for unknown types', async () => {
     await act(async () => {
       render(
-        <HashRouter>
+        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ModuleRenderer projectId="p1" />
         </HashRouter>
       )
@@ -63,7 +63,7 @@ describe('ModuleRenderer', () => {
 
     await act(async () => {
       render(
-        <HashRouter>
+        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ModuleRenderer projectId="p1" />
         </HashRouter>
       )

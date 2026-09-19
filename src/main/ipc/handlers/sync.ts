@@ -1,6 +1,16 @@
 import { ipcMain } from 'electron'
 import type { PrismaClient } from '@prisma/client/showcase-client'
+import { z } from 'zod'
 import { IPC_CHANNELS } from '../channels'
+
+const DeltaPayloadSchema = z.object({
+  projects: z.array(z.record(z.any())).optional(),
+  towers: z.array(z.record(z.any())).optional(),
+  units: z.array(z.record(z.any())).optional(),
+  modules: z.array(z.record(z.any())).optional(),
+  highlights: z.array(z.record(z.any())).optional(),
+  amenities: z.array(z.record(z.any())).optional(),
+})
 
 export class SyncHandlers {
   constructor(private db: PrismaClient) {}
@@ -48,14 +58,8 @@ export class SyncHandlers {
         return { success: false, reason: `Sync payload fetch failed: ${syncRes.status}` }
       }
 
-      const delta = (await syncRes.json()) as {
-        projects?: any[]
-        towers?: any[]
-        units?: any[]
-        modules?: any[]
-        highlights?: any[]
-        amenities?: any[]
-      }
+      const rawJson = await syncRes.json()
+      const delta = DeltaPayloadSchema.parse(rawJson)
 
       const cleanObj = (obj: any, keys: string[]) => {
         const cleaned = { ...obj }

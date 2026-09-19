@@ -8,7 +8,7 @@ import './assets/accessibility-fixes.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <HashRouter>
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/kiosk/*" element={<KioskRoute />} />
         <Route path="/admin/*" element={<AdminRoute />} />
