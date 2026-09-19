@@ -1095,7 +1095,16 @@ export default function AdminRoute(): JSX.Element {
     narrationEnabled: true,
     watermarkEnabled: true,
     vpsBaseUrl: '',
-    vpsApiKey: ''
+    vpsApiKey: '',
+    whatsappEnabled: true,
+    whatsappAllowDeepLink: true,
+    whatsappAllowQrCode: true,
+    whatsappAllowApiSend: false,
+    whatsappDefaultMode: 'DEEP_LINK',
+    whatsappMessageTemplate: 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}',
+    whatsappApiProvider: 'META_CLOUD',
+    whatsappApiToken: '',
+    whatsappApiPhoneNumberId: ''
   })
   const [adminPinInput, setAdminPinInput] = useState('')
 
@@ -1157,7 +1166,16 @@ export default function AdminRoute(): JSX.Element {
         exitRequiresPin: settings.exitRequiresPin ?? false,
         startupSecurityMode: settings.startupSecurityMode || 'DISABLED',
         vpsBaseUrl: settings.vpsBaseUrl || '',
-        vpsApiKey: settings.vpsApiKey || ''
+        vpsApiKey: settings.vpsApiKey || '',
+        whatsappEnabled: settings.whatsappEnabled !== false,
+        whatsappAllowDeepLink: settings.whatsappAllowDeepLink !== false,
+        whatsappAllowQrCode: settings.whatsappAllowQrCode !== false,
+        whatsappAllowApiSend: settings.whatsappAllowApiSend === true,
+        whatsappDefaultMode: settings.whatsappDefaultMode || 'DEEP_LINK',
+        whatsappMessageTemplate: settings.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}',
+        whatsappApiProvider: settings.whatsappApiProvider || 'META_CLOUD',
+        whatsappApiToken: settings.whatsappApiToken || '',
+        whatsappApiPhoneNumberId: settings.whatsappApiPhoneNumberId || ''
       }
       if (adminPinInput) {
         payload.adminPin = adminPinInput
@@ -1253,7 +1271,16 @@ export default function AdminRoute(): JSX.Element {
         setSettings({
           ...config,
           narrationEnabled: config.narrationEnabled !== false,
-          watermarkEnabled: config.watermarkEnabled !== false
+          watermarkEnabled: config.watermarkEnabled !== false,
+          whatsappEnabled: config.whatsappEnabled !== false,
+          whatsappAllowDeepLink: config.whatsappAllowDeepLink !== false,
+          whatsappAllowQrCode: config.whatsappAllowQrCode !== false,
+          whatsappAllowApiSend: config.whatsappAllowApiSend === true,
+          whatsappDefaultMode: config.whatsappDefaultMode || 'DEEP_LINK',
+          whatsappMessageTemplate: config.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}',
+          whatsappApiProvider: config.whatsappApiProvider || 'META_CLOUD',
+          whatsappApiToken: config.whatsappApiToken || '',
+          whatsappApiPhoneNumberId: config.whatsappApiPhoneNumberId || ''
         } as Settings)
         try { localStorage.setItem('showcaseos_settings', JSON.stringify(config)) } catch {}
       }
