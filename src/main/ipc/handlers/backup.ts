@@ -10,7 +10,7 @@ export class BackupHandlers {
   private mediaDir: string
   private dbPath: string
 
-  constructor(_db: PrismaClient, appDataPath: string) {
+  constructor(private db: PrismaClient, appDataPath: string) {
     this.mediaDir = path.join(appDataPath, 'media')
     
     // Determine the path to the database
@@ -88,10 +88,27 @@ export class BackupHandlers {
         throw new Error('Invalid backup package: missing database.db')
       }
 
-      // 3. Atomically replace database
-      // (Since we are using Prisma/LibSQL, replacing the file while in use might cause issues in production,
-      // but for offline Kiosk it is acceptable if they restart or we do it carefully)
+      // 3. Disconnect active database connection, clean WAL/SHM artifacts, and safely replace database
+      try {
+        await this.db.$disconnect()
+      } catch (err) {
+        console.warn('[BackupRestore] Notice during DB disconnect:', err)
+      }
+
+      // Remove potential WAL / SHM write-ahead logs to avoid database state sync mismatch
+      const walPath = `${this.dbPath}-wal`
+      const shmPath = `${this.dbPath}-shm`
+      if (fs.existsSync(walPath)) fs.rmSync(walPath, { force: true })
+      if (fs.existsSync(shmPath)) fs.rmSync(shmPath, { force: true })
+
       fs.copyFileSync(extractedDbPath, this.dbPath)
+
+      // Reconnect database client
+      try {
+        await this.db.$connect()
+      } catch (err) {
+        console.warn('[BackupRestore] Notice during DB reconnect:', err)
+      }
 
       // 4. Replace media folder
       if (fs.existsSync(extractedMediaDir)) {

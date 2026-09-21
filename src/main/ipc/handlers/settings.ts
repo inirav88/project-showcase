@@ -22,6 +22,8 @@ export class SettingsHandlers {
       ...res,
       showExitButton: (res as any).showExitButton === false || (res as any).showExitButton === 0 ? false : true,
       exitRequiresPin: Boolean((res as any).exitRequiresPin),
+      isDefaultPin: !res.adminPinHash,
+      hasCustomPin: Boolean(res.adminPinHash),
     }
   }
 
@@ -42,7 +44,12 @@ export class SettingsHandlers {
     if (!s) return false
     const hash = crypto.createHash('sha256').update(pin).digest('hex')
     const expectedHash = s.adminPinHash || crypto.createHash('sha256').update('0000').digest('hex')
-    if (hash === expectedHash) return true
+    if (hash === expectedHash) {
+      if (!s.adminPinHash) {
+        console.warn('[Security] Admin action authenticated with default fallback PIN (0000). Setting a custom PIN is strongly recommended.')
+      }
+      return true
+    }
 
     // Check if PIN matches any active staff member's PIN
     const activeStaff = await this.db.staffProfile.findMany({
