@@ -145,7 +145,7 @@ export class SyncHandlers {
     try {
       const publishUrl = `${settings.vpsBaseUrl.replace(/\/$/, '')}/api/publish`
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-      if (settings.vpsApiKey) headers['x-api-key'] = settings.vpsApiKey
+      headers['x-api-key'] = settings.vpsApiKey || 'salesstudio-secret-key-2026'
 
       // Gather all local data to publish
       const projects = await this.db.project.findMany()
