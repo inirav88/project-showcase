@@ -189,12 +189,15 @@ export class SyncHandlers {
             if (stat.isFile() && stat.size > 0 && stat.size < 50 * 1024 * 1024) {
               try {
                 const fileData = fs.readFileSync(fullPath).toString('base64')
-                await fetch(uploadUrl, {
+                const upRes = await fetch(uploadUrl, {
                   method: 'POST',
                   headers,
                   body: JSON.stringify({ fileName, fileData }),
                   signal: AbortSignal.timeout(60000)
                 })
+                if (!upRes.ok) {
+                  console.error(`[Sync] Media file upload failed for ${fileName}: HTTP ${upRes.status} ${upRes.statusText}`)
+                }
               } catch (e: any) {
                 console.error(`[Sync] Media file upload error for ${fileName}:`, e?.message)
               }
