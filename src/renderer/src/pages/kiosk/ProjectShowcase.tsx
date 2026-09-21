@@ -296,9 +296,20 @@ export default function ProjectShowcase(): JSX.Element {
     }
   }
 
+  const getPersonaLabel = (p: Persona | null): string | undefined => {
+    if (p === 'END_USE') return 'Own Home'
+    if (p === 'INVESTMENT') return 'Investment'
+    if (p === 'NRI') return 'NRI Buyer'
+    return undefined
+  }
+
   const handlePersonaSelect = (p: Persona) => {
     setPersona(p)
     setShowPersona(false)
+    const label = getPersonaLabel(p)
+    if (sessionId && label) {
+      window.api.invoke(IPC_CHANNELS.SESSION_END, { id: sessionId, personaMode: label }).catch(console.error)
+    }
   }
 
   let activeConfig: Record<string, any> = {}

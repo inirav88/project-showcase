@@ -17,10 +17,13 @@ export class SessionHandlers {
     })
   }
 
-  async end(id: string, sectionsViewed?: string[]) {
+  async end(id: string, sectionsViewed?: string[], personaMode?: string) {
     const updateData: any = { endedAt: new Date() }
     if (sectionsViewed) {
       updateData.sectionsViewed = JSON.stringify(sectionsViewed)
+    }
+    if (personaMode) {
+      updateData.personaMode = personaMode
     }
     return this.db.sessionLog.update({
       where: { id },
@@ -51,8 +54,8 @@ export class SessionHandlers {
     ipcMain.handle(IPC_CHANNELS.SESSION_START, (_, { projectId, staffId, personaMode }: any) =>
       this.start(projectId, staffId, personaMode)
     )
-    ipcMain.handle(IPC_CHANNELS.SESSION_END, (_, { id, sectionsViewed }: any) =>
-      this.end(id, sectionsViewed)
+    ipcMain.handle(IPC_CHANNELS.SESSION_END, (_, { id, sectionsViewed, personaMode }: any) =>
+      this.end(id, sectionsViewed, personaMode)
     )
     ipcMain.handle(IPC_CHANNELS.SESSION_SHORTLIST, (_, { id, unitIds }: any) =>
       this.shortlist(id, unitIds)
