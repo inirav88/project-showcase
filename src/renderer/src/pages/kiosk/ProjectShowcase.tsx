@@ -11,6 +11,7 @@ import { AccessibilityToggle } from '../../components/AccessibilityToggle'
 import { SecurityPinModal } from './components/SecurityPinModal'
 import { ShortlistDrawer } from './components/ShortlistDrawer'
 import { LeadCaptureModal } from './components/LeadCaptureModal'
+import { EndPresentationModal } from './components/EndPresentationModal'
 
 interface Project {
   id: string
@@ -127,6 +128,8 @@ export default function ProjectShowcase(): JSX.Element {
   // Session
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [sectionsViewed, setSectionsViewed] = useState<Set<string>>(new Set(['OVERVIEW']))
+  const [showEndSessionModal, setShowEndSessionModal] = useState(false)
+  const sessionStartTimeRef = useRef<number>(Date.now())
 
   const { items: shortlistItems } = useShortlistStore()
 
@@ -257,6 +260,10 @@ export default function ProjectShowcase(): JSX.Element {
   if (!project) return <div className="loading">Loading project…</div>
 
   const handleBack = () => {
+    setShowEndSessionModal(true)
+  }
+
+  const handleConfirmEndSession = () => {
     if (sessionId) {
       window.api.invoke(IPC_CHANNELS.SESSION_END, {
         id: sessionId,
@@ -338,17 +345,39 @@ export default function ProjectShowcase(): JSX.Element {
 
       {/* Header */}
       <header className="showcase-header">
-        <button
-          className="back-btn"
-          onClick={handleBack}
-          onTouchEnd={(e) => {
-            e.preventDefault()
-            handleBack()
-          }}
-          aria-label="Go back to project selection"
-        >
-          {String.fromCharCode(8592)} Back
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            className="back-btn"
+            onClick={handleBack}
+            onTouchEnd={(e) => {
+              e.preventDefault()
+              handleBack()
+            }}
+            aria-label="Go back to project selection"
+          >
+            {String.fromCharCode(8592)} Back
+          </button>
+          <button
+            onClick={() => setShowEndSessionModal(true)}
+            className="btn-hover-effect"
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '10px 16px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              background: 'rgba(239, 68, 68, 0.12)',
+              color: '#ef4444',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 700,
+            }}
+            aria-label="End presentation session"
+          >
+            <span>⏹️</span> End Presentation
+          </button>
+        </div>
         <div className="showcase-header-info">
           <h1>{project.name}</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
@@ -574,6 +603,23 @@ export default function ProjectShowcase(): JSX.Element {
             setShowPersona(true)
           }}
           onSkip={() => setShowLeadModal(false)}
+        />
+      )}
+
+      {/* End Presentation Summary Modal */}
+      {showEndSessionModal && (
+        <EndPresentationModal
+          projectName={project.name}
+          persona={getPersonaLabel(_persona) ?? null}
+          sectionsCount={sectionsViewed.size}
+          shortlistCount={shortlistItems.length}
+          sessionDurationMinutes={Math.max(1, Math.round((Date.now() - sessionStartTimeRef.current) / 60000))}
+          onConfirmEnd={handleConfirmEndSession}
+          onSaveLead={() => {
+            setShowEndSessionModal(false)
+            setShowLeadModal(true)
+          }}
+          onResume={() => setShowEndSessionModal(false)}
         />
       )}
     </div>
