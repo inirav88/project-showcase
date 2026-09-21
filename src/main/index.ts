@@ -111,7 +111,7 @@ app.whenReady().then(async () => {
     new StaffHandlers(db).registerIpc()
     new AppointmentHandlers(db).registerIpc()
     new UsbHandlers(db, appDataPath, dbPath).registerIpc()
-    new SyncHandlers(db).registerIpc()
+    new SyncHandlers(db, appDataPath).registerIpc()
     new WhatsappHandlers(db).registerIpc()
 
     // Register dialog (file picker) handlers — no DB dependency

@@ -15,7 +15,10 @@ const DeltaPayloadSchema = z.object({
 })
 
 export class SyncHandlers {
-  constructor(private db: PrismaClient) {}
+  private mediaDir: string
+  constructor(private db: PrismaClient, appDataPath?: string) {
+    this.mediaDir = appDataPath ? path.join(appDataPath, 'media') : ''
+  }
 
   async getStatus() {
     const settings = await this.db.settings.findUnique({ where: { id: 1 } })
@@ -175,45 +178,30 @@ export class SyncHandlers {
 
       const reply = (await res.json()) as { success: boolean; contentVersion: string }
 
-      // Also upload physical brochure and media files to VPS /api/upload so they are available online
+      // Scan and upload all physical media files from local storage folder to VPS /api/upload
       const uploadUrl = `${settings.vpsBaseUrl.replace(/\/$/, '')}/api/upload`
-      const mediaRecords = await this.db.media.findMany()
-      for (const m of mediaRecords) {
-        if (m.filePath && fs.existsSync(m.filePath)) {
-          try {
-            const fileName = path.basename(m.filePath)
-            const fileData = fs.readFileSync(m.filePath).toString('base64')
-            await fetch(uploadUrl, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ fileName, fileData }),
-              signal: AbortSignal.timeout(60000)
-            })
-          } catch (e: any) {
-            console.error(`[Sync] Media file publish failed for ${m.filePath}:`, e?.message)
-          }
-        }
-      }
-
-      // Check brochure modules for brochure PDF files
-      for (const mod of modules) {
-        if (mod.type === 'BROCHURE' && mod.config) {
-          try {
-            const cfg = typeof mod.config === 'string' ? JSON.parse(mod.config) : mod.config
-            const bPath = cfg.brochurePath || cfg.filePath
-            if (bPath && fs.existsSync(bPath)) {
-              const fileName = path.basename(bPath)
-              const fileData = fs.readFileSync(bPath).toString('base64')
-              await fetch(uploadUrl, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ fileName, fileData }),
-                signal: AbortSignal.timeout(60000)
-              })
+      if (this.mediaDir && fs.existsSync(this.mediaDir)) {
+        try {
+          const files = fs.readdirSync(this.mediaDir)
+          for (const fileName of files) {
+            const fullPath = path.join(this.mediaDir, fileName)
+            const stat = fs.statSync(fullPath)
+            if (stat.isFile() && stat.size > 0 && stat.size < 50 * 1024 * 1024) {
+              try {
+                const fileData = fs.readFileSync(fullPath).toString('base64')
+                await fetch(uploadUrl, {
+                  method: 'POST',
+                  headers,
+                  body: JSON.stringify({ fileName, fileData }),
+                  signal: AbortSignal.timeout(60000)
+                })
+              } catch (e: any) {
+                console.error(`[Sync] Media file upload error for ${fileName}:`, e?.message)
+              }
             }
-          } catch (e: any) {
-            console.error('[Sync] Brochure PDF upload error:', e?.message)
           }
+        } catch (e: any) {
+          console.error('[Sync] Directory scan error:', e?.message)
         }
       }
 
