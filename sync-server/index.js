@@ -99,6 +99,8 @@ app.post('/api/publish', authMiddleware, (req, res) => {
     contentVersion: newVersion,
     message: 'Catalog published to VPS successfully'
   })
+})
+
 // 4. POST /api/upload -> Upload media files (brochure PDFs, images) to VPS
 app.post('/api/upload', authMiddleware, (req, res) => {
   const { fileName, fileData } = req.body
