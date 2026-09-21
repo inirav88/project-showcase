@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, Suspense, useCallback } from 'react'
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useKioskExit } from '../../hooks/useKioskExit'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
