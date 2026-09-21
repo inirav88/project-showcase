@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 
 export type Persona = 'END_USE' | 'INVESTMENT' | 'NRI'
 
@@ -46,7 +46,7 @@ export function PersonaSelector({ onSelect, onSkip }: Props) {
         boxShadow: 'var(--shadow-xl)',
       }}>
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>\uD83D\uDC4B</div>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>👋</div>
           <h2 style={{
             fontSize: 'var(--font-size-2xl)', fontWeight: 800,
             color: 'var(--color-text-primary)', letterSpacing: '-0.03em', marginBottom: 8,
