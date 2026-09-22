@@ -1694,6 +1694,17 @@ export default function AdminRoute(): JSX.Element {
       fontFamily: 'var(--font-sans)',
       overflow: 'hidden'
     }}>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only"
+        style={{
+          position: 'absolute', top: 10, left: 10, zIndex: 99999,
+          background: 'var(--color-accent)', color: '#fff',
+          padding: '8px 16px', borderRadius: 4, fontWeight: 700
+        }}
+      >
+        Skip to main content
+      </a>
       {/* SIDEBAR TABS SELECTOR */}
       <aside style={{
         width: '240px',
@@ -1714,7 +1725,7 @@ export default function AdminRoute(): JSX.Element {
         </div>
 
         {/* Sidebar Nav Toggles */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+        <nav aria-label="Admin control center navigation" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
           {([
             { id: 'projects', label: 'Projects' },
             { id: 'modules', label: 'Modules' },
@@ -1750,7 +1761,7 @@ export default function AdminRoute(): JSX.Element {
               {label}
             </button>
           ))}
-        </div>
+        </nav>
 
         {/* Selected Project Quick Display */}
         {selectedProjectId && (
@@ -1771,7 +1782,7 @@ export default function AdminRoute(): JSX.Element {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+      <main id="main-content" tabIndex={-1} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         
         {/* TOP BAR / PROJECT selector */}
         <header style={{
@@ -2497,17 +2508,18 @@ export default function AdminRoute(): JSX.Element {
 
                     {/* Table View */}
                     <div style={{ maxHeight: '380px', overflowY: 'auto', border: '1px solid var(--color-border)', borderRadius: '6px' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                      <table aria-label="Project Units Directory" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                        <caption className="sr-only">Directory of project units with floor, configuration, area, pricing, and availability status</caption>
                         <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--color-surface-raised)', zIndex: 1, borderBottom: '1px solid var(--color-border)' }}>
                           <tr style={{ color: 'var(--color-text-muted)' }}>
-                            <th style={{ padding: '10px 12px' }}>Tower</th>
-                            <th style={{ padding: '10px 12px' }}>Floor</th>
-                            <th style={{ padding: '10px 12px' }}>Unit No.</th>
-                            <th style={{ padding: '10px 12px' }}>Config</th>
-                            <th style={{ padding: '10px 12px' }}>Area</th>
-                            <th style={{ padding: '10px 12px' }}>Price</th>
-                            <th style={{ padding: '10px 12px' }}>Status</th>
-                            <th style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Tower</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Floor</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Unit No.</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Config</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Area</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Price</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Status</th>
+                            <th scope="col" style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -2890,8 +2902,8 @@ export default function AdminRoute(): JSX.Element {
               <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>Global Firm Configuration</h3>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Company Name</label>
-                <input value={settings.firmName} onChange={(e) => setSettings({ ...settings, firmName: e.target.value })} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
+                <label htmlFor="settingsFirmNameInput" style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Company Name</label>
+                <input id="settingsFirmNameInput" aria-label="Company Name" value={settings.firmName} onChange={(e) => setSettings({ ...settings, firmName: e.target.value })} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
               </div>
 
               <div>
@@ -2940,23 +2952,23 @@ export default function AdminRoute(): JSX.Element {
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Contact Phone</label>
-                  <input value={settings.firmContactPhone} onChange={(e) => setSettings({ ...settings, firmContactPhone: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
+                  <label htmlFor="settingsContactPhoneInput" style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Contact Phone</label>
+                  <input id="settingsContactPhoneInput" aria-label="Contact Phone" value={settings.firmContactPhone} onChange={(e) => setSettings({ ...settings, firmContactPhone: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Website</label>
-                  <input value={settings.firmWebsite} onChange={(e) => setSettings({ ...settings, firmWebsite: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
+                  <label htmlFor="settingsWebsiteInput" style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Website</label>
+                  <input id="settingsWebsiteInput" aria-label="Company Website" value={settings.firmWebsite} onChange={(e) => setSettings({ ...settings, firmWebsite: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Contact Email</label>
-                <input value={settings.firmContactEmail} onChange={(e) => setSettings({ ...settings, firmContactEmail: e.target.value })} type="email" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
+                <label htmlFor="settingsContactEmailInput" style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Contact Email</label>
+                <input id="settingsContactEmailInput" aria-label="Contact Email" value={settings.firmContactEmail} onChange={(e) => setSettings({ ...settings, firmContactEmail: e.target.value })} type="email" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }} />
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Kiosk Footer Disclaimer Text</label>
-                <textarea value={settings.disclaimerText} onChange={(e) => setSettings({ ...settings, disclaimerText: e.target.value })} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', resize: 'vertical' }} />
+                <label htmlFor="settingsDisclaimerTextInput" style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>Kiosk Footer Disclaimer Text</label>
+                <textarea id="settingsDisclaimerTextInput" aria-label="Kiosk Footer Disclaimer Text" value={settings.disclaimerText} onChange={(e) => setSettings({ ...settings, disclaimerText: e.target.value })} rows={3} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', resize: 'vertical' }} />
               </div>
 
               <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -3318,25 +3330,30 @@ export default function AdminRoute(): JSX.Element {
         </div>
       </main>
       {toast && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          backgroundColor: toast.type === 'error' ? 'var(--color-error)' : toast.type === 'success' ? 'var(--color-success)' : 'var(--color-accent)',
-          color: toast.type === 'error' ? '#fff' : '#000',
-          padding: '14px 28px',
-          borderRadius: '8px',
-          boxShadow: 'var(--shadow-lg)',
-          zIndex: 9999,
-          fontSize: '14px',
-          fontWeight: 600,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          pointerEvents: 'none',
-          animation: 'slideInRight 0.3s ease-out forwards'
-        }}>
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            backgroundColor: toast.type === 'error' ? 'var(--color-error)' : toast.type === 'success' ? 'var(--color-success)' : 'var(--color-accent)',
+            color: toast.type === 'error' ? '#fff' : '#000',
+            padding: '14px 28px',
+            borderRadius: '8px',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 9999,
+            fontSize: '14px',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            pointerEvents: 'none',
+            animation: 'slideInRight 0.3s ease-out forwards'
+          }}
+        >
           <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
+          <span>{toast.message}</span>
         </div>
       )}
 

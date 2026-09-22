@@ -95,14 +95,15 @@ export function StaffTab() {
         </div>
 
         {staff.length === 0 ? <p style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>No users found.</p> : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <table aria-label="System Users and Staff Profiles" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <caption className="sr-only">List of system users, assigned roles, and security PIN management</caption>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
-                <th style={{ padding: 10, textAlign: 'left' }}>User Name</th>
-                <th style={{ padding: 10, textAlign: 'left' }}>System Role</th>
-                <th style={{ padding: 10, textAlign: 'left' }}>Status</th>
-                <th style={{ padding: 10, textAlign: 'left' }}>Added On</th>
-                <th style={{ padding: 10, textAlign: 'center' }}>Actions</th>
+                <th scope="col" style={{ padding: 10, textAlign: 'left' }}>User Name</th>
+                <th scope="col" style={{ padding: 10, textAlign: 'left' }}>System Role</th>
+                <th scope="col" style={{ padding: 10, textAlign: 'left' }}>Status</th>
+                <th scope="col" style={{ padding: 10, textAlign: 'left' }}>Added On</th>
+                <th scope="col" style={{ padding: 10, textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -114,6 +115,8 @@ export function StaffTab() {
                   </td>
                   <td style={{ padding: 10 }}>
                     <select
+                      id={`staffRoleSelect-${s.id}`}
+                      aria-label={`System role for ${s.name}`}
                       value={s.role || 'AGENT'}
                       onChange={(e) => handleUpdateRole(s, e.target.value)}
                       style={{
@@ -171,8 +174,10 @@ export function StaffTab() {
           <form onSubmit={handleResetPin} style={{ backgroundColor: 'var(--color-surface-raised)', padding: 24, borderRadius: 10, width: 340, border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 14 }}>
             <h4 style={{ margin: 0, fontSize: 16 }}>Reset PIN for {editingStaff.name}</h4>
             <div>
-              <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>New 4-Digit Security PIN</label>
+              <label htmlFor="editPinInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>New 4-Digit Security PIN</label>
               <input
+                id="editPinInput"
+                aria-label="New 4-Digit Security PIN"
                 value={editPin}
                 onChange={(e) => setEditPin(e.target.value.replace(/\D/g,'').slice(0,4))}
                 required
@@ -195,28 +200,28 @@ export function StaffTab() {
         <h3 style={{ margin: '0 0 16px' }}>Create New User Account</h3>
         <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, maxWidth: 650 }}>
           <div>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Full Name *</label>
-            <input value={newName} onChange={(e) => setNewName(e.target.value)} required placeholder="e.g. Nirav Sales Admin" style={inputStyle} />
+            <label htmlFor="createUserNameInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Full Name *</label>
+            <input id="createUserNameInput" aria-label="Full Name" value={newName} onChange={(e) => setNewName(e.target.value)} required placeholder="e.g. Nirav Sales Admin" style={inputStyle} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>User Role *</label>
-            <select value={newRole} onChange={(e) => setNewRole(e.target.value as any)} style={inputStyle}>
+            <label htmlFor="createUserRoleSelect" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>User Role *</label>
+            <select id="createUserRoleSelect" aria-label="User Role" value={newRole} onChange={(e) => setNewRole(e.target.value as any)} style={inputStyle}>
               <option value="SUPERADMIN">👑 SUPERADMIN (Full Access + VPS Push)</option>
               <option value="ADMIN">🛡️ ADMIN (Catalog & Inventory Edit)</option>
               <option value="AGENT">👤 AGENT / STAFF (Presentation Only)</option>
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Email Address</label>
-            <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email" placeholder="admin@salesstudio.in" style={inputStyle} />
+            <label htmlFor="createUserEmailInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Email Address</label>
+            <input id="createUserEmailInput" aria-label="Email Address" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email" placeholder="admin@salesstudio.in" style={inputStyle} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Contact Phone</label>
-            <input value={newPhone} onChange={(e) => setNewPhone(e.target.value)} placeholder="+91 9904033395" style={inputStyle} />
+            <label htmlFor="createUserPhoneInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Contact Phone</label>
+            <input id="createUserPhoneInput" aria-label="Contact Phone" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} placeholder="+91 9904033395" style={inputStyle} />
           </div>
           <div style={{ gridColumn: 'span 2' }}>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>4-Digit Security PIN *</label>
-            <input value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/\D/g,'').slice(0,4))} required type="password" maxLength={4} placeholder="- - - -" style={{ ...inputStyle, letterSpacing: 8, maxWidth: 200 }} />
+            <label htmlFor="createUserPinInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>4-Digit Security PIN *</label>
+            <input id="createUserPinInput" aria-label="4-Digit Security PIN" value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/\D/g,'').slice(0,4))} required type="password" maxLength={4} placeholder="- - - -" style={{ ...inputStyle, letterSpacing: 8, maxWidth: 200 }} />
           </div>
           <button type="submit" disabled={saving} style={{ padding: '10px 20px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', justifySelf: 'start', fontFamily: 'var(--font-sans)', gridColumn: 'span 2' }}>
             {saving ? 'Creating User...' : 'Create User Account'}
@@ -248,12 +253,13 @@ export function AppointmentsTab() {
       <div style={cardStyle}>
         <h3 style={{ margin: '0 0 16px' }}>Upcoming Appointments</h3>
         {appointments.length === 0 ? <p style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>No appointments scheduled.</p> : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <table aria-label="Upcoming Appointments" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <caption className="sr-only">List of client presentation appointments and scheduled times</caption>
             <thead><tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
-              <th style={{ padding: 10, textAlign: 'left' }}>Client</th>
-              <th style={{ padding: 10, textAlign: 'left' }}>Date and Time</th>
-              <th style={{ padding: 10, textAlign: 'left' }}>Notes</th>
-              <th style={{ padding: 10 }}>Delete</th>
+              <th scope="col" style={{ padding: 10, textAlign: 'left' }}>Client</th>
+              <th scope="col" style={{ padding: 10, textAlign: 'left' }}>Date and Time</th>
+              <th scope="col" style={{ padding: 10, textAlign: 'left' }}>Notes</th>
+              <th scope="col" style={{ padding: 10, textAlign: 'center' }}>Delete</th>
             </tr></thead>
             <tbody>{appointments.map((a) => (
               <tr key={a.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
@@ -269,9 +275,9 @@ export function AppointmentsTab() {
       <div style={cardStyle}>
         <h3 style={{ margin: '0 0 16px' }}>Schedule New Appointment</h3>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 500 }}>
-          <div><label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Client Name *</label><input value={clientName} onChange={(e) => setClientName(e.target.value)} required placeholder='e.g. Ramesh Shah' style={inputStyle} /></div>
-          <div><label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Date and Time *</label><input type='datetime-local' value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required style={inputStyle} /></div>
-          <div><label style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Notes</label><input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder='Optional' style={inputStyle} /></div>
+          <div><label htmlFor="apptClientNameInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Client Name *</label><input id="apptClientNameInput" aria-label="Client Name" value={clientName} onChange={(e) => setClientName(e.target.value)} required placeholder='e.g. Ramesh Shah' style={inputStyle} /></div>
+          <div><label htmlFor="apptScheduledAtInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Date and Time *</label><input id="apptScheduledAtInput" aria-label="Date and Time" type='datetime-local' value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required style={inputStyle} /></div>
+          <div><label htmlFor="apptNotesInput" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>Notes</label><input id="apptNotesInput" aria-label="Appointment Notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder='Optional' style={inputStyle} /></div>
           <button type='submit' disabled={saving} style={{ padding: '10px 20px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', alignSelf: 'flex-start', fontFamily: 'var(--font-sans)' }}>{saving ? 'Saving...' : 'Schedule Appointment'}</button>
         </form>
       </div>
