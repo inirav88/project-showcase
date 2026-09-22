@@ -68,11 +68,19 @@ async function main() {
   console.log('\nStep 3/5: Executing Git release pipeline...')
   try {
     run('git add package.json')
-    run(`git commit -m "chore(release): bump version to v${targetVersion}"`)
+    try {
+      run(`git commit -m "chore(release): bump version to v${targetVersion}"`)
+    } catch (_) {
+      console.log('ℹ️ Note: package.json version already committed.')
+    }
     run('git push origin dev')
     run('git checkout main')
     run('git merge dev')
-    run(`git tag -a v${targetVersion} -m "Release v${targetVersion}"`)
+    try {
+      run(`git tag -a v${targetVersion} -m "Release v${targetVersion}"`)
+    } catch (_) {
+      console.log(`ℹ️ Note: Tag v${targetVersion} already exists locally.`)
+    }
     run('git push origin main --tags')
     run('git checkout dev')
     console.log('✅ Git branch merge & release tag pushed successfully!')
