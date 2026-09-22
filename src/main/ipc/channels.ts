@@ -68,6 +68,12 @@ export const IPC_CHANNELS = {
   DIALOG_OPEN_FOLDER:       'dialog:openFolder',
   // WhatsApp
   WHATSAPP_SEND_API:        'whatsapp:sendApi',
+  // Updater
+  UPDATER_CHECK:            'updater:check',
+  UPDATER_QUIT_AND_INSTALL: 'updater:quitAndInstall',
+  UPDATER_GET_STATUS:       'updater:getStatus',
+  UPDATER_STATUS_CHANGED:   'updater:statusChanged',
+  UPDATER_DOWNLOAD_PROGRESS:'updater:downloadProgress',
 } as const
 
 export type IpcChannel = typeof IPC_CHANNELS[keyof typeof IPC_CHANNELS]

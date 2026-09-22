@@ -311,13 +311,27 @@ export function AnalyticsTab({ sessions }: { sessions: SessionLog[] }) {
 // ---- BACKUP AND SYNC TAB ----
 export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
   const [syncStatus, setSyncStatus] = useState<{ configured: boolean; lastSyncedAt?: string | null; contentVersion?: string } | null>(null)
+  const [updaterStatus, setUpdaterStatus] = useState<any | null>(null)
+  const [checkingSoftwareUpdate, setCheckingSoftwareUpdate] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [syncResult, setSyncResult] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
-  const loadStatus = () => { (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => setSyncStatus(s)).catch(() => {}) }
-  useEffect(() => { loadStatus() }, [])
+
+  const loadStatus = () => {
+    (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => setSyncStatus(s)).catch(() => {})
+    (window as any).api.invoke(IPC_CHANNELS.UPDATER_GET_STATUS).then((u: any) => setUpdaterStatus(u)).catch(() => {})
+  }
+
+  useEffect(() => {
+    loadStatus()
+    const unsub = (window as any).api.on(IPC_CHANNELS.UPDATER_STATUS_CHANGED, (st: any) => {
+      setUpdaterStatus(st)
+      setCheckingSoftwareUpdate(false)
+    })
+    return () => unsub()
+  }, [])
 
   const isSuperadmin = !currentUser || currentUser.role === 'SUPERADMIN'
 
@@ -352,8 +366,58 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
       loadStatus()
     } finally { setPublishing(false) }
   }
+
+  const handleCheckSoftwareUpdate = async () => {
+    setCheckingSoftwareUpdate(true)
+    try {
+      const st = await (window as any).api.invoke(IPC_CHANNELS.UPDATER_CHECK)
+      if (st) setUpdaterStatus(st)
+    } catch (err: any) {
+      alert(`Software update check failed: ${err.message}`)
+    } finally {
+      setCheckingSoftwareUpdate(false)
+    }
+  }
+
+  const handleQuitAndInstall = () => {
+    (window as any).api.invoke(IPC_CHANNELS.UPDATER_QUIT_AND_INSTALL)
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* SOFTWARE UPDATES CARD */}
+      <div style={cardStyle}>
+        <h3 style={{ margin: '0 0 8px' }}>Software & App Updates (OTA)</h3>
+        <p style={{ fontSize: 13, color: 'var(--color-text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
+          Check for application software updates (UI enhancements, new features, and bug fixes). Software updates download automatically in the background.
+        </p>
+        {updaterStatus && (
+          <div style={{ fontSize: 13, marginBottom: 16, padding: '12px 14px', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div><strong>Installed Version:</strong> <span style={{ fontFamily: 'monospace' }}>v{updaterStatus.currentVersion}</span></div>
+            <div><strong>Status:</strong> {updaterStatus.status} {updaterStatus.updateInfo?.version ? `(Latest: v${updaterStatus.updateInfo.version})` : ''}</div>
+            {updaterStatus.lastCheckedAt && <div><strong>Last Checked:</strong> {new Date(updaterStatus.lastCheckedAt).toLocaleString()}</div>}
+            {updaterStatus.error && <div style={{ color: '#ef4444' }}><strong>Message:</strong> {updaterStatus.error}</div>}
+          </div>
+        )}
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button
+            onClick={handleCheckSoftwareUpdate}
+            disabled={checkingSoftwareUpdate}
+            style={{ padding: '12px 24px', background: 'var(--color-surface)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 8, fontWeight: 700, cursor: checkingSoftwareUpdate ? 'not-allowed' : 'pointer', fontSize: 14, fontFamily: 'var(--font-sans)' }}
+          >
+            {checkingSoftwareUpdate ? 'Checking for Updates...' : 'Check for Software Updates'}
+          </button>
+          {updaterStatus?.status === 'DOWNLOADED' && (
+            <button
+              onClick={handleQuitAndInstall}
+              style={{ padding: '12px 24px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer', fontSize: 14, fontFamily: 'var(--font-sans)' }}
+            >
+              Restart & Install Update Now
+            </button>
+          )}
+        </div>
+      </div>
+
       <div style={cardStyle}>
         <h3 style={{ margin: '0 0 8px' }}>Local Backup (USB or File)</h3>
         <p style={{ fontSize: 13, color: 'var(--color-text-muted)', marginBottom: 20, lineHeight: 1.6 }}>Export a complete backup ZIP (database + all media) to USB or local storage. Import is always safe - your current data is auto-backed up before any overwrite.</p>
@@ -363,7 +427,7 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
         </div>
       </div>
       <div style={cardStyle}>
-        <h3 style={{ margin: '0 0 8px' }}>Cloud Sync & Publishing</h3>
+        <h3 style={{ margin: '0 0 8px' }}>Cloud Data Sync & Publishing</h3>
         {syncStatus != null && (
           <div style={{ fontSize: 13, marginBottom: 16, padding: '10px 14px', borderRadius: 8, background: syncStatus.configured ? 'rgba(34,197,94,0.08)' : 'rgba(245,158,11,0.08)', border: '1px solid ' + (syncStatus.configured ? 'rgba(34,197,94,0.3)' : 'rgba(245,158,11,0.3)') }}>
             {syncStatus.configured ? (<span style={{ color: '#16a34a' }}>VPS Configured. Version: {syncStatus.contentVersion || '0'}. Last synced: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleString() : 'Never'}</span>) : (<span style={{ color: '#d97706' }}>Cloud sync not configured. Add VPS URL in Settings to enable.</span>)}

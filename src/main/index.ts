@@ -17,6 +17,7 @@ import { AppointmentHandlers } from './ipc/handlers/appointments'
 import { UsbHandlers } from './ipc/handlers/usb'
 import { SyncHandlers } from './ipc/handlers/sync'
 import { WhatsappHandlers } from './ipc/handlers/whatsapp'
+import { UpdaterHandlers } from './ipc/handlers/updater'
 import { registerDialogHandlers } from './ipc/handlers/dialog'
 import { IPC_CHANNELS } from './ipc/channels'
 
@@ -113,6 +114,7 @@ app.whenReady().then(async () => {
     new UsbHandlers(db, appDataPath, dbPath).registerIpc()
     new SyncHandlers(db, appDataPath).registerIpc()
     new WhatsappHandlers(db).registerIpc()
+    new UpdaterHandlers().registerIpc()
 
     // Register dialog (file picker) handlers — no DB dependency
     registerDialogHandlers()
