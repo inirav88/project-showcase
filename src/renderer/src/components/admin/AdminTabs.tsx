@@ -439,7 +439,20 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
         {updaterStatus && (
           <div style={{ fontSize: 13, marginBottom: 16, padding: '12px 14px', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div><strong>Installed Version:</strong> <span style={{ fontFamily: 'monospace' }}>v{updaterStatus.currentVersion || '0.0.1'}</span></div>
-            <div><strong>Status:</strong> {updaterStatus.status || 'IDLE'} {updaterStatus.updateInfo?.version ? `(Latest: v${updaterStatus.updateInfo.version})` : ''}</div>
+            <div>
+              <strong>Status:</strong>{' '}
+              {updaterStatus.status === 'NOT_AVAILABLE'
+                ? '✅ App is Up-to-Date'
+                : updaterStatus.status === 'AVAILABLE'
+                ? `⚡ New Update Available (v${updaterStatus.updateInfo?.version})`
+                : updaterStatus.status === 'DOWNLOADING'
+                ? '⏳ Downloading Update...'
+                : updaterStatus.status === 'DOWNLOADED'
+                ? '🎉 Update Ready to Install'
+                : updaterStatus.status === 'CHECKING'
+                ? '🔍 Checking for Updates...'
+                : updaterStatus.status || 'IDLE'}
+            </div>
             {updaterStatus.lastCheckedAt && <div><strong>Last Checked:</strong> {formatSafeDate(updaterStatus.lastCheckedAt)}</div>}
             {updaterStatus.error && <div style={{ color: '#ef4444' }}><strong>Message:</strong> {typeof updaterStatus.error === 'object' ? (updaterStatus.error.message || JSON.stringify(updaterStatus.error)) : String(updaterStatus.error)}</div>}
           </div>
