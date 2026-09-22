@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../main/ipc/channels'
 import { toMediaUrl } from '../utils/media'
 import { ThemeToggle } from '../components/ThemeToggle'
-import { StaffTab, AppointmentsTab, AnalyticsTab, BackupSyncTab } from '../components/admin/AdminTabs'
+import { StaffTab, AppointmentsTab, AnalyticsTab, BackupSyncTab, formatSafeDate } from '../components/admin/AdminTabs'
 
 // ─── Smart Module Config Editor ───────────────────────────────────────────────
 
@@ -2807,7 +2807,7 @@ export default function AdminRoute(): JSX.Element {
                         <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                           <td style={{ padding: '12px', fontWeight: 600 }}>{s.project?.name}</td>
                           <td style={{ padding: '12px' }}>{s.personaMode || 'Not specified'}</td>
-                          <td style={{ padding: '12px' }}>{new Date(s.startedAt).toLocaleString()}</td>
+                          <td style={{ padding: '12px' }}>{formatSafeDate(s.startedAt)}</td>
                           <td style={{ padding: '12px' }}>{dur}</td>
                           <td style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>{viewsCount} sections</td>
                           <td style={{ padding: '12px', fontWeight: 600 }}>{shortlistCount} units</td>
@@ -2855,7 +2855,7 @@ export default function AdminRoute(): JSX.Element {
                         <td style={{ padding: '12px' }}>{l.phone}</td>
                         <td style={{ padding: '12px' }}>{l.email || 'N/A'}</td>
                         <td style={{ padding: '12px', color: 'var(--color-success)' }}>{l.project?.name || 'General interest'}</td>
-                        <td style={{ padding: '12px' }}>{new Date(l.capturedAt).toLocaleString()}</td>
+                        <td style={{ padding: '12px' }}>{formatSafeDate(l.capturedAt)}</td>
                         <td style={{ padding: '12px', color: 'var(--color-text-muted)' }}>{l.notes}</td>
                       </tr>
                     ))}

@@ -141,7 +141,7 @@ export const UpdateNotificationBanner: React.FC = () => {
         {status === 'ERROR' && (
           <div className="text-amber-100">
             <span className="font-semibold text-white">Update Warning:</span>{' '}
-            {error || 'Unable to download update automatically.'}
+            {typeof error === 'object' ? ((error as any)?.message || JSON.stringify(error)) : String(error || 'Unable to download update automatically.')}
           </div>
         )}
       </div>

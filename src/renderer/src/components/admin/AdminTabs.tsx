@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 
+export function formatSafeDate(d?: string | null | Date | number | any): string {
+  if (d === null || d === undefined || d === '') return 'N/A'
+  try {
+    if (typeof d === 'number' && isNaN(d)) return 'N/A'
+    const parsed = new Date(d)
+    return isNaN(parsed.getTime()) ? String(d) : parsed.toLocaleString()
+  } catch (_) {
+    return typeof d === 'object' ? JSON.stringify(d) : String(d)
+  }
+}
+
 const cardStyle: React.CSSProperties = { backgroundColor: 'var(--color-surface-raised)', padding: 24, borderRadius: 8, border: '1px solid var(--color-border)' }
 
 // ---- STAFF & USER ROLES TAB ----
@@ -126,7 +137,7 @@ export function StaffTab() {
                       {s.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td style={{ padding: 10, color: 'var(--color-text-muted)' }}>{new Date(s.createdAt).toLocaleDateString()}</td>
+                  <td style={{ padding: 10, color: 'var(--color-text-muted)' }}>{formatSafeDate(s.createdAt)}</td>
                   <td style={{ padding: 10, display: 'flex', gap: 8, justifyContent: 'center' }}>
                     <button
                       onClick={() => setEditingStaff(s)}
@@ -247,7 +258,7 @@ export function AppointmentsTab() {
             <tbody>{appointments.map((a) => (
               <tr key={a.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                 <td style={{ padding: 10, fontWeight: 600 }}>{a.clientName}</td>
-                <td style={{ padding: 10 }}>{new Date(a.scheduledAt).toLocaleString()}</td>
+                <td style={{ padding: 10 }}>{formatSafeDate(a.scheduledAt)}</td>
                 <td style={{ padding: 10, color: 'var(--color-text-muted)' }}>{a.notes || '-'}</td>
                 <td style={{ padding: 10, textAlign: 'center' }}><button onClick={async () => { await (window as any).api.invoke(IPC_CHANNELS.APPOINTMENT_DELETE, a.id); load() }} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.4)', background: 'transparent', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button></td>
               </tr>
@@ -272,7 +283,16 @@ export function AppointmentsTab() {
 interface SessionLog { id: string; projectId: string; startedAt: string; endedAt?: string; sectionsViewed: string; unitsShortlisted: string; project?: { name: string } }
 export function AnalyticsTab({ sessions }: { sessions: SessionLog[] }) {
   const completed = sessions.filter((s) => s.endedAt)
-  const avgMin = completed.length > 0 ? Math.round(completed.reduce((a, s) => a + (new Date(s.endedAt!).getTime() - new Date(s.startedAt).getTime()) / 60000, 0) / completed.length) : 0
+  const avgMin = completed.length > 0
+    ? Math.round(
+        completed.reduce((a, s) => {
+          const end = s.endedAt ? new Date(s.endedAt).getTime() : NaN
+          const start = s.startedAt ? new Date(s.startedAt).getTime() : NaN
+          if (isNaN(end) || isNaN(start)) return a
+          return a + (end - start) / 60000
+        }, 0) / completed.length
+      )
+    : 0
   const pCount: Record<string, number> = {}; sessions.forEach((s) => { const n = s.project?.name || s.projectId; pCount[n] = (pCount[n] || 0) + 1 })
   const mCount: Record<string, number> = {}; sessions.forEach((s) => { try { (JSON.parse(s.sectionsViewed || '[]') as string[]).forEach((m) => { mCount[m] = (mCount[m] || 0) + 1 }) } catch {/* ignore */} })
   const uCount: Record<string, number> = {}; sessions.forEach((s) => { try { (JSON.parse(s.unitsShortlisted || '[]') as string[]).forEach((u) => { uCount[u] = (uCount[u] || 0) + 1 }) } catch {/* ignore */} })
@@ -344,15 +364,7 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
     }
   }, [])
 
-  const formatSafeDate = (d?: string | null) => {
-    if (!d) return null
-    try {
-      const parsed = new Date(d)
-      return isNaN(parsed.getTime()) ? d : parsed.toLocaleString()
-    } catch (_) {
-      return d
-    }
-  }
+
 
   const isSuperadmin = !currentUser || currentUser.role === 'SUPERADMIN'
 
@@ -419,7 +431,7 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
             <div><strong>Installed Version:</strong> <span style={{ fontFamily: 'monospace' }}>v{updaterStatus.currentVersion || '0.0.1'}</span></div>
             <div><strong>Status:</strong> {updaterStatus.status || 'IDLE'} {updaterStatus.updateInfo?.version ? `(Latest: v${updaterStatus.updateInfo.version})` : ''}</div>
             {updaterStatus.lastCheckedAt && <div><strong>Last Checked:</strong> {formatSafeDate(updaterStatus.lastCheckedAt)}</div>}
-            {updaterStatus.error && <div style={{ color: '#ef4444' }}><strong>Message:</strong> {updaterStatus.error}</div>}
+            {updaterStatus.error && <div style={{ color: '#ef4444' }}><strong>Message:</strong> {typeof updaterStatus.error === 'object' ? (updaterStatus.error.message || JSON.stringify(updaterStatus.error)) : String(updaterStatus.error)}</div>}
           </div>
         )}
         <div style={{ display: 'flex', gap: 12 }}>
@@ -453,7 +465,7 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
         <h3 style={{ margin: '0 0 8px' }}>Cloud Data Sync & Publishing</h3>
         {syncStatus != null && (
           <div style={{ fontSize: 13, marginBottom: 16, padding: '10px 14px', borderRadius: 8, background: syncStatus.configured ? 'rgba(34,197,94,0.08)' : 'rgba(245,158,11,0.08)', border: '1px solid ' + (syncStatus.configured ? 'rgba(34,197,94,0.3)' : 'rgba(245,158,11,0.3)') }}>
-            {syncStatus.configured ? (<span style={{ color: '#16a34a' }}>VPS Configured. Version: {syncStatus.contentVersion || '0'}. Last synced: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleString() : 'Never'}</span>) : (<span style={{ color: '#d97706' }}>Cloud sync not configured. Add VPS URL in Settings to enable.</span>)}
+            {syncStatus.configured ? (<span style={{ color: '#16a34a' }}>VPS Configured. Version: {syncStatus.contentVersion || '0'}. Last synced: {formatSafeDate(syncStatus.lastSyncedAt)}</span>) : (<span style={{ color: '#d97706' }}>Cloud sync not configured. Add VPS URL in Settings to enable.</span>)}
           </div>
         )}
         {!isSuperadmin && (
