@@ -320,18 +320,39 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
   const [importing, setImporting] = useState(false)
 
   const loadStatus = () => {
-    (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => setSyncStatus(s)).catch(() => {})
-    (window as any).api.invoke(IPC_CHANNELS.UPDATER_GET_STATUS).then((u: any) => setUpdaterStatus(u)).catch(() => {})
+    if ((window as any).api?.invoke) {
+      (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => { if (s) setSyncStatus(s) }).catch(() => {})
+      (window as any).api.invoke(IPC_CHANNELS.UPDATER_GET_STATUS).then((u: any) => { if (u) setUpdaterStatus(u) }).catch(() => {})
+    }
   }
 
   useEffect(() => {
     loadStatus()
-    const unsub = (window as any).api.on(IPC_CHANNELS.UPDATER_STATUS_CHANGED, (st: any) => {
-      setUpdaterStatus(st)
-      setCheckingSoftwareUpdate(false)
-    })
-    return () => unsub()
+    let unsub: any = null
+    if ((window as any).api?.on) {
+      try {
+        unsub = (window as any).api.on(IPC_CHANNELS.UPDATER_STATUS_CHANGED, (st: any) => {
+          if (st) setUpdaterStatus(st)
+          setCheckingSoftwareUpdate(false)
+        })
+      } catch (err) {
+        console.warn('Updater status listener failed:', err)
+      }
+    }
+    return () => {
+      if (typeof unsub === 'function') unsub()
+    }
   }, [])
+
+  const formatSafeDate = (d?: string | null) => {
+    if (!d) return null
+    try {
+      const parsed = new Date(d)
+      return isNaN(parsed.getTime()) ? d : parsed.toLocaleString()
+    } catch (_) {
+      return d
+    }
+  }
 
   const isSuperadmin = !currentUser || currentUser.role === 'SUPERADMIN'
 
@@ -380,7 +401,9 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
   }
 
   const handleQuitAndInstall = () => {
-    (window as any).api.invoke(IPC_CHANNELS.UPDATER_QUIT_AND_INSTALL)
+    if ((window as any).api?.invoke) {
+      (window as any).api.invoke(IPC_CHANNELS.UPDATER_QUIT_AND_INSTALL)
+    }
   }
 
   return (
@@ -393,9 +416,9 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
         </p>
         {updaterStatus && (
           <div style={{ fontSize: 13, marginBottom: 16, padding: '12px 14px', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div><strong>Installed Version:</strong> <span style={{ fontFamily: 'monospace' }}>v{updaterStatus.currentVersion}</span></div>
-            <div><strong>Status:</strong> {updaterStatus.status} {updaterStatus.updateInfo?.version ? `(Latest: v${updaterStatus.updateInfo.version})` : ''}</div>
-            {updaterStatus.lastCheckedAt && <div><strong>Last Checked:</strong> {new Date(updaterStatus.lastCheckedAt).toLocaleString()}</div>}
+            <div><strong>Installed Version:</strong> <span style={{ fontFamily: 'monospace' }}>v{updaterStatus.currentVersion || '0.0.1'}</span></div>
+            <div><strong>Status:</strong> {updaterStatus.status || 'IDLE'} {updaterStatus.updateInfo?.version ? `(Latest: v${updaterStatus.updateInfo.version})` : ''}</div>
+            {updaterStatus.lastCheckedAt && <div><strong>Last Checked:</strong> {formatSafeDate(updaterStatus.lastCheckedAt)}</div>}
             {updaterStatus.error && <div style={{ color: '#ef4444' }}><strong>Message:</strong> {updaterStatus.error}</div>}
           </div>
         )}

@@ -30,34 +30,47 @@ export const UpdateNotificationBanner: React.FC = () => {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    // Fetch initial state
-    window.api
-      .invoke(IPC_CHANNELS.UPDATER_GET_STATUS)
-      .then((res) => {
-        if (res) setUpdaterState(res as UpdaterState)
-      })
-      .catch((err) => console.error('Failed to get updater status:', err))
+    // Fetch initial state safely
+    if (window.api?.invoke) {
+      window.api
+        .invoke(IPC_CHANNELS.UPDATER_GET_STATUS)
+        .then((res) => {
+          if (res) setUpdaterState(res as UpdaterState)
+        })
+        .catch((err) => console.error('Failed to get updater status:', err))
+    }
 
-    // Listen for status changes
-    const unsubscribeStatus = window.api.on(
-      IPC_CHANNELS.UPDATER_STATUS_CHANGED,
-      (data) => {
-        setUpdaterState(data as UpdaterState)
-        setDismissed(false) // Re-open banner if state changes
-      }
-    )
+    let unsubscribeStatus: any = null
+    let unsubscribeProgress: any = null
 
-    // Listen for download progress
-    const unsubscribeProgress = window.api.on(
-      IPC_CHANNELS.UPDATER_DOWNLOAD_PROGRESS,
-      (progData) => {
-        setProgress(progData as DownloadProgress)
+    if (window.api?.on) {
+      try {
+        unsubscribeStatus = window.api.on(
+          IPC_CHANNELS.UPDATER_STATUS_CHANGED,
+          (data) => {
+            if (data) setUpdaterState(data as UpdaterState)
+            setDismissed(false)
+          }
+        )
+      } catch (e) {
+        console.warn('Failed to subscribe to status changed:', e)
       }
-    )
+
+      try {
+        unsubscribeProgress = window.api.on(
+          IPC_CHANNELS.UPDATER_DOWNLOAD_PROGRESS,
+          (progData) => {
+            if (progData) setProgress(progData as DownloadProgress)
+          }
+        )
+      } catch (e) {
+        console.warn('Failed to subscribe to download progress:', e)
+      }
+    }
 
     return () => {
-      unsubscribeStatus()
-      unsubscribeProgress()
+      if (typeof unsubscribeStatus === 'function') unsubscribeStatus()
+      if (typeof unsubscribeProgress === 'function') unsubscribeProgress()
     }
   }, [])
 
