@@ -18,6 +18,12 @@ if (!fs.existsSync(MEDIA_DIR)) {
 }
 app.use('/media', express.static(MEDIA_DIR))
 
+const UPDATES_DIR = path.join(__dirname, 'updates')
+if (!fs.existsSync(UPDATES_DIR)) {
+  fs.mkdirSync(UPDATES_DIR, { recursive: true })
+}
+app.use('/updates', express.static(UPDATES_DIR))
+
 // Middleware to verify API key
 function authMiddleware(req, res, next) {
   const reqKey = req.headers['x-api-key']
