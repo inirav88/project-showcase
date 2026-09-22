@@ -31,14 +31,17 @@ export const UpdateNotificationBanner: React.FC = () => {
 
   useEffect(() => {
     // Fetch initial state safely
-    if (window.api?.invoke) {
-      window.api
-        .invoke(IPC_CHANNELS.UPDATER_GET_STATUS)
-        .then((res) => {
+    const fetchStatus = async () => {
+      if (window.api?.invoke) {
+        try {
+          const res = await window.api.invoke(IPC_CHANNELS.UPDATER_GET_STATUS)
           if (res) setUpdaterState(res as UpdaterState)
-        })
-        .catch((err) => console.error('Failed to get updater status:', err))
+        } catch (err) {
+          console.error('Failed to get updater status:', err)
+        }
+      }
     }
+    fetchStatus()
 
     let unsubscribeStatus: any = null
     let unsubscribeProgress: any = null

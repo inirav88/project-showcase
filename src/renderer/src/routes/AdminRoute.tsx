@@ -3365,13 +3365,21 @@ function AdminUserLoginModal({
   const [verifying, setVerifying] = useState(false)
 
   useEffect(() => {
-    ;(window as any).api.invoke(IPC_CHANNELS.STAFF_LIST).then((list: any[]) => {
-      if (list && list.length > 0) {
-        const activeUsers = list.filter((u) => u.isActive !== false)
-        setUsers(activeUsers)
-        if (activeUsers.length > 0) setSelectedUserId(activeUsers[0].id)
+    const fetchUsers = async () => {
+      if ((window as any).api?.invoke) {
+        try {
+          const list = await (window as any).api.invoke(IPC_CHANNELS.STAFF_LIST) as any[]
+          if (list && list.length > 0) {
+            const activeUsers = list.filter((u) => u.isActive !== false)
+            setUsers(activeUsers)
+            if (activeUsers.length > 0) setSelectedUserId(activeUsers[0].id)
+          }
+        } catch (err) {
+          console.error('Failed to fetch staff list:', err)
+        }
       }
-    }).catch(console.error)
+    }
+    fetchUsers()
   }, [])
 
   const handleVerify = async (e: React.FormEvent) => {

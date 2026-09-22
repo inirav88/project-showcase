@@ -339,10 +339,20 @@ export function BackupSyncTab({ currentUser }: { currentUser?: any }) {
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
 
-  const loadStatus = () => {
+  const loadStatus = async () => {
     if ((window as any).api?.invoke) {
-      (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS).then((s: any) => { if (s) setSyncStatus(s) }).catch(() => {})
-      (window as any).api.invoke(IPC_CHANNELS.UPDATER_GET_STATUS).then((u: any) => { if (u) setUpdaterStatus(u) }).catch(() => {})
+      try {
+        const s = await (window as any).api.invoke(IPC_CHANNELS.SYNC_STATUS)
+        if (s) setSyncStatus(s as any)
+      } catch (err) {
+        console.warn('Failed to load sync status:', err)
+      }
+      try {
+        const u = await (window as any).api.invoke(IPC_CHANNELS.UPDATER_GET_STATUS)
+        if (u) setUpdaterStatus(u)
+      } catch (err) {
+        console.warn('Failed to load updater status:', err)
+      }
     }
   }
 
