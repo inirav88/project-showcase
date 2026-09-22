@@ -1,6 +1,6 @@
 {
   "name": "showcaseos",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Offline-first real estate project showcase desktop app",
   "main": "./out/main/index.js",
   "author": "Nirav Real Estate",
