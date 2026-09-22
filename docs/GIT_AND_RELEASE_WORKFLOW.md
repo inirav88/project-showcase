@@ -38,7 +38,25 @@ ShowcaseOS has two distinct update mechanisms:
 
 Follow these exact steps whenever you want to release a new software version to clients:
 
-### Step 1: Develop & Test Locally
+### ⚡ Automated 1-Command Release (Recommended)
+
+Execute all release operations (tests, version bump, git merge/tag/push, electron build, & VPS upload) with a single command:
+
+```bash
+npm run release -- 0.0.2
+```
+
+This single command automatically:
+1. Runs `npm run test` vitest test suite.
+2. Updates `"version": "0.0.2"` in `package.json`.
+3. Commits to `dev`, merges into `main`, tags release `v0.0.2`, and pushes to GitHub.
+4. Switches back to `dev` branch.
+5. Runs `npm run package` to generate `dist/latest.yml` & `dist/SalesStudio Setup 0.0.2.exe`.
+6. Uploads build artifacts to your VPS `updates/` folder (or outputs exact manual copy commands).
+
+---
+
+### Manual Step-by-Step Equivalent (Reference)
 1. Make code changes on your laptop on the **`dev`** branch.
 2. Run test suite:
    ```bash
