@@ -1457,6 +1457,23 @@ export default function AdminRoute(): JSX.Element {
     }
   }
 
+  const handleDeleteModule = async (mod: ProjectModule) => {
+    if (!confirm(`Are you sure you want to delete the "${mod.moduleType.replace(/_/g, ' ')}" module from this project?`)) {
+      return
+    }
+    try {
+      await (window as any).api.invoke(IPC_CHANNELS.MODULE_DELETE, mod.id)
+      if (editingModuleId === mod.id) {
+        setEditingModuleId('')
+      }
+      if (selectedProjectId) {
+        loadModules(selectedProjectId)
+      }
+    } catch (err: any) {
+      alert(`Error deleting module: ${err.message}`)
+    }
+  }
+
   // Media actions
   const handleUploadMedia = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -2136,6 +2153,22 @@ export default function AdminRoute(): JSX.Element {
                           </label>
                           <button onClick={() => handleMoveModule(idx, 'UP')} disabled={idx === 0} style={{ padding: '4px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text-primary)' }}>▲</button>
                           <button onClick={() => handleMoveModule(idx, 'DOWN')} disabled={idx === modules.length - 1} style={{ padding: '4px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text-primary)' }}>▼</button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteModule(mod)}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: 'transparent',
+                              border: '1px solid rgba(239, 68, 68, 0.4)',
+                              borderRadius: '6px',
+                              color: '#ef4444',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            🗑️ Delete
+                          </button>
                           <button
                             onClick={() => {
                               if (editingModuleId === mod.id) {
