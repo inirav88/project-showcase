@@ -31,9 +31,16 @@ export class ModuleHandlers {
     })
   }
 
+  async delete(id: string) {
+    return this.db.projectModule.delete({
+      where: { id },
+    })
+  }
+
   registerIpc() {
     ipcMain.handle(IPC_CHANNELS.MODULE_LIST, (_, projectId: string) => this.list(projectId))
     ipcMain.handle(IPC_CHANNELS.MODULE_UPSERT, (_, data: any) => this.upsert(data))
+    ipcMain.handle(IPC_CHANNELS.MODULE_DELETE, (_, id: string) => this.delete(id))
   }
 }
 

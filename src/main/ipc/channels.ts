@@ -8,6 +8,7 @@ export const IPC_CHANNELS = {
   // Modules
   MODULE_LIST:              'module:list',
   MODULE_UPSERT:            'module:upsert',
+  MODULE_DELETE:            'module:delete',
   // Towers
   TOWER_LIST:               'tower:list',
   TOWER_CREATE:             'tower:create',
