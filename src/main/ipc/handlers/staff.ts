@@ -2,9 +2,16 @@ import { ipcMain } from 'electron'
 import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import crypto from 'crypto'
+import { PinRateLimiter, timingSafeHashVerify, hashPin } from '../../security/authGuard'
 
 export class StaffHandlers {
+  private rateLimiter = new PinRateLimiter(5, 30000)
+
   constructor(private db: PrismaClient) {}
+
+  hashPin(pin: string): string {
+    return hashPin(pin)
+  }
 
   async ensureSuperadmin() {
     const existing = await this.db.staffProfile.findMany()
@@ -18,7 +25,7 @@ export class StaffHandlers {
         })
       } else {
         // Create default Superadmin account
-        const pinHash = crypto.createHash('sha256').update('0000').digest('hex')
+        const pinHash = hashPin('0000')
         await this.db.staffProfile.create({
           data: {
             name: 'Super Admin',
@@ -34,13 +41,23 @@ export class StaffHandlers {
   async list() {
     await this.ensureSuperadmin()
     return this.db.staffProfile.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
       orderBy: { createdAt: 'desc' },
     })
   }
 
   async create(data: { name: string; pin: string; email?: string; phone?: string; role?: string }) {
-    const pinHash = crypto.createHash('sha256').update(data.pin || '0000').digest('hex')
-    return this.db.staffProfile.create({
+    const pinHash = hashPin(data.pin || '0000')
+    const created = await this.db.staffProfile.create({
       data: {
         name: data.name,
         email: data.email || '',
@@ -50,6 +67,8 @@ export class StaffHandlers {
         isActive: true
       },
     })
+    const { pinHash: _, ...safeProfile } = created
+    return safeProfile
   }
 
   async update(data: { id: string; name?: string; email?: string; phone?: string; pin?: string; role?: string; isActive?: boolean }) {
@@ -60,13 +79,15 @@ export class StaffHandlers {
     if (data.role !== undefined) updateData.role = data.role
     if (data.isActive !== undefined) updateData.isActive = data.isActive
     if (data.pin) {
-      updateData.pinHash = crypto.createHash('sha256').update(data.pin).digest('hex')
+      updateData.pinHash = hashPin(data.pin)
     }
 
-    return this.db.staffProfile.update({
+    const updated = await this.db.staffProfile.update({
       where: { id: data.id },
       data: updateData
     })
+    const { pinHash: _, ...safeProfile } = updated
+    return safeProfile
   }
 
   async toggleActive(id: string) {
@@ -79,11 +100,38 @@ export class StaffHandlers {
   }
 
   async verifyPin(id: string, pin: string) {
+    const lock = this.rateLimiter.isLocked()
+    if (lock.locked) {
+      return {
+        valid: false,
+        locked: true,
+        reason: `Too many failed attempts. Try again in ${lock.remainingSec}s.`,
+      }
+    }
+
     const staff = await this.db.staffProfile.findUnique({ where: { id } })
-    if (!staff || !staff.isActive) return false
-    const hash = crypto.createHash('sha256').update(pin).digest('hex')
-    const isValid = hash === staff.pinHash
-    return isValid ? { valid: true, staff } : false
+    if (!staff || !staff.isActive) {
+      this.rateLimiter.recordFailure()
+      return false
+    }
+
+    const isValid = timingSafeHashVerify(pin, staff.pinHash)
+    if (isValid) {
+      this.rateLimiter.recordSuccess()
+      const { pinHash: _, ...safeStaff } = staff
+      return { valid: true, staff: safeStaff }
+    }
+
+    const failureLock = this.rateLimiter.recordFailure()
+    if (failureLock.locked) {
+      return {
+        valid: false,
+        locked: true,
+        reason: `Too many failed attempts. Try again in ${failureLock.remainingSec}s.`,
+      }
+    }
+
+    return false
   }
 
   async remove(id: string) {

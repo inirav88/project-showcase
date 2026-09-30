@@ -2,8 +2,11 @@ import { ipcMain } from 'electron'
 import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import crypto from 'crypto'
+import { PinRateLimiter, timingSafeHashVerify, hashPin } from '../../security/authGuard'
 
 export class SettingsHandlers {
+  private rateLimiter = new PinRateLimiter(5, 30000)
+
   constructor(private db: PrismaClient) {}
 
   async get() {
@@ -31,7 +34,7 @@ export class SettingsHandlers {
     const { adminPin, ...rest } = data
     const updateData: any = { ...rest }
     if (adminPin) {
-      updateData.adminPinHash = crypto.createHash('sha256').update(adminPin).digest('hex')
+      updateData.adminPinHash = hashPin(adminPin)
     }
     return this.db.settings.update({
       where: { id: 1 },
@@ -40,11 +43,26 @@ export class SettingsHandlers {
   }
 
   async verifyPin(pin: string) {
+    const lock = this.rateLimiter.isLocked()
+    if (lock.locked) {
+      return {
+        valid: false,
+        locked: true,
+        reason: `Too many failed attempts. Try again in ${lock.remainingSec}s.`,
+      }
+    }
+
     const s = await this.db.settings.findUnique({ where: { id: 1 } })
-    if (!s) return false
-    const hash = crypto.createHash('sha256').update(pin).digest('hex')
-    const expectedHash = s.adminPinHash || crypto.createHash('sha256').update('0000').digest('hex')
-    if (hash === expectedHash) {
+    if (!s) {
+      this.rateLimiter.recordFailure()
+      return false
+    }
+
+    const expectedHash = s.adminPinHash || hashPin('0000')
+    const matchesAdmin = timingSafeHashVerify(pin, expectedHash)
+
+    if (matchesAdmin) {
+      this.rateLimiter.recordSuccess()
       if (!s.adminPinHash) {
         console.warn('[Security] Admin action authenticated with default fallback PIN (0000). Setting a custom PIN is strongly recommended.')
       }
@@ -53,9 +71,25 @@ export class SettingsHandlers {
 
     // Check if PIN matches any active staff member's PIN
     const activeStaff = await this.db.staffProfile.findMany({
-      where: { isActive: true }
+      where: { isActive: true },
     })
-    return activeStaff.some((staff) => staff.pinHash === hash)
+
+    const matchesStaff = activeStaff.some((staff) => timingSafeHashVerify(pin, staff.pinHash))
+    if (matchesStaff) {
+      this.rateLimiter.recordSuccess()
+      return true
+    }
+
+    const failureLock = this.rateLimiter.recordFailure()
+    if (failureLock.locked) {
+      return {
+        valid: false,
+        locked: true,
+        reason: `Too many failed attempts. Try again in ${failureLock.remainingSec}s.`,
+      }
+    }
+
+    return false
   }
 
   registerIpc() {

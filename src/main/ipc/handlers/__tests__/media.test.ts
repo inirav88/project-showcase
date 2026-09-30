@@ -77,4 +77,24 @@ describe('MediaHandlers Pipeline', () => {
     // Clean up
     fs.unlinkSync(dummyImage)
   })
+
+  it('refuses to delete files located outside the designated mediaDir', async () => {
+    const externalFile = path.join(process.cwd(), 'scratch', 'do_not_delete.txt')
+    fs.writeFileSync(externalFile, 'IMPORTANT EXTERNAL DATA')
+
+    mockDb.media.findUnique.mockResolvedValueOnce({
+      id: 'm-external',
+      filePath: externalFile,
+      thumbnailPath: '',
+    })
+
+    const res = await handlers.delete('m-external')
+    expect(res.success).toBe(true)
+
+    // Verify external file was NOT deleted
+    expect(fs.existsSync(externalFile)).toBe(true)
+
+    // Cleanup test file
+    fs.unlinkSync(externalFile)
+  })
 })

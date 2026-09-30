@@ -155,12 +155,19 @@ export class MediaHandlers {
   async delete(id: string) {
     const record = await this.db.media.findUnique({ where: { id } })
     if (record) {
-      // Delete local physical files
-      if (fs.existsSync(record.filePath)) {
-        fs.unlinkSync(record.filePath)
+      const allowedDir = path.resolve(this.mediaDir)
+      // Delete local physical files with directory boundary containment check (CWE-22)
+      if (record.filePath) {
+        const canonicalPath = path.resolve(record.filePath)
+        if (canonicalPath.startsWith(allowedDir + path.sep) && fs.existsSync(canonicalPath)) {
+          fs.unlinkSync(canonicalPath)
+        }
       }
-      if (record.thumbnailPath && fs.existsSync(record.thumbnailPath)) {
-        fs.unlinkSync(record.thumbnailPath)
+      if (record.thumbnailPath) {
+        const canonicalThumb = path.resolve(record.thumbnailPath)
+        if (canonicalThumb.startsWith(allowedDir + path.sep) && fs.existsSync(canonicalThumb)) {
+          fs.unlinkSync(canonicalThumb)
+        }
       }
       await this.db.media.delete({ where: { id } })
     }

@@ -97,7 +97,7 @@ export class UsbHandlers {
         archive.finalize()
       })
     } catch (err) {
-      // Safety backup failed — abort import, don't touch anything
+      // Safety backup failed - abort import, don't touch anything
       return {
         success: false,
         reason: `Safety backup failed before import. Import aborted. No data was changed. (${String(err)})`,
@@ -110,21 +110,30 @@ export class UsbHandlers {
     const dbEntry = zip.getEntry('showcaseos.db')
     if (dbEntry) fs.writeFileSync(this.dbPath, dbEntry.getData())
 
-    // -- EXTRACT MEDIA -----------------------------------------------------
-    const mediaEntries = entries.filter((e) => e.startsWith('media/'))
-    for (const entry of mediaEntries) {
-      const outPath = path.join(this.appDataPath, entry)
+    // -- EXTRACT MEDIA (with Zip Slip traversal protection) -----------------
+    const mediaBaseDir = path.resolve(this.appDataPath, 'media')
+    if (!fs.existsSync(mediaBaseDir)) fs.mkdirSync(mediaBaseDir, { recursive: true })
+
+    let extractedCount = 0
+    for (const entryObj of zip.getEntries()) {
+      if (entryObj.isDirectory || !entryObj.entryName.startsWith('media/')) continue
+
+      const outPath = path.resolve(this.appDataPath, entryObj.entryName)
+      // Enforce path containment within media directory (CWE-22 Zip Slip defense)
+      if (!outPath.startsWith(mediaBaseDir + path.sep)) {
+        console.warn(`[Security] Blocked zip traversal path: ${entryObj.entryName}`)
+        continue
+      }
+
       const outDir = path.dirname(outPath)
       if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true })
-      const entryObj = zip.getEntry(entry)
-      if (entryObj && !entryObj.isDirectory) {
-        fs.writeFileSync(outPath, entryObj.getData())
-      }
+      fs.writeFileSync(outPath, entryObj.getData())
+      extractedCount++
     }
 
     return {
       success: true,
-      importedEntries: entries.length,
+      importedEntries: extractedCount + (dbEntry ? 1 : 0),
       safetyBackupPath,
       message: `Import complete. Your previous data was auto-backed up to: ${safetyBackupPath}`,
     }
@@ -135,4 +144,3 @@ export class UsbHandlers {
     ipcMain.handle(IPC_CHANNELS.IMPORT_USB_PACKAGE, () => this.importPackage())
   }
 }
-

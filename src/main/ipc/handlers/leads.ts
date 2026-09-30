@@ -59,8 +59,17 @@ export class LeadHandlers {
       new Date(l.capturedAt).toLocaleString(),
     ])
 
+    const sanitizeCsvCell = (val: unknown): string => {
+      let str = String(val ?? '')
+      // Prevent spreadsheet formula injection (CWE-1236)
+      if (/^[=+\-@\t\r]/.test(str)) {
+        str = `'${str}`
+      }
+      return `"${str.replace(/"/g, '""')}"`
+    }
+
     const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .map((row) => row.map(sanitizeCsvCell).join(','))
       .join('\r\n')
 
     fs.writeFileSync(filePath, '\uFEFF' + csv, 'utf-8') // BOM for Excel UTF-8
