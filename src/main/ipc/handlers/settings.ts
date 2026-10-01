@@ -3,6 +3,7 @@ import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
 import crypto from 'crypto'
 import { PinRateLimiter, timingSafeHashVerify, hashPin } from '../../security/authGuard'
+import { encryptSecret, decryptSecret } from '../../security/cryptoStorage'
 
 export class SettingsHandlers {
   private rateLimiter = new PinRateLimiter(5, 30000)
@@ -23,6 +24,8 @@ export class SettingsHandlers {
     })
     return {
       ...res,
+      whatsappApiToken: decryptSecret(res.whatsappApiToken || ''),
+      vpsApiKey: decryptSecret(res.vpsApiKey || ''),
       showExitButton: (res as any).showExitButton === false || (res as any).showExitButton === 0 ? false : true,
       exitRequiresPin: Boolean((res as any).exitRequiresPin),
       isDefaultPin: !res.adminPinHash,
@@ -35,6 +38,12 @@ export class SettingsHandlers {
     const updateData: any = { ...rest }
     if (adminPin) {
       updateData.adminPinHash = hashPin(adminPin)
+    }
+    if (rest.whatsappApiToken !== undefined) {
+      updateData.whatsappApiToken = encryptSecret(rest.whatsappApiToken)
+    }
+    if (rest.vpsApiKey !== undefined) {
+      updateData.vpsApiKey = encryptSecret(rest.vpsApiKey)
     }
     return this.db.settings.update({
       where: { id: 1 },

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { IPC_CHANNELS } from '../channels'
 import fs from 'fs'
 import path from 'path'
+import { decryptSecret } from '../../security/cryptoStorage'
 
 const DeltaPayloadSchema = z.object({
   projects: z.array(z.record(z.any())).optional(),
@@ -40,7 +41,7 @@ export class SyncHandlers {
     try {
       const manifestUrl = `${settings.vpsBaseUrl.replace(/\/$/, '')}/api/manifest`
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-      if (settings.vpsApiKey) headers['x-api-key'] = settings.vpsApiKey
+      if (settings.vpsApiKey) headers['x-api-key'] = decryptSecret(settings.vpsApiKey)
 
       const res = await fetch(manifestUrl, { headers, signal: AbortSignal.timeout(10000) })
       if (!res.ok) {
@@ -145,7 +146,11 @@ export class SyncHandlers {
     try {
       const publishUrl = `${settings.vpsBaseUrl.replace(/\/$/, '')}/api/publish`
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-      headers['x-api-key'] = settings.vpsApiKey || 'salesstudio-secret-key-2026'
+      if (settings.vpsApiKey) {
+        headers['x-api-key'] = decryptSecret(settings.vpsApiKey)
+      } else {
+        return { success: false, reason: 'VPS API key missing in Admin Settings.' }
+      }
 
       // Gather all local data to publish
       const projects = await this.db.project.findMany()

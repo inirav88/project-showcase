@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
+import { decryptSecret } from '../../security/cryptoStorage'
 
 export interface WhatsappSendPayload {
   phone: string
@@ -33,11 +34,12 @@ export class WhatsappHandlers {
 
     try {
       if (settings.whatsappApiProvider === 'META_CLOUD') {
+        const apiToken = decryptSecret(settings.whatsappApiToken)
         const url = `https://graph.facebook.com/v18.0/${settings.whatsappApiPhoneNumberId}/messages`
         const res = await fetch(url, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${settings.whatsappApiToken}`,
+            'Authorization': `Bearer ${apiToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
