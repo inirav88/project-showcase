@@ -16,7 +16,7 @@
 - Create: `src/renderer/src/hooks/useSwipeGesture.ts`
 - Test: `src/renderer/src/hooks/__tests__/useSwipeGesture.test.ts`
 
-- [ ] **Step 1: Write the failing unit tests for `useSwipeGesture`**
+- [x] **Step 1: Write the failing unit tests for `useSwipeGesture`**
 
 Create `src/renderer/src/hooks/__tests__/useSwipeGesture.test.ts`:
 ```typescript
@@ -105,12 +105,12 @@ describe('useSwipeGesture', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/renderer/src/hooks/__tests__/useSwipeGesture.test.ts`  
 Expected: FAIL with module not found or function not implemented.
 
-- [ ] **Step 3: Write minimal implementation for `useSwipeGesture`**
+- [x] **Step 3: Write minimal implementation for `useSwipeGesture`**
 
 Create `src/renderer/src/hooks/useSwipeGesture.ts`:
 ```typescript
@@ -182,12 +182,12 @@ export function useSwipeGesture(options: SwipeOptions) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/renderer/src/hooks/__tests__/useSwipeGesture.test.ts`  
 Expected: PASS with 4 tests passed.
 
-- [ ] **Step 5: Commit to dev**
+- [x] **Step 5: Commit to dev**
 
 ```bash
 git add src/renderer/src/hooks/useSwipeGesture.ts src/renderer/src/hooks/__tests__/useSwipeGesture.test.ts
@@ -202,7 +202,7 @@ git push origin dev
 **Files:**
 - Modify: `src/renderer/src/modules/components/GalleryModule.tsx`
 
-- [ ] **Step 1: Integrate `useSwipeGesture` and enlarged 64×64px touch arrows**
+- [x] **Step 1: Integrate `useSwipeGesture` and enlarged 64×64px touch arrows**
 
 In `src/renderer/src/modules/components/GalleryModule.tsx`:
 - Import `useSwipeGesture` from `../../hooks/useSwipeGesture`.
@@ -212,12 +212,12 @@ In `src/renderer/src/modules/components/GalleryModule.tsx`:
 - Increase close button dimensions from 44×44px to `width: 60, height: 60`.
 - Add touch hint text below lightbox image: `"Swipe or tap arrows to navigate"`.
 
-- [ ] **Step 2: Verify existing tests and build**
+- [x] **Step 2: Verify existing tests and build**
 
 Run: `npx vitest run` and `npm run build`  
 Expected: PASS (all tests pass, build code 0).
 
-- [ ] **Step 3: Commit to dev**
+- [x] **Step 3: Commit to dev**
 
 ```bash
 git add src/renderer/src/modules/components/GalleryModule.tsx
@@ -233,7 +233,7 @@ git push origin dev
 - Create: `src/renderer/src/hooks/usePinchPanZoom.ts`
 - Test: `src/renderer/src/hooks/__tests__/usePinchPanZoom.test.ts`
 
-- [ ] **Step 1: Write the failing unit tests for `usePinchPanZoom`**
+- [x] **Step 1: Write the failing unit tests for `usePinchPanZoom`**
 
 Create `src/renderer/src/hooks/__tests__/usePinchPanZoom.test.ts`:
 ```typescript
@@ -294,12 +294,12 @@ describe('usePinchPanZoom', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/renderer/src/hooks/__tests__/usePinchPanZoom.test.ts`  
 Expected: FAIL with module not found.
 
-- [ ] **Step 3: Implement `usePinchPanZoom` hook**
+- [x] **Step 3: Implement `usePinchPanZoom` hook**
 
 Create `src/renderer/src/hooks/usePinchPanZoom.ts`:
 ```typescript
@@ -409,12 +409,12 @@ export function usePinchPanZoom(options: PinchPanOptions = {}) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/renderer/src/hooks/__tests__/usePinchPanZoom.test.ts`  
 Expected: PASS with 4 tests passed.
 
-- [ ] **Step 5: Commit to dev**
+- [x] **Step 5: Commit to dev**
 
 ```bash
 git add src/renderer/src/hooks/usePinchPanZoom.ts src/renderer/src/hooks/__tests__/usePinchPanZoom.test.ts
@@ -429,7 +429,7 @@ git push origin dev
 **Files:**
 - Modify: `src/renderer/src/modules/components/MasterPlanModule.tsx`
 
-- [ ] **Step 1: Integrate `usePinchPanZoom` and floating zoom buttons**
+- [x] **Step 1: Integrate `usePinchPanZoom` and floating zoom buttons**
 
 In `src/renderer/src/modules/components/MasterPlanModule.tsx`:
 - Import `usePinchPanZoom` from `../../hooks/usePinchPanZoom`.
@@ -441,12 +441,12 @@ In `src/renderer/src/modules/components/MasterPlanModule.tsx`:
   - **Reset (⟲):** 56×56px target, calls `reset`, visible when `scale > 1.0`.
 - Display a small touch badge: `"Pinch to zoom or use controls"`.
 
-- [ ] **Step 2: Verify existing tests and build**
+- [x] **Step 2: Verify existing tests and build**
 
 Run: `npx vitest run` and `npm run build`  
 Expected: PASS (all tests pass, build code 0).
 
-- [ ] **Step 3: Commit to dev**
+- [x] **Step 3: Commit to dev**
 
 ```bash
 git add src/renderer/src/modules/components/MasterPlanModule.tsx
@@ -463,7 +463,7 @@ git push origin dev
 - Modify: `src/renderer/src/pages/kiosk/ProjectShowcase.tsx`
 - Modify: `src/renderer/src/pages/kiosk/ProjectLauncher.tsx`
 
-- [ ] **Step 1: Update design tokens and class definitions in `index.css`**
+- [x] **Step 1: Update design tokens and class definitions in `index.css`**
 
 In `src/renderer/src/assets/index.css`:
 - Increase `--touch-target-min: 44px` to `--touch-target-kiosk: 64px`.
@@ -471,19 +471,19 @@ In `src/renderer/src/assets/index.css`:
 - Update `.filter-chip` to `min-height: 56px; padding: 12px 22px; font-size: 14px; border-radius: 28px;`.
 - Ensure buttons have `touch-action: manipulation` and generous 12–16px gaps.
 
-- [ ] **Step 2: Verify buttons in `ProjectShowcase.tsx` & `ProjectLauncher.tsx`**
+- [x] **Step 2: Verify buttons in `ProjectShowcase.tsx` & `ProjectLauncher.tsx`**
 
 - In `ProjectShowcase.tsx`: Enlarge End Presentation / Exit button, WhatsApp Share button, and back button to have minimum 60–64px hit heights.
 - In `ProjectLauncher.tsx`: Ensure search input, clear button, and comparison bar trigger have ≥56–64px touch targets.
 
-- [ ] **Step 3: Run full verification suite**
+- [x] **Step 3: Run full verification suite**
 
 Run: `npx vitest run`  
 Expected: All 19+ test suites and 47+ tests passing.  
 Run: `npm run build`  
 Expected: Clean electron-vite production compilation with exit code 0.
 
-- [ ] **Step 4: Commit and push to `dev`**
+- [x] **Step 4: Commit and push to `dev`**
 
 ```bash
 git add src/renderer/src/assets/index.css src/renderer/src/pages/kiosk/ProjectShowcase.tsx src/renderer/src/pages/kiosk/ProjectLauncher.tsx
