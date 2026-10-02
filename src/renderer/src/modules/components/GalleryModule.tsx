@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { toMediaUrl } from '../../utils/media'
+import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 
 interface MediaItem {
   id: string
@@ -62,6 +63,22 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [lightboxIndex, filteredMedia.length])
+
+  // Touch swipe navigation
+  const { onTouchStart, onTouchEnd } = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (lightboxIndex !== null) {
+        setLightboxIndex(lightboxIndex === filteredMedia.length - 1 ? 0 : lightboxIndex + 1)
+      }
+    },
+    onSwipeRight: () => {
+      if (lightboxIndex !== null) {
+        setLightboxIndex(lightboxIndex === 0 ? filteredMedia.length - 1 : lightboxIndex - 1)
+      }
+    },
+    onSwipeDown: () => setLightboxIndex(null),
+    minDistance: 50,
+  })
 
   return (
     <div data-testid="module-GALLERY" style={{ animation: 'fadeInUp 0.4s var(--ease-out)' }}>
@@ -177,45 +194,54 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
           role="dialog"
           aria-label="Image viewer"
           onClick={() => setLightboxIndex(null)}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
           style={{
             position: 'fixed', inset: 0,
             background: 'var(--backdrop-modal)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             zIndex: 'var(--z-supreme)' as any,
             animation: 'fadeIn 0.2s ease',
+            touchAction: 'manipulation',
           }}
         >
-          {/* Close */}
+          {/* Close - 60x60px touch target */}
           <button
             onClick={() => setLightboxIndex(null)}
+            aria-label="Close image viewer"
             style={{
               position: 'absolute', top: 24, right: 24,
               all: 'unset', cursor: 'pointer',
-              width: 44, height: 44, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.15)',
+              width: 60, height: 60, minWidth: 60, minHeight: 60, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.15)',
+              border: '1.5px solid rgba(255,255,255,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--color-text-primary)', fontSize: 22, transition: 'all var(--transition-fast)',
+              color: 'var(--color-text-primary)', fontSize: 24, transition: 'all var(--transition-fast)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              touchAction: 'manipulation',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.25)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
           >
             {String.fromCharCode(10005)}
           </button>
 
-          {/* Prev */}
+          {/* Prev - 64x64px touch target */}
           <button
             onClick={handlePrev}
+            aria-label="Previous image"
             style={{
               position: 'absolute', left: 24, top: '50%', transform: 'translateY(-50%)',
               all: 'unset', cursor: 'pointer',
-              width: 56, height: 56, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
+              width: 64, height: 64, minWidth: 64, minHeight: 64, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.15)', border: '1.5px solid rgba(255,255,255,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--color-text-primary)', fontSize: 28, transition: 'all var(--transition-fast)',
+              color: 'var(--color-text-primary)', fontSize: 32, transition: 'all var(--transition-fast)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              touchAction: 'manipulation',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.25)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
           >
             {String.fromCharCode(8249)}
           </button>
@@ -231,36 +257,43 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
               borderRadius: 'var(--radius-sm)',
               boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
               animation: 'scaleIn 0.25s var(--ease-out)',
+              userSelect: 'none',
+              pointerEvents: 'auto',
             }}
           />
 
-          {/* Next */}
+          {/* Next - 64x64px touch target */}
           <button
             onClick={handleNext}
+            aria-label="Next image"
             style={{
               position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)',
               all: 'unset', cursor: 'pointer',
-              width: 56, height: 56, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
+              width: 64, height: 64, minWidth: 64, minHeight: 64, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.15)', border: '1.5px solid rgba(255,255,255,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--color-text-primary)', fontSize: 28, transition: 'all var(--transition-fast)',
+              color: 'var(--color-text-primary)', fontSize: 32, transition: 'all var(--transition-fast)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              touchAction: 'manipulation',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.25)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
           >
             {String.fromCharCode(8250)}
           </button>
 
-          {/* Caption */}
+          {/* Caption & Gesture Hint */}
           <div style={{
-            position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+            position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+            background: 'rgba(15, 23, 42, 0.7)', padding: '8px 20px', borderRadius: 20,
+            backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)',
           }}>
-
-
-
-            <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.8)', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
               {filteredMedia[lightboxIndex].category} {String.fromCharCode(8226)} {lightboxIndex + 1} of {filteredMedia.length}
+            </span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              👆 Swipe left/right or tap arrows to navigate
             </span>
             {/* Dot indicators */}
             <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
