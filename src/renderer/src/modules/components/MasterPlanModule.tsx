@@ -52,7 +52,7 @@ function formatPrice(n: number): string {
 
 export default function MasterPlanModule({ config, projectId }: { config: Record<string, any>; projectId: string }): JSX.Element {
   const [project, setProject] = useState<Project | null>(null)
-  const [floorPlanMedia, setFloorPlanMedia] = useState<MediaItem[]>([])
+  const [projectMedia, setProjectMedia] = useState<MediaItem[]>([])
   const [currentView, setCurrentView] = useState<'MASTER_PLAN' | 'TOWER_VIEW'>('MASTER_PLAN')
   const [selectedTower, setSelectedTower] = useState<Tower | null>(null)
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null)
@@ -77,9 +77,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
       .invoke(IPC_CHANNELS.MEDIA_LIST, { projectId })
       .then((data) => {
         if (Array.isArray(data)) {
-          setFloorPlanMedia(
-            data.filter((m: any) => m.category?.toUpperCase() === 'FLOOR_PLAN')
-          )
+          setProjectMedia(data as MediaItem[])
         }
       })
       .catch(console.error)
@@ -140,7 +138,8 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
     ? resolveFloorPlanImage({
         towerName: selectedTower.name,
         floorNumber: selectedFloor,
-        mediaList: floorPlanMedia,
+        mediaList: projectMedia,
+        fallbackImage: rawImg,
       })
     : ''
 
@@ -1034,7 +1033,8 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
             unit: activeUnitModal,
             towerName: selectedTower.name,
             floorNumber: activeUnitModal.floor,
-            mediaList: floorPlanMedia,
+            mediaList: projectMedia,
+            fallbackImage: rawImg,
           })}
           isShortlisted={isInShortlist(activeUnitModal.id)}
           onToggleShortlist={() => toggleShortlist(activeUnitModal, selectedTower.name)}

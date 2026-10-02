@@ -25,7 +25,12 @@ describe('resolveFloorPlanImage', () => {
     expect(url).toContain('fp_tower_a.jpg')
   })
 
-  it('returns empty string when media list has no floor plan media', () => {
+  it('returns explicit fallbackImage when media list has no floor plan media', () => {
+    const url = resolveFloorPlanImage({ towerName: 'Tower B', floorNumber: 1, mediaList: [], fallbackImage: '/media/master_site.jpg' })
+    expect(url).toContain('master_site.jpg')
+  })
+
+  it('returns empty string when media list has no floor plan media and no fallback', () => {
     const url = resolveFloorPlanImage({ towerName: 'Tower B', floorNumber: 1, mediaList: [] })
     expect(url).toBe('')
   })
