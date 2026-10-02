@@ -53,7 +53,7 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
         } else if (mode === 'STAFF_PIN') {
           window.api.invoke(IPC_CHANNELS.STAFF_LIST)
             .then((list: any) => {
-              const active = (list as StaffMember[]) || []
+              const active = ((list as StaffMember[]) || []).filter((s: any) => s.isActive !== false)
               setStaffList(active)
               if (active.length > 0) setSelectedStaffId(active[0].id)
             })
