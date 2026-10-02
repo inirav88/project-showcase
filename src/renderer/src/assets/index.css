@@ -387,32 +387,35 @@ input, textarea, select, [contenteditable="true"] {
   animation: pulseDot 2s ease-in-out infinite;
 }
 
-/* ─── Search + Filter Bar ────────────────────────────────────────────────────── */
+/* ─── Search + Filter Bar (Touch-first) ─────────────────────────────────────────── */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--space-4);
   align-items: center;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-5);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
   flex-shrink: 0;
   animation: slideInLeft 0.5s 0.08s var(--ease-out) both;
 }
 
 .filter-search {
   flex: 2;
-  min-width: 220px;
-  padding: 10px 16px;
+  min-width: 260px;
+  min-height: 52px;
+  box-sizing: border-box;
+  padding: 12px 20px;
   background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   outline: none;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  touch-action: manipulation;
 }
 
 .filter-search:focus {
@@ -422,30 +425,37 @@ input, textarea, select, [contenteditable="true"] {
 
 .filter-chips {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex-wrap: wrap;
   flex: 1;
 }
 
 .filter-chip-group {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 3px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 4px;
 }
 
 .filter-chip {
   all: unset;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: var(--font-size-xs);
-  font-weight: 500;
+  padding: 12px 20px;
+  min-height: 48px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .filter-chip:hover {
@@ -456,7 +466,7 @@ input, textarea, select, [contenteditable="true"] {
 .filter-chip.active {
   background: var(--color-accent);
   color: #000;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* ─── Project Grid ───────────────────────────────────────────────────────────── */
@@ -707,29 +717,29 @@ input, textarea, select, [contenteditable="true"] {
 }
 
 .back-btn {
-  /* Removed all:unset - it breaks touch handling on kiosk devices */
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: 12px 20px; /* Increased from 8px 16px for better touch target */
-  min-height: 44px; /* Ensure minimum touch target size */
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  gap: var(--space-3);
+  padding: 14px 24px;
+  min-height: 56px;
+  min-width: 56px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: var(--color-surface-raised);
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: 600;
   transition: all var(--transition-fast);
   white-space: nowrap;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation; /* Removes 300ms tap delay on mobile */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   position: relative;
-  z-index: 100; /* Increased to be above kiosk-exit-corner */
-  margin-left: 80px; /* Offset from corner to avoid overlap */
+  z-index: 100;
+  margin-left: 80px;
 }
 
 .back-btn:active {
@@ -788,14 +798,14 @@ input, textarea, select, [contenteditable="true"] {
   font-size: 10px;
 }
 
-/* ─── Module Tab Navigation ──────────────────────────────────────────────────── */
+/* ─── Module Tab Navigation (Touch-first 64px height) ────────────────────────── */
 .module-tabs-bar {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   padding: 0 var(--space-8);
   background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1.5px solid var(--color-border);
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
@@ -807,6 +817,7 @@ input, textarea, select, [contenteditable="true"] {
   width: 100%;
   box-sizing: border-box;
   min-width: 0;
+  min-height: 68px;
 }
 
 .module-tabs-bar:active {
@@ -820,25 +831,31 @@ input, textarea, select, [contenteditable="true"] {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-4) var(--space-5);
+  padding: 0 var(--space-6);
+  min-height: 64px;
+  box-sizing: border-box;
   font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-size: var(--font-size-base);
+  font-weight: 600;
   color: var(--color-text-muted);
   white-space: nowrap;
   position: relative;
-  transition: color var(--transition-fast);
-  border-bottom: 2px solid transparent;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  border-bottom: 3px solid transparent;
+  touch-action: manipulation;
 }
 
 .module-tab-btn:hover {
   color: var(--color-text-primary);
+  background: var(--color-surface-hover);
 }
 
 .module-tab-btn.active {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
+  font-weight: 700;
 }
 
 /* ─── Showcase Content ───────────────────────────────────────────────────────── */
