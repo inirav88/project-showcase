@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { toMediaUrl } from '../../utils/media'
 import { useSwipeGesture } from '../../hooks/useSwipeGesture'
+import { TouchGestureIcon } from '../../components/common/Icons'
 
 interface MediaItem {
   id: string
@@ -286,14 +287,16 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
           <div style={{
             position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-            background: 'rgba(15, 23, 42, 0.7)', padding: '8px 20px', borderRadius: 20,
-            backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)',
+            background: 'var(--backdrop-modal)', padding: '10px 24px', borderRadius: 24,
+            backdropFilter: 'blur(12px)', border: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-lg)',
           }}>
-            <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.8)', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
+            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-primary)', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700 }}>
               {filteredMedia[lightboxIndex].category} {String.fromCharCode(8226)} {lightboxIndex + 1} of {filteredMedia.length}
             </span>
-            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              👆 Swipe left/right or tap arrows to navigate
+            <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <TouchGestureIcon size={14} color="var(--color-accent)" />
+              <span>Swipe or tap arrows to navigate</span>
             </span>
             {/* Dot indicators */}
             <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>

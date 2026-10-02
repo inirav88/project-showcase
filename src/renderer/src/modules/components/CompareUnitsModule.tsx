@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { useShortlistStore } from '../../store/useShortlistStore'
+import { HeartIcon } from '../../components/common/Icons'
 
 interface Unit {
   id: string
@@ -156,7 +157,8 @@ export default function CompareUnitsModule({ config: _config, projectId }: { con
                     transition: 'all var(--transition-fast)'
                   }}
                 >
-                  {isInShortlist(u.id) ? '❤️ Shortlisted' : '🤍 Add to Shortlist'}
+                  <HeartIcon size={18} isFilled={isInShortlist(u.id)} color={isInShortlist(u.id) ? '#ef4444' : 'currentColor'} />
+                  <span>{isInShortlist(u.id) ? 'Shortlisted' : 'Add to Shortlist'}</span>
                 </button>
             </div>
           </div>

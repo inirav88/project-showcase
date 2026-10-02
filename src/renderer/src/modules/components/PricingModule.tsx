@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { useShortlistStore } from '../../store/useShortlistStore'
+import { HeartIcon } from '../../components/common/Icons'
 
 interface Unit {
   id: string
@@ -275,7 +276,7 @@ export default function PricingModule({ projectId }: { config: Record<string, an
                           transition: 'color var(--transition-fast)'
                         }}
                       >
-                        {isSaved ? '❤️' : '🤍'}
+                        <HeartIcon size={18} isFilled={isSaved} color={isSaved ? '#ef4444' : 'var(--color-text-muted)'} />
                       </button>
                     </td>
                   </tr>

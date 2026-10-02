@@ -1,4 +1,5 @@
 import React from 'react'
+import { HeartIcon, BlueprintIcon } from '../../components/common/Icons'
 
 export interface UnitDetailProps {
   unit: {
@@ -69,7 +70,7 @@ export default function UnitDetailModal({
           maxWidth: '1050px',
           maxHeight: '90vh',
           backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
+          border: '1.5px solid var(--color-border)',
           borderRadius: 'var(--radius-xl)',
           boxShadow: 'var(--shadow-xl)',
           display: 'flex',
@@ -111,12 +112,17 @@ export default function UnitDetailModal({
                 textAlign: 'center',
                 padding: 'var(--space-8)',
                 color: 'var(--color-text-muted)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
             >
-              <div style={{ fontSize: 52, opacity: 0.5, marginBottom: 12 }}>📐</div>
-              <h4 style={{ color: 'var(--color-text-primary)', marginBottom: 6 }}>Architectural Layout</h4>
-              <p style={{ fontSize: 'var(--font-size-sm)' }}>
-                {unit.configuration} layout for {towerName}
+              <BlueprintIcon size={64} color="var(--color-accent)" style={{ opacity: 0.8, marginBottom: 16 }} />
+              <h4 style={{ color: 'var(--color-text-primary)', marginBottom: 6, fontSize: '18px', fontWeight: 700 }}>
+                Architectural Layout
+              </h4>
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', maxWidth: 280 }}>
+                {unit.configuration} layout specification for {towerName}
               </p>
             </div>
           )}
@@ -125,11 +131,14 @@ export default function UnitDetailModal({
               position: 'absolute',
               bottom: 16,
               left: 16,
-              background: 'rgba(0,0,0,0.6)',
-              padding: '4px 10px',
-              borderRadius: 6,
-              fontSize: 11,
-              color: 'var(--color-text-secondary)',
+              background: 'var(--backdrop-modal)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid var(--color-border)',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
             }}
           >
             {unit.configuration} Layout Plan
@@ -153,23 +162,24 @@ export default function UnitDetailModal({
                 <span
                   style={{
                     display: 'inline-block',
-                    padding: '3px 10px',
+                    padding: '4px 12px',
                     borderRadius: 99,
                     backgroundColor: `${statusColor}15`,
                     color: statusColor,
-                    border: `1px solid ${statusColor}35`,
+                    border: `1.5px solid ${statusColor}35`,
                     fontSize: '11px',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     marginBottom: 8,
+                    letterSpacing: '0.04em',
                   }}
                 >
                   {unit.status}
                 </span>
-                <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+                <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
                   Unit {unit.unitNumber}
                 </h2>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '13px', margin: '4px 0 0' }}>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '14px', margin: '4px 0 0' }}>
                   {towerName} · Floor {unit.floor} · {projectName}
                 </p>
               </div>
@@ -183,14 +193,17 @@ export default function UnitDetailModal({
                   border: '1px solid var(--color-border)',
                   background: 'var(--color-surface-raised)',
                   color: 'var(--color-text-secondary)',
-                  fontSize: 18,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  transition: 'all var(--transition-fast)',
                 }}
               >
-                ✕
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
 
@@ -201,13 +214,13 @@ export default function UnitDetailModal({
                 padding: 'var(--space-5)',
                 backgroundColor: 'var(--color-surface-raised)',
                 borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--color-border)',
+                border: '1.5px solid var(--color-border)',
               }}
             >
-              <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
                 Pricing ({unit.priceLabel || 'Official'})
               </div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-accent)', marginTop: 4 }}>
+              <div style={{ fontSize: '30px', fontWeight: 800, color: 'var(--color-accent)', marginTop: 4, letterSpacing: '-0.02em' }}>
                 {formatPrice(unit.price)}
               </div>
             </div>
@@ -217,30 +230,30 @@ export default function UnitDetailModal({
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                gap: 'var(--space-4)',
+                gap: 'var(--space-3)',
                 marginTop: 'var(--space-6)',
               }}
             >
-              <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 8 }}>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Configuration</span>
-                <div style={{ fontSize: '15px', fontWeight: 700, marginTop: 2 }}>{unit.configuration}</div>
+              <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Configuration</span>
+                <div style={{ fontSize: '16px', fontWeight: 700, marginTop: 2, color: 'var(--color-text-primary)' }}>{unit.configuration}</div>
               </div>
-              <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 8 }}>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Carpet Area</span>
-                <div style={{ fontSize: '15px', fontWeight: 700, marginTop: 2 }}>
+              <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Carpet Area</span>
+                <div style={{ fontSize: '16px', fontWeight: 700, marginTop: 2, color: 'var(--color-text-primary)' }}>
                   {unit.carpetArea} sqft ({(unit.carpetArea / 9).toFixed(1)} sqyd)
                 </div>
               </div>
               {unit.builtUpArea ? (
-                <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 8 }}>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Built-Up Area</span>
-                  <div style={{ fontSize: '15px', fontWeight: 700, marginTop: 2 }}>{unit.builtUpArea} sqft</div>
+                <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Built-Up Area</span>
+                  <div style={{ fontSize: '16px', fontWeight: 700, marginTop: 2, color: 'var(--color-text-primary)' }}>{unit.builtUpArea} sqft</div>
                 </div>
               ) : null}
               {unit.facing ? (
-                <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 8 }}>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Facing</span>
-                  <div style={{ fontSize: '15px', fontWeight: 700, marginTop: 2 }}>{unit.facing}</div>
+                <div style={{ background: 'var(--color-surface-raised)', padding: '12px 16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Facing</span>
+                  <div style={{ fontSize: '16px', fontWeight: 700, marginTop: 2, color: 'var(--color-text-primary)' }}>{unit.facing}</div>
                 </div>
               ) : null}
             </div>
@@ -254,7 +267,7 @@ export default function UnitDetailModal({
               style={{
                 flex: 1,
                 minHeight: 56,
-                padding: '0 20px',
+                padding: '0 24px',
                 borderRadius: 'var(--radius-lg)',
                 border: 'none',
                 backgroundColor: isShortlisted ? '#ef4444' : 'var(--color-accent)',
@@ -266,11 +279,13 @@ export default function UnitDetailModal({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 10,
+                gap: 12,
                 boxShadow: 'var(--shadow-md)',
+                transition: 'all var(--transition-fast)',
               }}
             >
-              <span>{isShortlisted ? '❤️ In Shortlist (Remove)' : '🤍 Add to Shortlist'}</span>
+              <HeartIcon size={22} color="#fff" isFilled={isShortlisted} />
+              <span>{isShortlisted ? 'In Shortlist (Tap to Remove)' : 'Add to Shortlist'}</span>
             </button>
           </div>
         </div>

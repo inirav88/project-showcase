@@ -1,4 +1,5 @@
 import React from 'react'
+import { StopIcon, HeartIcon } from '../../../components/common/Icons'
 
 export interface EndPresentationModalProps {
   projectName: string
@@ -63,7 +64,7 @@ export function EndPresentationModal({
               color: '#ef4444',
             }}
           >
-            ⏹️
+            <StopIcon size={22} color="#ef4444" />
           </div>
           <h2
             id="end-presentation-title"
@@ -157,8 +158,9 @@ export function EndPresentationModal({
               border: '1px solid var(--color-border, rgba(255,255,255,0.08))',
             }}
           >
-            <div style={{ fontSize: 11, color: 'var(--color-text-muted, #64748b)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              ❤️ Shortlisted Units
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--color-text-muted, #64748b)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <HeartIcon size={13} isFilled color="#ef4444" />
+              <span>Shortlisted Units</span>
             </div>
             <div style={{ fontSize: 18, fontWeight: 700, marginTop: 4, color: shortlistCount > 0 ? '#ec4899' : 'var(--color-text-primary, #f8fafc)' }}>
               {shortlistCount} {shortlistCount === 1 ? 'unit' : 'units'}

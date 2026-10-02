@@ -5,6 +5,17 @@ import { toMediaUrl } from '../../utils/media'
 import { usePinchPanZoom } from '../../hooks/usePinchPanZoom'
 import { resolveFloorPlanImage, type MediaItem } from '../../utils/floorPlanMedia'
 import UnitDetailModal from './UnitDetailModal'
+import {
+  ZoomInIcon,
+  ZoomOutIcon,
+  ResetZoomIcon,
+  TouchGestureIcon,
+  ChevronRightIcon,
+  ArrowLeftIcon,
+  BuildingTowerIcon,
+  BlueprintIcon,
+  HeartIcon
+} from '../../components/common/Icons'
 
 interface Unit {
   id: string
@@ -29,11 +40,12 @@ interface Tower {
 
 interface Project {
   name: string
+  developer?: string
   towers: Tower[]
 }
 
 function formatPrice(n: number): string {
-  if (!n) return 'Price on Request'
+  if (!n || n <= 0) return 'Price on Request'
   if (n >= 10000000) return String.fromCharCode(8377) + (n / 10000000).toFixed(2) + ' Cr'
   return String.fromCharCode(8377) + (n / 100000).toFixed(0) + ' L'
 }
@@ -132,6 +144,18 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
       })
     : ''
 
+  // Project site summary calculations
+  const totalUnits = project.towers.reduce((acc, t) => acc + t.units.length, 0)
+  const availableUnits = project.towers.reduce(
+    (acc, t) => acc + t.units.filter((u) => u.status === 'AVAILABLE').length,
+    0
+  )
+  const allConfigs = Array.from(
+    new Set(project.towers.flatMap((t) => t.units.map((u) => u.configuration)))
+  ).filter(Boolean)
+  const validPrices = project.towers.flatMap((t) => t.units.map((u) => u.price)).filter((p) => p > 0)
+  const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : 0
+
   return (
     <div
       className="module-container"
@@ -175,68 +199,108 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
               <img
                 src={masterPlanImg}
                 alt="Master Plan"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8, pointerEvents: 'none' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9, pointerEvents: 'none' }}
               />
 
-              {/* Tower Hotspot Buttons */}
+              {/* Glassmorphic Tower Badges Overlaid on Map */}
               <div
                 style={{
                   position: 'absolute',
-                  inset: 0,
-                  padding: 'var(--space-8)',
+                  top: 24,
+                  left: 24,
                   display: 'flex',
                   flexWrap: 'wrap',
-                  gap: 'var(--space-4)',
-                  alignContent: 'flex-start',
-                  background: 'rgba(0,0,0,0.2)',
+                  gap: 12,
+                  zIndex: 5,
+                  maxWidth: 'calc(100% - 48px)',
                 }}
               >
-                {project.towers.map((tower) => (
-                  <button
-                    key={tower.id}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleSelectTower(tower)
-                    }}
+                {project.towers.map((tower) => {
+                  const availCount = tower.units.filter((u) => u.status === 'AVAILABLE').length
+                  const uCount = tower.units.length
+                  return (
+                    <button
+                      key={tower.id}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleSelectTower(tower)
+                      }}
+                      style={{
+                        padding: '12px 18px',
+                        minHeight: 56,
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
+                        border: '1.5px solid var(--color-border)',
+                        borderRadius: 'var(--radius-lg)',
+                        backdropFilter: 'blur(16px)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        boxShadow: 'var(--shadow-lg)',
+                        transition: 'all var(--transition-fast)',
+                        touchAction: 'manipulation',
+                        textAlign: 'left',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        e.currentTarget.style.borderColor = 'var(--color-accent)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'none'
+                        e.currentTarget.style.borderColor = 'var(--color-border)'
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: 'var(--radius-md)',
+                          background: 'var(--color-accent-dim)',
+                          color: 'var(--color-accent)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <BuildingTowerIcon size={20} />
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--color-text-primary)' }}>
+                          {tower.name}
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--color-accent)', fontWeight: 600, marginTop: 2 }}>
+                          {availCount} of {uCount} {uCount === 1 ? 'Unit' : 'Units'} Available
+                        </div>
+                      </div>
+                      <ChevronRightIcon size={16} color="var(--color-accent)" style={{ marginLeft: 4 }} />
+                    </button>
+                  )
+                })}
+                {project.towers.length === 0 && (
+                  <div
                     style={{
-                      padding: 'var(--space-4) var(--space-6)',
-                      background: 'var(--backdrop-modal)',
                       color: 'var(--color-text-primary)',
-                      border: '1.5px solid var(--color-border)',
-                      backdropFilter: 'blur(8px)',
+                      padding: '16px 24px',
+                      background: 'var(--color-surface)',
+                      backdropFilter: 'blur(12px)',
                       borderRadius: 'var(--radius-md)',
-                      cursor: 'pointer',
-                      fontWeight: 700,
-                      fontSize: 'var(--font-size-lg)',
-                      boxShadow: 'var(--shadow-lg)',
-                      transition: 'all var(--transition-fast)',
-                      touchAction: 'manipulation',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      minWidth: 160,
+                      border: '1px solid var(--color-border)',
                     }}
                   >
-                    <span>{tower.name}</span>
-                    <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 500, color: 'var(--color-accent)', marginTop: 4 }}>
-                      {tower.units.length} Units · Tap to Explore →
-                    </span>
-                  </button>
-                ))}
-                {project.towers.length === 0 && (
-                  <div style={{ color: 'white', padding: 20, background: 'rgba(0,0,0,0.5)', borderRadius: 8 }}>
                     No towers configured for this project yet.
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Floating Zoom & Pan Controls (56x56px) */}
+            {/* Floating Zoom & Pan Controls (56x56px, theme-aware glass) */}
             <div
               style={{
                 position: 'absolute',
-                bottom: 20,
-                right: 20,
+                bottom: 24,
+                right: 24,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 10,
@@ -252,21 +316,20 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                   minWidth: 56,
                   minHeight: 56,
                   borderRadius: '50%',
-                  background: 'rgba(15, 23, 42, 0.85)',
-                  backdropFilter: 'blur(8px)',
+                  background: 'var(--color-surface)',
+                  backdropFilter: 'blur(12px)',
                   border: '1.5px solid var(--color-border)',
                   color: 'var(--color-text-primary)',
-                  fontSize: 26,
-                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: 'var(--shadow-lg)',
                   touchAction: 'manipulation',
+                  transition: 'all var(--transition-fast)',
                 }}
               >
-                +
+                <ZoomInIcon size={22} />
               </button>
               <button
                 onClick={masterPlanZoom.zoomOut}
@@ -277,21 +340,20 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                   minWidth: 56,
                   minHeight: 56,
                   borderRadius: '50%',
-                  background: 'rgba(15, 23, 42, 0.85)',
-                  backdropFilter: 'blur(8px)',
+                  background: 'var(--color-surface)',
+                  backdropFilter: 'blur(12px)',
                   border: '1.5px solid var(--color-border)',
                   color: 'var(--color-text-primary)',
-                  fontSize: 26,
-                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: 'var(--shadow-lg)',
                   touchAction: 'manipulation',
+                  transition: 'all var(--transition-fast)',
                 }}
               >
-                –
+                <ZoomOutIcon size={22} />
               </button>
               {masterPlanZoom.scale > 1.0 && (
                 <button
@@ -306,8 +368,6 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                     background: 'var(--color-accent)',
                     color: '#fff',
                     border: 'none',
-                    fontSize: 20,
-                    fontWeight: 700,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -317,7 +377,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                     touchAction: 'manipulation',
                   }}
                 >
-                  ⟲
+                  <ResetZoomIcon size={20} color="#fff" />
                 </button>
               )}
             </div>
@@ -326,27 +386,30 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
             <div
               style={{
                 position: 'absolute',
-                bottom: 20,
-                left: 20,
-                background: 'rgba(15, 23, 42, 0.75)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                padding: '6px 14px',
-                borderRadius: 16,
-                fontSize: '11px',
-                color: 'var(--color-text-muted)',
+                bottom: 24,
+                left: 24,
+                background: 'var(--color-surface)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid var(--color-border)',
+                padding: '8px 16px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--color-text-secondary)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 8,
                 pointerEvents: 'none',
+                boxShadow: 'var(--shadow-md)',
                 zIndex: 10,
               }}
             >
-              <span>👆 Pinch to zoom or drag with two fingers ({masterPlanZoom.scale.toFixed(1)}x)</span>
+              <TouchGestureIcon size={16} color="var(--color-accent)" />
+              <span>Pinch to zoom · 2-finger pan ({masterPlanZoom.scale.toFixed(1)}x)</span>
             </div>
           </div>
 
-          {/* Quick Tower Guide Side Panel (Right 1/3) */}
+          {/* Master Site & Towers Directory (Right 1/3) */}
           <div
             style={{
               flex: 1,
@@ -356,50 +419,188 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
-            <div style={{ padding: 'var(--space-5)', borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface-raised)' }}>
-              <h2 style={{ fontSize: 'var(--font-size-xl)', color: 'var(--color-text-primary)', fontWeight: 700 }}>
-                {project.name}
-              </h2>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-sm)', marginTop: 4 }}>
-                Master Site & Towers Overview
-              </p>
-            </div>
-
-            <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              {project.towers.map((tower) => (
-                <div
-                  key={tower.id}
-                  onClick={() => handleSelectTower(tower)}
+            {/* Header */}
+            <div
+              style={{
+                padding: 'var(--space-5)',
+                borderBottom: '1px solid var(--color-border)',
+                background: 'var(--color-surface-raised)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h2 style={{ fontSize: '22px', color: 'var(--color-text-primary)', fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>
+                    {project.name}
+                  </h2>
+                  <p style={{ color: 'var(--color-text-muted)', fontSize: '13px', margin: '4px 0 0' }}>
+                    Master Site & Inventory Directory
+                  </p>
+                </div>
+                <span
                   style={{
-                    padding: 'var(--space-4)',
-                    background: 'var(--color-surface-raised)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    transition: 'all var(--transition-fast)',
+                    padding: '4px 10px',
+                    borderRadius: 99,
+                    backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                    color: 'var(--color-available, #22c55e)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
                   }}
                 >
-                  <div>
-                    <h3 style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
-                      {tower.name}
-                    </h3>
-                    <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>
-                      {tower.units.length} total units · {new Set(tower.units.map(u => u.floor)).size} floors
-                    </p>
+                  Live Inventory
+                </span>
+              </div>
+
+              {/* 2x2 Project Key Metrics Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '8px',
+                  marginTop: '16px',
+                }}
+              >
+                <div style={{ background: 'var(--color-surface)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--color-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Towers</span>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: 2 }}>
+                    {project.towers.length} {project.towers.length === 1 ? 'Block' : 'Blocks'}
                   </div>
-                  <span style={{ fontSize: '18px', color: 'var(--color-accent)' }}>➔</span>
                 </div>
-              ))}
+                <div style={{ background: 'var(--color-surface)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--color-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Availability</span>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-available, #22c55e)', marginTop: 2 }}>
+                    {availableUnits} Units
+                  </div>
+                </div>
+                <div style={{ background: 'var(--color-surface)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--color-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Configurations</span>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {allConfigs.slice(0, 3).join(', ') || 'Luxury Units'}
+                  </div>
+                </div>
+                <div style={{ background: 'var(--color-surface)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--color-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Starting Price</span>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-accent)', marginTop: 2 }}>
+                    {minPrice > 0 ? formatPrice(minPrice) : 'On Request'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Towers Selection List */}
+            <div
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: 'var(--space-4)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--space-3)',
+              }}
+            >
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 4px' }}>
+                Select a Tower to Explore Floors
+              </div>
+
+              {project.towers.map((tower) => {
+                const floorsCount = new Set(tower.units.map((u) => u.floor)).size
+                const availCount = tower.units.filter((u) => u.status === 'AVAILABLE').length
+                const uCount = tower.units.length
+                return (
+                  <div
+                    key={tower.id}
+                    onClick={() => handleSelectTower(tower)}
+                    style={{
+                      padding: 'var(--space-4)',
+                      background: 'var(--color-surface-raised)',
+                      border: '1.5px solid var(--color-border)',
+                      borderRadius: 'var(--radius-lg)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      transition: 'all var(--transition-fast)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.borderColor = 'var(--color-accent)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'none'
+                      e.currentTarget.style.borderColor = 'var(--color-border)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <div
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 'var(--radius-md)',
+                          background: 'var(--color-accent-dim)',
+                          color: 'var(--color-accent)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <BuildingTowerIcon size={24} />
+                      </div>
+                      <div>
+                        <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+                          {tower.name}
+                        </h3>
+                        <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>
+                          {uCount} {uCount === 1 ? 'total unit' : 'total units'} · {floorsCount} {floorsCount === 1 ? 'floor' : 'floors'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span
+                        style={{
+                          padding: '3px 8px',
+                          borderRadius: 99,
+                          backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                          color: 'var(--color-available, #22c55e)',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {availCount} Available
+                      </span>
+                      <ChevronRightIcon size={20} color="var(--color-accent)" />
+                    </div>
+                  </div>
+                )
+              })}
+
               {project.towers.length === 0 && (
                 <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-muted)' }}>
                   No towers added yet.
                 </div>
               )}
+            </div>
+
+            {/* Bottom Kiosk Interactive Helper Prompt */}
+            <div
+              style={{
+                padding: '12px 16px',
+                borderTop: '1px solid var(--color-border)',
+                background: 'var(--color-surface-raised)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                fontSize: '12px',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              <TouchGestureIcon size={18} color="var(--color-accent)" style={{ flexShrink: 0 }} />
+              <span>Tap any block on the interactive site map or select a tower above to view architectural floor plans.</span>
             </div>
           </div>
         </div>
@@ -419,6 +620,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
               border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-lg)',
               gap: 'var(--space-4)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             {/* Back Button */}
@@ -439,10 +641,11 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                 fontWeight: 700,
                 cursor: 'pointer',
                 flexShrink: 0,
+                transition: 'all var(--transition-fast)',
               }}
             >
-              <span>←</span>
-              <span>Master Plan</span>
+              <ArrowLeftIcon size={16} />
+              <span>Back to Master Plan</span>
             </button>
 
             {/* Tower Heading */}
@@ -450,7 +653,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
               <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
                 {selectedTower.name}
               </h2>
-              <span style={{ fontSize: '12px', color: 'var(--color-accent)' }}>
+              <span style={{ fontSize: '12px', color: 'var(--color-accent)', fontWeight: 600 }}>
                 {selectedTower.units.filter((u) => u.status === 'AVAILABLE').length} Available Units
               </span>
             </div>
@@ -476,19 +679,20 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                         floorPlateZoom.reset()
                       }}
                       style={{
-                        padding: '8px 16px',
-                        minHeight: 44,
-                        minWidth: 70,
-                        borderRadius: '99px',
+                        padding: '10px 20px',
+                        minHeight: 46,
+                        minWidth: 78,
+                        borderRadius: 'var(--radius-full)',
                         border: isActive ? '1.5px solid var(--color-accent)' : '1px solid var(--color-border)',
                         backgroundColor: isActive ? 'var(--color-accent)' : 'var(--color-surface-raised)',
                         color: isActive ? '#fff' : 'var(--color-text-secondary)',
-                        fontSize: '13px',
-                        fontWeight: isActive ? 700 : 500,
+                        fontSize: '14px',
+                        fontWeight: isActive ? 700 : 600,
                         cursor: 'pointer',
                         whiteSpace: 'nowrap',
                         transition: 'all var(--transition-fast)',
                         touchAction: 'manipulation',
+                        boxShadow: isActive ? 'var(--shadow-md)' : 'none',
                       }}
                     >
                       Floor {floor}
@@ -547,24 +751,24 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                     }}
                   />
                 ) : (
-                  <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-muted)' }}>
-                    <div style={{ fontSize: 56, opacity: 0.4, marginBottom: 12 }}>🏢</div>
-                    <h3 style={{ color: 'var(--color-text-primary)', marginBottom: 6 }}>
+                  <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <BlueprintIcon size={64} color="var(--color-accent)" style={{ opacity: 0.7, marginBottom: 16 }} />
+                    <h3 style={{ color: 'var(--color-text-primary)', marginBottom: 6, fontSize: '18px', fontWeight: 800 }}>
                       {selectedTower.name} · Floor {selectedFloor}
                     </h3>
-                    <p style={{ fontSize: '13px' }}>
+                    <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', maxWidth: 280 }}>
                       Architectural Floor Plate Drawing
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Floating Controls for Floor Plate */}
+              {/* Floating Controls for Floor Plate (Theme-aware glass) */}
               <div
                 style={{
                   position: 'absolute',
-                  bottom: 20,
-                  right: 20,
+                  bottom: 24,
+                  right: 24,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 10,
@@ -578,12 +782,10 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                     width: 50,
                     height: 50,
                     borderRadius: '50%',
-                    background: 'rgba(15, 23, 42, 0.85)',
-                    backdropFilter: 'blur(8px)',
+                    background: 'var(--color-surface)',
+                    backdropFilter: 'blur(12px)',
                     border: '1.5px solid var(--color-border)',
                     color: 'var(--color-text-primary)',
-                    fontSize: 24,
-                    fontWeight: 700,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -592,7 +794,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                     touchAction: 'manipulation',
                   }}
                 >
-                  +
+                  <ZoomInIcon size={20} />
                 </button>
                 <button
                   onClick={floorPlateZoom.zoomOut}
@@ -601,12 +803,10 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                     width: 50,
                     height: 50,
                     borderRadius: '50%',
-                    background: 'rgba(15, 23, 42, 0.85)',
-                    backdropFilter: 'blur(8px)',
+                    background: 'var(--color-surface)',
+                    backdropFilter: 'blur(12px)',
                     border: '1.5px solid var(--color-border)',
                     color: 'var(--color-text-primary)',
-                    fontSize: 24,
-                    fontWeight: 700,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -615,7 +815,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                     touchAction: 'manipulation',
                   }}
                 >
-                  –
+                  <ZoomOutIcon size={20} />
                 </button>
                 {floorPlateZoom.scale > 1.0 && (
                   <button
@@ -628,8 +828,6 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                       background: 'var(--color-accent)',
                       color: '#fff',
                       border: 'none',
-                      fontSize: 18,
-                      fontWeight: 700,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -638,7 +836,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                       touchAction: 'manipulation',
                     }}
                   >
-                    ⟲
+                    <ResetZoomIcon size={18} color="#fff" />
                   </button>
                 )}
               </div>
@@ -647,16 +845,17 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
               <div
                 style={{
                   position: 'absolute',
-                  top: 16,
-                  left: 16,
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '6px 14px',
+                  top: 18,
+                  left: 18,
+                  background: 'var(--color-surface)',
+                  backdropFilter: 'blur(12px)',
+                  padding: '8px 16px',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  fontSize: '12px',
-                  fontWeight: 600,
+                  border: '1px solid var(--color-border)',
+                  fontSize: '13px',
+                  fontWeight: 700,
                   color: 'var(--color-text-primary)',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
                 Floor Plate · Floor {selectedFloor}
@@ -673,6 +872,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               <div
@@ -686,11 +886,11 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                 }}
               >
                 <div>
-                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
                     Floor {selectedFloor} Units
                   </h3>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                    {floorUnits.length} units on this floor
+                    {floorUnits.length} {floorUnits.length === 1 ? 'unit' : 'units'} on this floor
                   </span>
                 </div>
               </div>
@@ -709,10 +909,10 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                   const isSaved = isInShortlist(u.id)
                   const statusColor =
                     u.status === 'AVAILABLE'
-                      ? 'var(--color-available)'
+                      ? 'var(--color-available, #22c55e)'
                       : u.status === 'HELD'
-                        ? 'var(--color-held)'
-                        : 'var(--color-sold)'
+                        ? 'var(--color-held, #f59e0b)'
+                        : 'var(--color-sold, #ef4444)'
 
                   return (
                     <div
@@ -721,18 +921,26 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                       style={{
                         padding: 'var(--space-4)',
                         background: 'var(--color-surface-raised)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
+                        border: '1.5px solid var(--color-border)',
+                        borderRadius: 'var(--radius-lg)',
                         cursor: 'pointer',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: 8,
+                        gap: 10,
                         transition: 'all var(--transition-fast)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        e.currentTarget.style.borderColor = 'var(--color-accent)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'none'
+                        e.currentTarget.style.borderColor = 'var(--color-border)'
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                          <div style={{ fontWeight: 700, fontSize: '16px' }}>
+                          <div style={{ fontWeight: 800, fontSize: '17px', color: 'var(--color-text-primary)' }}>
                             Unit {u.unitNumber}
                           </div>
                           <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: 2 }}>
@@ -740,11 +948,11 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <span
                             style={{
                               display: 'inline-block',
-                              padding: '2px 8px',
+                              padding: '3px 8px',
                               borderRadius: 99,
                               backgroundColor: `${statusColor}15`,
                               color: statusColor,
@@ -752,6 +960,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                               fontSize: '10px',
                               fontWeight: 700,
                               textTransform: 'uppercase',
+                              letterSpacing: '0.04em',
                             }}
                           >
                             {u.status}
@@ -762,26 +971,42 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                               toggleShortlist(u, selectedTower.name)
                             }}
                             disabled={u.status === 'SOLD'}
+                            aria-label={isSaved ? 'Remove from shortlist' : 'Add to shortlist'}
                             style={{
                               background: 'none',
                               border: 'none',
-                              color: isSaved ? '#f87171' : 'var(--color-text-muted)',
-                              fontSize: '18px',
                               cursor: u.status === 'SOLD' ? 'not-allowed' : 'pointer',
-                              padding: 2,
+                              padding: 4,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                             }}
                           >
-                            {isSaved ? '❤️' : '🤍'}
+                            <HeartIcon
+                              size={20}
+                              isFilled={isSaved}
+                              color={isSaved ? '#ef4444' : 'var(--color-text-muted)'}
+                            />
                           </button>
                         </div>
                       </div>
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                        <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-accent)' }}>
+                        <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-accent)' }}>
                           {formatPrice(u.price)}
                         </span>
-                        <span style={{ fontSize: '12px', color: 'var(--color-accent)', fontWeight: 600 }}>
-                          View Details ➔
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--color-accent)',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <span>Inspect Unit</span>
+                          <ChevronRightIcon size={14} color="var(--color-accent)" />
                         </span>
                       </div>
                     </div>

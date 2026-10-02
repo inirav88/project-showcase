@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
+import { ChevronRightIcon } from '../../components/common/Icons'
 
 interface Project {
   id: string
@@ -121,8 +122,18 @@ export default function PresenterConsole(): JSX.Element {
                   }}
                 >
                   <span>{MODULE_LABELS[mod.moduleType] || mod.moduleType}</span>
-                  <span style={{ fontSize: 11, opacity: isActive ? 1 : 0.4 }}>
-                    {isActive ? 'Showing 🟢' : 'Show ➔'}
+                  <span style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 5, opacity: isActive ? 1 : 0.6, color: isActive ? 'var(--color-available, #22c55e)' : 'inherit' }}>
+                    {isActive ? (
+                      <>
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-available, #22c55e)', display: 'inline-block' }} />
+                        <span>Active on Kiosk</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Show</span>
+                        <ChevronRightIcon size={12} />
+                      </>
+                    )}
                   </span>
                 </button>
               )
@@ -136,7 +147,7 @@ export default function PresenterConsole(): JSX.Element {
             <>
               <div style={{ background: '#1c1c20', borderRadius: 12, padding: 28, border: '1px solid #27272a' }}>
                 <h2 style={{ fontSize: 18, margin: '0 0 12px 0', color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  📝 Presenter Script & Strategic Notes
+                  <span>Presenter Script & Strategic Notes</span>
                 </h2>
                 <div style={{
                   fontSize: 15, lineHeight: 1.6, color: '#e4e4e7', background: '#121214',

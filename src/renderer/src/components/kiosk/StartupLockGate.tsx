@@ -117,7 +117,7 @@ export function StartupLockGate({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, fontFamily: 'var(--font-sans)' }}>
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'var(--backdrop-modal)', backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, fontFamily: 'var(--font-sans)' }}>
       {securityMode === 'STAFF_PIN' ? (
         <form onSubmit={handleStaffLogin} style={{ backgroundColor: 'var(--color-surface)', padding: '36px 32px', borderRadius: 20, width: 380, border: '1px solid var(--color-border)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ textAlign: 'center' }}>

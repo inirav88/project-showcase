@@ -12,6 +12,14 @@ import { SecurityPinModal } from './components/SecurityPinModal'
 import { ShortlistDrawer } from './components/ShortlistDrawer'
 import { LeadCaptureModal } from './components/LeadCaptureModal'
 import { EndPresentationModal } from './components/EndPresentationModal'
+import {
+  ShieldCheckIcon,
+  StopIcon,
+  PowerIcon,
+  VolumeUpIcon,
+  VolumeMuteIcon,
+  ArrowLeftIcon,
+} from '../../components/common/Icons'
 
 interface Project {
   id: string
@@ -345,7 +353,7 @@ export default function ProjectShowcase(): JSX.Element {
 
       {/* Header */}
       <header className="showcase-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
             className="back-btn"
             onClick={handleBack}
@@ -354,8 +362,10 @@ export default function ProjectShowcase(): JSX.Element {
               handleBack()
             }}
             aria-label="Go back to project selection"
+            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            {String.fromCharCode(8592)} Back
+            <ArrowLeftIcon size={16} />
+            <span>Back</span>
           </button>
           <button
             onClick={() => setShowEndSessionModal(true)}
@@ -369,7 +379,7 @@ export default function ProjectShowcase(): JSX.Element {
               minHeight: 56,
               borderRadius: 'var(--radius-md)',
               border: '1.5px solid rgba(239, 68, 68, 0.4)',
-              background: 'rgba(239, 68, 68, 0.12)',
+              background: 'rgba(239, 68, 68, 0.08)',
               color: '#ef4444',
               fontSize: 'var(--font-size-base)',
               fontWeight: 700,
@@ -377,7 +387,8 @@ export default function ProjectShowcase(): JSX.Element {
             }}
             aria-label="End presentation session"
           >
-            <span style={{ fontSize: 18 }}>⏹️</span> End Presentation
+            <StopIcon size={16} color="#ef4444" />
+            <span>End Presentation</span>
           </button>
         </div>
         <div className="showcase-header-info">
@@ -387,10 +398,15 @@ export default function ProjectShowcase(): JSX.Element {
               {project.developer}
             </span>
             {project.reraNumber && (
-              <>
-                <span style={{ color: 'var(--color-border)', fontSize: 12 }}>{String.fromCharCode(8226)}</span>
-                <span className="rera-badge">: {project.reraNumber}</span>
-              </>
+              <div
+                className="rera-badge"
+                title={`Official RERA Registration Number:\n${project.reraNumber}`}
+                aria-label={`RERA Registration ${project.reraNumber}`}
+              >
+                <ShieldCheckIcon size={13} color="var(--color-accent)" />
+                <span className="rera-label">RERA</span>
+                <span className="rera-number">{project.reraNumber}</span>
+              </div>
             )}
           </div>
         </div>
@@ -437,7 +453,7 @@ export default function ProjectShowcase(): JSX.Element {
               fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)",
             }}
           >
-            {muted ? String.fromCodePoint(128263) : String.fromCodePoint(128266)}
+            {muted ? <VolumeMuteIcon size={18} color="var(--color-text-muted)" /> : <VolumeUpIcon size={18} color="var(--color-accent)" />}
           </button>
         )}
 
@@ -459,7 +475,8 @@ export default function ProjectShowcase(): JSX.Element {
               fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)',
             }}
           >
-            {narrationMuted ? String.fromCodePoint(128263) + ' Narration' : String.fromCodePoint(128483) + ' Narration'}
+            {narrationMuted ? <VolumeMuteIcon size={17} color="var(--color-text-muted)" /> : <VolumeUpIcon size={17} color="var(--color-accent)" />}
+            <span>Narration</span>
           </button>
           {(settings?.showExitButton ?? true) && (
             <button
@@ -489,7 +506,8 @@ export default function ProjectShowcase(): JSX.Element {
                 e.currentTarget.style.borderColor = 'var(--color-border)'
               }}
             >
-              <span>⏻</span> Exit
+              <PowerIcon size={16} />
+              <span>Exit</span>
             </button>
           )}
         </div>
