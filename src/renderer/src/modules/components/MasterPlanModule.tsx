@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
 import { useShortlistStore } from '../../store/useShortlistStore'
 import { toMediaUrl } from '../../utils/media'
+import { usePinchPanZoom } from '../../hooks/usePinchPanZoom'
 
 interface Unit {
   id: string
@@ -35,6 +36,16 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
   const [project, setProject] = useState<Project | null>(null)
   const [selectedTower, setSelectedTower] = useState<Tower | null>(null)
   const { addItem, removeItem, isInShortlist } = useShortlistStore()
+  const {
+    scale,
+    zoomIn,
+    zoomOut,
+    reset,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+    transformStyle,
+  } = usePinchPanZoom({ minScale: 1.0, maxScale: 3.5 })
 
   useEffect(() => {
     window.api
@@ -74,55 +85,132 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
     <div className="module-container" data-testid="module-MASTERPLAN" style={{ display: 'flex', gap: 'var(--space-6)', height: '100%', overflow: 'hidden' }}>
       
       {/* Interactive Map Area (Left side 2/3) */}
-      <div style={{
-        flex: 2,
-        position: 'relative',
-        borderRadius: 'var(--radius-lg)',
-        overflow: 'hidden',
-        border: '1px solid var(--color-border)',
-        background: 'var(--color-surface)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'crosshair'
-      }}>
-        <img 
-          src={masterPlanImg} 
-          alt="Master Plan" 
-          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} 
-        />
-        
-        {/* Abstract Tower Overlay Hotspots */}
-        <div style={{ position: 'absolute', inset: 0, padding: 'var(--space-8)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', alignContent: 'flex-start', background: 'rgba(0,0,0,0.2)' }}>
-           {project.towers.map((tower) => (
-             <button
-                key={tower.id}
-                onClick={() => setSelectedTower(tower)}
-                style={{
-                  padding: 'var(--space-4) var(--space-6)',
-                  background: selectedTower?.id === tower.id ? 'var(--color-accent)' : 'var(--backdrop-modal)',
-                  color: selectedTower?.id === tower.id ? 'var(--color-bg)' : 'var(--color-text-primary)',
-                  border: '1px solid var(--color-border)',
-                  backdropFilter: 'blur(8px)',
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  fontSize: 'var(--font-size-lg)',
-                  boxShadow: 'var(--shadow-lg)',
-                  transition: 'all var(--transition-fast)'
-                }}
-             >
-                {tower.name}
-                <div style={{ fontSize: 'var(--font-size-xs)', fontWeight: 400, opacity: 0.8, marginTop: '4px' }}>
-                  {tower.units.length} Units Available
-                </div>
-             </button>
-           ))}
-           {project.towers.length === 0 && (
-             <div style={{ color: 'white', padding: 20, background: 'rgba(0,0,0,0.5)', borderRadius: 8 }}>
-                No towers configured for this project yet.
-             </div>
-           )}
+      <div
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{
+          flex: 2,
+          position: 'relative',
+          borderRadius: 'var(--radius-lg)',
+          overflow: 'hidden',
+          border: '1px solid var(--color-border)',
+          background: 'var(--color-surface)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: scale > 1 ? 'grab' : 'crosshair',
+          touchAction: 'none',
+          userSelect: 'none',
+        }}
+      >
+        <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', ...transformStyle }}>
+          <img 
+            src={masterPlanImg} 
+            alt="Master Plan" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8, pointerEvents: 'none' }} 
+          />
+          
+          {/* Abstract Tower Overlay Hotspots */}
+          <div style={{ position: 'absolute', inset: 0, padding: 'var(--space-8)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', alignContent: 'flex-start', background: 'rgba(0,0,0,0.2)' }}>
+             {project.towers.map((tower) => (
+               <button
+                  key={tower.id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setSelectedTower(tower)
+                  }}
+                  style={{
+                    padding: 'var(--space-4) var(--space-6)',
+                    background: selectedTower?.id === tower.id ? 'var(--color-accent)' : 'var(--backdrop-modal)',
+                    color: selectedTower?.id === tower.id ? 'var(--color-bg)' : 'var(--color-text-primary)',
+                    border: '1px solid var(--color-border)',
+                    backdropFilter: 'blur(8px)',
+                    borderRadius: 'var(--radius-md)',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: 'var(--font-size-lg)',
+                    boxShadow: 'var(--shadow-lg)',
+                    transition: 'all var(--transition-fast)',
+                    touchAction: 'manipulation',
+                  }}
+               >
+                  {tower.name}
+                  <div style={{ fontSize: 'var(--font-size-xs)', fontWeight: 400, opacity: 0.8, marginTop: '4px' }}>
+                    {tower.units.length} Units Available
+                  </div>
+               </button>
+             ))}
+             {project.towers.length === 0 && (
+               <div style={{ color: 'white', padding: 20, background: 'rgba(0,0,0,0.5)', borderRadius: 8 }}>
+                  No towers configured for this project yet.
+               </div>
+             )}
+          </div>
+        </div>
+
+        {/* Floating Zoom & Pan Controls (56x56px touch targets) */}
+        <div style={{
+          position: 'absolute', bottom: 20, right: 20,
+          display: 'flex', flexDirection: 'column', gap: 10,
+          zIndex: 10,
+        }}>
+          <button
+            onClick={zoomIn}
+            aria-label="Zoom in master plan"
+            style={{
+              width: 56, height: 56, minWidth: 56, minHeight: 56, borderRadius: '50%',
+              background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)',
+              border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)',
+              fontSize: 26, fontWeight: 700, cursor: 'pointer', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-lg)',
+              touchAction: 'manipulation',
+            }}
+          >
+            +
+          </button>
+          <button
+            onClick={zoomOut}
+            aria-label="Zoom out master plan"
+            style={{
+              width: 56, height: 56, minWidth: 56, minHeight: 56, borderRadius: '50%',
+              background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)',
+              border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)',
+              fontSize: 26, fontWeight: 700, cursor: 'pointer', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-lg)',
+              touchAction: 'manipulation',
+            }}
+          >
+            –
+          </button>
+          {scale > 1.0 && (
+            <button
+              onClick={reset}
+              aria-label="Reset master plan zoom"
+              style={{
+                width: 56, height: 56, minWidth: 56, minHeight: 56, borderRadius: '50%',
+                background: 'var(--color-accent)', color: '#fff',
+                border: 'none', fontSize: 20, fontWeight: 700, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: 'var(--shadow-lg)', animation: 'scaleIn 0.2s ease',
+                touchAction: 'manipulation',
+              }}
+            >
+              ⟲
+            </button>
+          )}
+        </div>
+
+        {/* Gesture Hint Badge */}
+        <div style={{
+          position: 'absolute', bottom: 20, left: 20,
+          background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255,255,255,0.1)', padding: '6px 14px',
+          borderRadius: 16, fontSize: '11px', color: 'var(--color-text-muted)',
+          display: 'flex', alignItems: 'center', gap: 6, pointerEvents: 'none',
+          zIndex: 10,
+        }}>
+          <span>👆 Pinch to zoom or drag with two fingers ({scale.toFixed(1)}x)</span>
         </div>
       </div>
 
