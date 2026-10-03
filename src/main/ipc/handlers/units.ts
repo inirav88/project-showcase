@@ -94,6 +94,7 @@ export class UnitHandlers {
           price: parseFloat(record.price || '0'),
           priceLabel: (record.priceLabel?.toUpperCase() || 'OFFICIAL') as any,
           status: (record.status?.toUpperCase() || 'AVAILABLE') as any,
+          floorPlanMediaId: record.floorPlanMediaId?.trim() || null,
           notes: record.notes?.trim() || '',
         }
 

@@ -487,6 +487,17 @@ function ModuleConfigEditor({
   if (moduleType === 'MASTER_PLAN' || moduleType === 'MASTERPLAN') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{
+          padding: '10px 14px',
+          borderRadius: '6px',
+          backgroundColor: 'rgba(59, 130, 246, 0.08)',
+          border: '1px solid rgba(59, 130, 246, 0.25)',
+          fontSize: '12px',
+          color: 'var(--color-text-secondary)',
+          lineHeight: 1.4
+        }}>
+          💡 <strong>Master Plan vs Floor Plans:</strong> Upload the overall project/site campus drawing below. For individual unit &amp; floor layouts, navigate to the <strong>Units</strong> tab in the sidebar where you can assign architectural layout drawings to each unit.
+        </div>
         <div style={fieldStyle}>
           <label style={labelStyle}>Master Plan Image</label>
           <FilePicker projectId={projectId} value={cfg.imagePath || ''} onChange={v => set('imagePath', v)} accept="image" label="Master Plan Image" placeholder="Select the master plan image..." mediaCategory="MASTER_PLAN" />
@@ -1064,6 +1075,7 @@ export default function AdminRoute(): JSX.Element {
   const [priceLabel, setPriceLabel] = useState('OFFICIAL')
   const [unitStatus, setUnitStatus] = useState('AVAILABLE')
   const [unitNotes, setUnitNotes] = useState('')
+  const [unitFloorPlanMediaId, setUnitFloorPlanMediaId] = useState<string>('')
 
   // Towers management state
   const [towers, setTowers] = useState<any[]>([])
@@ -1621,7 +1633,8 @@ export default function AdminRoute(): JSX.Element {
         price: Number(unitPrice),
         priceLabel,
         status: unitStatus,
-        notes: unitNotes
+        notes: unitNotes,
+        floorPlanMediaId: unitFloorPlanMediaId || null
       }
 
       if (editingUnit) {
@@ -1682,6 +1695,7 @@ export default function AdminRoute(): JSX.Element {
     setPriceLabel(u.priceLabel)
     setUnitStatus(u.status)
     setUnitNotes(u.notes || '')
+    setUnitFloorPlanMediaId(u.floorPlanMediaId || '')
   }
 
   const cancelEditUnit = () => {
@@ -1699,6 +1713,7 @@ export default function AdminRoute(): JSX.Element {
     setPriceLabel('OFFICIAL')
     setUnitStatus('AVAILABLE')
     setUnitNotes('')
+    setUnitFloorPlanMediaId('')
   }
 
   return (
@@ -2068,6 +2083,28 @@ export default function AdminRoute(): JSX.Element {
                 ) : (
                   <div style={{ gridColumn: 'span 2', padding: '16px', border: '1px dashed var(--color-border)', borderRadius: '6px', fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center' }}>
                     Note: Project Logo and Launcher Cover Image can be uploaded after saving the project.
+                  </div>
+                )}
+
+                {/* Plans & Media Upload Quick Guidance */}
+                {isEditing && (
+                  <div style={{
+                    gridColumn: 'span 2',
+                    padding: '14px 16px',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(201, 168, 76, 0.08)',
+                    border: '1px solid rgba(201, 168, 76, 0.25)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px'
+                  }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-accent)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      🗺️ Looking to upload Master Plans or Floor Plans?
+                    </span>
+                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                      • <strong>Master Plan (Site/Campus View):</strong> Go to the <strong>Modules</strong> tab on the left sidebar → expand <strong>Master Plan</strong> to upload the master campus blueprint.<br/>
+                      • <strong>Floor Plans (Unit Layouts):</strong> Go to the <strong>Units</strong> tab to attach blueprints directly to each unit or tower, or bulk-upload drawings in the <strong>Media Library</strong> tab.
+                    </p>
                   </div>
                 )}
 
@@ -2551,6 +2588,7 @@ export default function AdminRoute(): JSX.Element {
                             <th scope="col" style={{ padding: '10px 12px' }}>Config</th>
                             <th scope="col" style={{ padding: '10px 12px' }}>Area</th>
                             <th scope="col" style={{ padding: '10px 12px' }}>Price</th>
+                            <th scope="col" style={{ padding: '10px 12px' }}>Plan</th>
                             <th scope="col" style={{ padding: '10px 12px' }}>Status</th>
                             <th scope="col" style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
                           </tr>
@@ -2572,7 +2610,7 @@ export default function AdminRoute(): JSX.Element {
                             if (filtered.length === 0) {
                               return (
                                 <tr>
-                                  <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--color-text-muted)' }}>
+                                  <td colSpan={9} style={{ textAlign: 'center', padding: '32px', color: 'var(--color-text-muted)' }}>
                                     No units found matching search/filter criteria.
                                   </td>
                                 </tr>
@@ -2594,6 +2632,17 @@ export default function AdminRoute(): JSX.Element {
                                   <td style={{ padding: '10px 12px' }}>{u.configuration}</td>
                                   <td style={{ padding: '10px 12px', fontVariantNumeric: 'tabular-nums' }}>{displayArea}</td>
                                   <td style={{ padding: '10px 12px', color: 'var(--color-accent)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{formatPrice(u.price)}</td>
+                                  <td style={{ padding: '10px 12px' }}>
+                                    {u.floorPlanMediaId ? (
+                                      <span style={{ fontSize: '11px', color: 'var(--color-success)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                        <span>📐</span> Linked
+                                      </span>
+                                    ) : (
+                                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                                        Auto fallback
+                                      </span>
+                                    )}
+                                  </td>
                                   <td style={{ padding: '10px 12px' }}>
                                     <span style={{
                                       display: 'inline-block', padding: '2px 8px', borderRadius: '99px',
@@ -2622,7 +2671,7 @@ export default function AdminRoute(): JSX.Element {
                   <div style={{ backgroundColor: 'var(--color-surface-raised)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                     <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 700 }}>Bulk Unit CSV Import</h3>
                     <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', fontSize: '12px' }}>
-                      Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes,areaUnit</code>
+                      Format columns: <code>towerName,floor,unitNumber,configuration,carpetArea,builtUpArea,superBuiltUpArea,facing,price,priceLabel,status,notes,areaUnit,floorPlanMediaId</code>
                     </p>
                     <textarea
                       value={csvContent}
@@ -2805,6 +2854,60 @@ export default function AdminRoute(): JSX.Element {
                   <div>
                     <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Notes</label>
                     <input value={unitNotes} onChange={(e) => setUnitNotes(e.target.value)} placeholder="E.g. Pool view" style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }} />
+                  </div>
+
+                  {/* Floor Plan Blueprint Selector & Uploader */}
+                  <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '10px', marginTop: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                        Floor Plan Layout (Blueprint)
+                      </label>
+                      {unitFloorPlanMediaId && (
+                        <button
+                          type="button"
+                          onClick={() => setUnitFloorPlanMediaId('')}
+                          style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '10px', padding: 0 }}
+                        >
+                          Clear Link
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Quick selector from existing project media */}
+                    <div style={{ marginBottom: '8px' }}>
+                      <select
+                        value={unitFloorPlanMediaId}
+                        onChange={(e) => setUnitFloorPlanMediaId(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)', fontSize: '12px' }}
+                      >
+                        <option value="">-- Choose from existing media --</option>
+                        {mediaList.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.originalName} ({m.category})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Or upload directly via FilePicker */}
+                    <div>
+                      <FilePicker
+                        projectId={selectedProjectId}
+                        value={mediaList.find(m => m.id === unitFloorPlanMediaId)?.filePath || ''}
+                        onChange={async (newFilePath) => {
+                          const refreshed = await (window as any).api.invoke(IPC_CHANNELS.MEDIA_LIST, { projectId: selectedProjectId }) as any[]
+                          setMediaList(refreshed || [])
+                          const matched = (refreshed || []).find((m: any) => m.filePath === newFilePath)
+                          if (matched) {
+                            setUnitFloorPlanMediaId(matched.id)
+                          }
+                        }}
+                        accept="image"
+                        label="Floor Plan Image"
+                        placeholder="Or browse computer to upload layout drawing..."
+                        mediaCategory="FLOOR_PLAN"
+                      />
+                    </div>
                   </div>
                   
                   <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
