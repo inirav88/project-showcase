@@ -209,44 +209,103 @@ async function main() {
     ],
   })
 
-  // Project 4 — The Stately (Mahadev Buildcon)
+  // Project 4 — The Stately (Samved Group)
   const p4 = await db.project.create({
     data: {
       name: 'The Stately',
-      developer: 'Mahadev Buildcon',
+      developer: 'Samved Group',
       reraNumber: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14924/100325/311230',
-      location: 'Kudasan, Gandhinagar',
-      description: 'Roman-themed luxury mixed-development featuring flats, shops, and premium bungalows. Boasts 3-side open spacious homes with 55% green spaces, high-end clubhouse, swimming pool, and earthquake-resistant R.C.C. construction.',
+      location: 'Nr. Hari Heights, Kudasan Road, Kudasan, Gandhinagar - 382421',
+      description: 'Neoclassical Roman-themed architectural landmark offering palatial 3 & 4 BHK residences, skydeck penthouses, and 24 ground-level commercial showrooms. Spanning three 14-storey blocks with grand arched elevations, triangular pediments, Roman sculpture entrance foyer, 24-foot panoramic balconies, Italian marble finishes, and 30 curated royal club and wellness amenities.',
       type: 'MIXED_USE',
       status: 'ACTIVE',
       possessionStatus: 'UNDER_CONSTRUCTION',
       possessionDate: 'December 2030',
-      priceRangeMin: 10400000,
-      priceRangeMax: 13900000,
-      themeAccentColor: '#D97706', // Roman Gold / Amber
+      priceRangeMin: 11500000,
+      priceRangeMax: 26500000,
+      themeAccentColor: '#8B263E', // Imperial Roman Burgundy
       themeFontPairing: 'Lora',
-      isFeatured: false,
+      isFeatured: true,
     },
   })
 
   await db.projectModule.createMany({
     data: [
-      { projectId: p4.id, moduleType: 'OVERVIEW',       sortOrder: 0, config: '{"heroHeadline":"Roman-Themed Luxury Mixed Living"}' },
-      { projectId: p4.id, moduleType: 'USP_SPOTLIGHT',   sortOrder: 1, config: '{"headline":"3-Side Open Homes","body":"Roman arches, extensive gardens, and premium amenities"}' },
-      { projectId: p4.id, moduleType: 'GALLERY',          sortOrder: 2, config: '{}' },
-      { projectId: p4.id, moduleType: 'PRICING',          sortOrder: 3, config: '{}' },
-      { projectId: p4.id, moduleType: 'AMENITIES',        sortOrder: 4, config: '{}' },
+      { projectId: p4.id, moduleType: 'OVERVIEW', sortOrder: 0, config: '{"heroHeadline":"The Stately — Neoclassical Roman Living","subHeadline":"Palatial 3 & 4 BHK Residences, Skydeck Penthouses & Boutique Showrooms in Kudasan","stats":["14 Storeys • 3 Regal Blocks","Spacious 3 & 4 BHK Homes","24ft Panoramic Balconies","30+ Curated Royal Amenities","750+ sq.m Central Floral Garden","RERA Approved: MAA14924"],"ctaLabel":"Explore Residences & Layouts"}' },
+      { projectId: p4.id, moduleType: 'USP_SPOTLIGHT', sortOrder: 1, config: '{"headline":"Neoclassical Grandeur Meets Contemporary Living","subtext":"Designed with Roman columns, triangular pediments, and royal floral landscapes for an uncompromising luxury lifestyle."}' },
+      { projectId: p4.id, moduleType: 'GALLERY', sortOrder: 2, config: '{}' },
+      { projectId: p4.id, moduleType: 'AMENITIES', sortOrder: 3, config: '{"headline":"30+ Curated Royal Club & Wellness Amenities","subtext":"A world of fitness, culture, relaxation, and entertainment conceived for every generation of your family."}' },
+      { projectId: p4.id, moduleType: 'MASTER_PLAN', sortOrder: 4, config: '{"description":"Thoughtfully planned 14-storey layout encompassing 3 residential blocks (Block A for 4 BHK, Block B & C for 3 BHK), 24 ground-level double-height commercial showrooms, 750+ sq.m central vehicle-free podium garden, and basement parking."}' },
+      { projectId: p4.id, moduleType: 'LOCATION', sortOrder: 5, config: '{"addressLine":"THE STATELY, Nr. Hari Heights, Kudasan Road, Kudasan, Gandhinagar - 382421","mapEmbedUrl":"https://maps.google.com/?q=Kudasan+Gandhinagar"}' },
+      { projectId: p4.id, moduleType: 'PRICING', sortOrder: 6, config: '{"headline":"Transparent Value Proposition & Flexible Terms"}' },
+      { projectId: p4.id, moduleType: 'COMPARE_UNITS', sortOrder: 7, config: '{}' },
+      { projectId: p4.id, moduleType: 'CALCULATORS', sortOrder: 8, config: '{"defaultLoanAmount":12000000,"defaultTenure":20,"defaultRate":8.5,"maxLoanAmount":30000000}' },
+      { projectId: p4.id, moduleType: 'COMMUNITY_LIFESTYLE', sortOrder: 9, config: '{"headline":"A Harmonious Life Beyond Four Walls","subtext":"Where timeless classical aesthetics blend with modern community camaraderie and wellness."}' },
+      { projectId: p4.id, moduleType: 'RERA_TRUST', sortOrder: 10, config: '{"reraNo":"PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14924/100325/311230","validityDate":"December 2030","approvedBy":"GUJRERA (Gujarat Real Estate Regulatory Authority)"}' },
+      { projectId: p4.id, moduleType: 'BROCHURE', sortOrder: 11, config: '{"buttonLabel":"Download The Stately Official Brochure (PDF)"}' },
     ],
   })
 
-  const tower4A = await db.tower.create({ data: { projectId: p4.id, name: 'Block A' } })
-  const tower4B = await db.tower.create({ data: { projectId: p4.id, name: 'Block B' } })
+  await db.highlightCard.createMany({
+    data: [
+      { projectId: p4.id, icon: '🏛️', shortText: 'Roman-Themed Neoclassical Architecture', sortOrder: 0 },
+      { projectId: p4.id, icon: '👑', shortText: '3 & 4 BHK Palatial Homes & Penthouses', sortOrder: 1 },
+      { projectId: p4.id, icon: '🌅', shortText: '24ft Huge Panoramic Balconies', sortOrder: 2 },
+      { projectId: p4.id, icon: '🌳', shortText: '750+ sq.m Central Floral Garden & Fountains', sortOrder: 3 },
+      { projectId: p4.id, icon: '🎭', shortText: '30+ Curated Royal Lifestyle Amenities', sortOrder: 4 },
+      { projectId: p4.id, icon: '📍', shortText: 'Prime Kudasan Gandhinagar • Near Raysan Metro', sortOrder: 5 },
+    ],
+  })
+
+  const tower4A = await db.tower.create({ data: { projectId: p4.id, name: 'Block A (4 BHK Residences)' } })
+  const tower4B = await db.tower.create({ data: { projectId: p4.id, name: 'Block B (3 BHK Residences)' } })
+  const tower4C = await db.tower.create({ data: { projectId: p4.id, name: 'Block C (3 BHK Residences)' } })
 
   await db.unit.createMany({
     data: [
-      { towerId: tower4A.id, floor: 3, unitNumber: 'A-302', configuration: '3BHK', carpetArea: 1550, builtUpArea: 2150, price: 10500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
-      { towerId: tower4A.id, floor: 9, unitNumber: 'A-902', configuration: '4BHK', carpetArea: 1980, builtUpArea: 2750, price: 13500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
-      { towerId: tower4B.id, floor: 4, unitNumber: 'B-401', configuration: '3BHK', carpetArea: 1550, builtUpArea: 2150, price: 10800000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+      { towerId: tower4A.id, floor: 2, unitNumber: 'A-201', configuration: '4BHK', carpetArea: 1980, builtUpArea: 2750, superBuiltUpArea: 3500, price: 17100000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: "Personal Foyer (8'4\" x 12'7\") • 24'10\" Balcony • 4 Attached Toilets" },
+      { towerId: tower4A.id, floor: 6, unitNumber: 'A-601', configuration: '4BHK', carpetArea: 1980, builtUpArea: 2750, superBuiltUpArea: 3500, price: 17700000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: "Overlooking Central Floral Garden & Cascades" },
+      { towerId: tower4A.id, floor: 13, unitNumber: 'A-1301', configuration: '4BHK Penthouse', carpetArea: 2650, builtUpArea: 3850, superBuiltUpArea: 4800, price: 26500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: "Palatial Penthouse • Massive 34'6\" x 56'10\" Private Terrace" },
+      { towerId: tower4B.id, floor: 3, unitNumber: 'B-301', configuration: '3BHK', carpetArea: 1520, builtUpArea: 2150, superBuiltUpArea: 2720, price: 12100000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'North', notes: "Corner Layout • 24'10\" Balcony • Living-Dining (18'10\" x 17'6\")" },
+      { towerId: tower4B.id, floor: 8, unitNumber: 'B-802', configuration: '3BHK', carpetArea: 1480, builtUpArea: 2080, superBuiltUpArea: 2650, price: 12300000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: "Garden Facing • 17' Balcony • Grand Living Lounge" },
+      { towerId: tower4B.id, floor: 13, unitNumber: 'B-1301', configuration: '3BHK Penthouse', carpetArea: 1850, builtUpArea: 2600, superBuiltUpArea: 3300, price: 18500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'North', notes: "Exclusive Penthouse with 22'5\" x 30'6\" Open-Air Terrace" },
+      { towerId: tower4C.id, floor: 4, unitNumber: 'C-401', configuration: '3BHK', carpetArea: 1520, builtUpArea: 2150, superBuiltUpArea: 2720, price: 12200000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: "Corner Unit • 24'10\" Wide Balcony • Personal Vestibule" },
+      { towerId: tower4C.id, floor: 13, unitNumber: 'C-1301', configuration: '3BHK Penthouse', carpetArea: 1850, builtUpArea: 2600, superBuiltUpArea: 3300, price: 18500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: "Exclusive Penthouse with 19'6\" x 30'6\" Open-Air Terrace" },
+    ],
+  })
+
+  await db.amenity.createMany({
+    data: [
+      { projectId: p4.id, name: 'Attractive Entrance Foyer', description: 'Double-height grand entrance foyer adorned with classical Roman sculptures and Italian marble medallion.', icon: 'Building', sortOrder: 0 },
+      { projectId: p4.id, name: 'Pickup - Drop Off Zone', description: 'Covered, convenient vehicular arrival porch ensuring smooth transit for residents and visitors.', icon: 'Car', sortOrder: 1 },
+      { projectId: p4.id, name: 'High-Tech Gymnasium', description: 'Comprehensive fitness center with state-of-the-art cardio machines, free weights, and cross-training zone.', icon: 'Dumbbell', sortOrder: 2 },
+      { projectId: p4.id, name: 'Music / Tuition Room', description: 'Dedicated acoustically insulated classroom for personal music practice, instrument lessons, and tuitions.', icon: 'Music', sortOrder: 3 },
+      { projectId: p4.id, name: 'Automatic Boom Barrier', description: 'Intelligent RFID/tag sensor barrier gate providing seamless authorized vehicular access control.', icon: 'ShieldCheck', sortOrder: 4 },
+      { projectId: p4.id, name: 'Senior Citizen Seating', description: 'Serene, shaded seating alcoves amidst tranquil gardens crafted for restful elderly socialization.', icon: 'Armchair', sortOrder: 5 },
+      { projectId: p4.id, name: 'Common Wash Area / Restrooms', description: 'Hygienic and well-ventilated ground floor restroom facilities for maintenance staff and guests.', icon: 'Bath', sortOrder: 6 },
+      { projectId: p4.id, name: 'Toddlers Play Area', description: 'Cushioned, baby-proofed indoor discovery playroom with vibrant developmental toys and soft flooring.', icon: 'Baby', sortOrder: 7 },
+      { projectId: p4.id, name: 'Society Administration Office', description: 'Fully equipped executive boardroom and administrative office for resident society management.', icon: 'Briefcase', sortOrder: 8 },
+      { projectId: p4.id, name: 'Jula Court & Sitting Area', description: 'Traditional Gujarati brass-chain swings nestled in scenic courtyard for evening leisure.', icon: 'Sun', sortOrder: 9 },
+      { projectId: p4.id, name: 'Floral Landscaped Garden', description: '751.61 sq.m central green oasis featuring flowering shrubs, manicured lawns, and palm courts.', icon: 'Trees', sortOrder: 10 },
+      { projectId: p4.id, name: 'Children\'s Outdoor Play Arena', description: 'Safe outdoor multi-play jungle gym, slides, swings, and sand pit over shock-absorbent turf.', icon: 'Gamepad2', sortOrder: 11 },
+      { projectId: p4.id, name: 'Reading Library & Study Nook', description: 'Quiet, sunlit reading sanctuary with arched bookshelves and comfortable reading armchairs.', icon: 'BookOpen', sortOrder: 12 },
+      { projectId: p4.id, name: 'Multipurpose Gathering Hall', description: 'Air-conditioned banquet venue equipped with audio-visual setups for family celebrations and festivals.', icon: 'Users', sortOrder: 13 },
+      { projectId: p4.id, name: 'Outdoor Badminton Court', description: 'Standard-dimension outdoor badminton court with anti-skid surface and perimeter floodlights.', icon: 'Trophy', sortOrder: 14 },
+      { projectId: p4.id, name: 'Piped Natural Gas (PNG)', description: 'Safe, metered piped natural gas supply integrated directly into every apartment kitchen.', icon: 'Flame', sortOrder: 15 },
+      { projectId: p4.id, name: 'Advanced Fire Fighting Safety', description: 'Comprehensive fire safety network with wet risers, sprinklers, hose reels, and smoke detectors.', icon: 'ShieldAlert', sortOrder: 16 },
+      { projectId: p4.id, name: 'Rainwater Harvesting System', description: 'Eco-conscious rainwater collection network recharging local groundwater aquifers.', icon: 'Droplets', sortOrder: 17 },
+      { projectId: p4.id, name: 'Fully Automatic Premium Elevators', description: 'High-speed automatic elevators from Kone / Schindler with ARD rescue device and power backup.', icon: 'ArrowUpDown', sortOrder: 18 },
+      { projectId: p4.id, name: 'Indoor Games Lounge', description: 'Recreational lounge featuring full-size billiards/pool table, table tennis, carrom, and board games.', icon: 'Dices', sortOrder: 19 },
+      { projectId: p4.id, name: '24x7 Manned Security', description: 'Round-the-clock trained security guards monitoring entry, exit, and campus perimeter.', icon: 'Shield', sortOrder: 20 },
+      { projectId: p4.id, name: '24x7 Continuous Water Supply', description: 'Pressurized dual-source water supply supported by high-capacity underground and overhead reservoirs.', icon: 'Waves', sortOrder: 21 },
+      { projectId: p4.id, name: 'Royal Water Cascade & Fountains', description: 'Cascading architectural fountains with ambient lighting creating a soothing acoustic environment.', icon: 'Sparkles', sortOrder: 22 },
+      { projectId: p4.id, name: 'CCTV Surveillance Network', description: 'Comprehensive high-definition CCTV coverage across all gates, basements, lobbies, and elevators.', icon: 'Camera', sortOrder: 23 },
+      { projectId: p4.id, name: 'Allotted Covered Car Parking', description: 'Guaranteed numbered covered car parking bays in basement and ground levels.', icon: 'ParkingSquare', sortOrder: 24 },
+      { projectId: p4.id, name: 'Solar Panels for Common Areas', description: 'Green rooftop solar photovoltaic panels generating clean renewable energy for common utilities.', icon: 'SunMedium', sortOrder: 25 },
+      { projectId: p4.id, name: 'Door-to-Door Garbage Collection', description: 'Daily segregated household waste collection system ensuring pristine sanitation.', icon: 'Trash2', sortOrder: 26 },
+      { projectId: p4.id, name: '100% DG Power Backup', description: 'Heavy-duty diesel generator providing automatic power backup for lifts, water pumps, and lighting.', icon: 'Zap', sortOrder: 27 },
+      { projectId: p4.id, name: 'DTH & High-Speed Telecom Cabling', description: 'Pre-installed concealed conduits for high-speed fiber internet and multi-operator satellite TV.', icon: 'Wifi', sortOrder: 28 },
+      { projectId: p4.id, name: 'Indoor Private Cinema Theater', description: 'Boutique private mini-theater with plush recliner seating and Dolby surround acoustics.', icon: 'Film', sortOrder: 29 },
     ],
   })
 
