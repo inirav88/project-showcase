@@ -237,14 +237,28 @@ app.whenReady().then(async () => {
         filePath = filePath.slice(1)
       }
 
-      const normalizedPath = path.normalize(filePath)
-      if (!fs.existsSync(normalizedPath)) {
-        console.warn(`[Media Protocol] WARNING: File does not exist at: ${normalizedPath}`)
+      let targetPath = path.normalize(filePath)
+
+      // Use display-optimized WebP if available for ultra-fast kiosk rendering unless ?original=true
+      const forceOriginal = parsed.searchParams.get('original') === 'true'
+      if (!forceOriginal) {
+        const ext = path.extname(targetPath).toLowerCase()
+        if (['.jpg', '.jpeg', '.png', '.webp'].includes(ext) && !targetPath.endsWith('_thumb.webp')) {
+          const displayCandidate = targetPath.replace(/\.[^.]+$/, '_display.webp')
+          if (fs.existsSync(displayCandidate)) {
+            targetPath = displayCandidate
+          }
+        }
+      }
+
+      if (!fs.existsSync(targetPath)) {
+        console.warn(`[Media Protocol] WARNING: File does not exist at: ${targetPath}`)
         return new Response("File not found", { status: 404 })
       }
 
-      const stat = fs.statSync(normalizedPath)
+      const stat = fs.statSync(targetPath)
       const fileSize = stat.size
+      const etag = `"${stat.mtimeMs.toString(36)}-${fileSize.toString(36)}"`
       const range = request.headers.get('range')
 
       if (range) {
@@ -253,7 +267,7 @@ app.whenReady().then(async () => {
         const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
         const chunksize = (end - start) + 1
 
-        const fileStream = fs.createReadStream(normalizedPath, { start, end })
+        const fileStream = fs.createReadStream(targetPath, { start, end })
         return new Response(fileStream as any, {
           status: 206,
           statusText: 'Partial Content',
@@ -261,16 +275,33 @@ app.whenReady().then(async () => {
             'Content-Range': `bytes ${start}-${end}/${fileSize}`,
             'Accept-Ranges': 'bytes',
             'Content-Length': chunksize.toString(),
-            'Content-Type': getMimeType(normalizedPath)
+            'Content-Type': getMimeType(targetPath),
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'ETag': etag
           }
         })
       } else {
-        const fileStream = fs.createReadStream(normalizedPath)
+        const ifNoneMatch = request.headers.get('if-none-match')
+        if (ifNoneMatch === etag) {
+          return new Response(null, {
+            status: 304,
+            statusText: 'Not Modified',
+            headers: {
+              'ETag': etag,
+              'Cache-Control': 'public, max-age=31536000, immutable'
+            }
+          })
+        }
+
+        const fileStream = fs.createReadStream(targetPath)
         return new Response(fileStream as any, {
           status: 200,
           headers: {
             'Content-Length': fileSize.toString(),
-            'Content-Type': getMimeType(normalizedPath)
+            'Content-Type': getMimeType(targetPath),
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'ETag': etag,
+            'Accept-Ranges': 'bytes'
           }
         })
       }

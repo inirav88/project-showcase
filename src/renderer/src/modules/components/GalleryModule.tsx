@@ -22,6 +22,44 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
   const [media, setMedia] = useState<MediaItem[]>([])
   const [activeTab, setActiveTab] = useState<string>('ALL')
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [lightboxLoaded, setLightboxLoaded] = useState<boolean>(false)
+
+  // Reset loaded state on slide change
+  useEffect(() => {
+    setLightboxLoaded(false)
+  }, [lightboxIndex])
+
+  // Background idle warmup for top gallery images
+  useEffect(() => {
+    if (!media.length) return
+    const preload = () => {
+      media.slice(0, 10).forEach((item) => {
+        if (item.filePath) {
+          const img = new Image()
+          img.src = toMediaUrl(item.filePath)
+        }
+      })
+    }
+    const timer = setTimeout(preload, 150)
+    return () => clearTimeout(timer)
+  }, [media])
+
+  // Preload adjacent next/prev images when lightbox is open for 0ms transitions
+  useEffect(() => {
+    if (lightboxIndex === null || !filteredMedia.length) return
+    const indicesToPreload = [
+      (lightboxIndex + 1) % filteredMedia.length,
+      (lightboxIndex - 1 + filteredMedia.length) % filteredMedia.length,
+      (lightboxIndex + 2) % filteredMedia.length,
+    ]
+    indicesToPreload.forEach((idx) => {
+      const item = filteredMedia[idx]
+      if (item?.filePath) {
+        const img = new Image()
+        img.src = toMediaUrl(item.filePath)
+      }
+    })
+  }, [lightboxIndex, filteredMedia])
 
   useEffect(() => {
     window.api
@@ -158,6 +196,8 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
               <img
                 src={toMediaUrl(item.thumbnailPath || item.filePath)}
                 alt={item.originalName}
+                loading={idx < 8 ? 'eager' : 'lazy'}
+                decoding="async"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 400ms var(--ease-out)' }}
               />
               {/* Overlay */}
@@ -247,21 +287,60 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
             {String.fromCharCode(8249)}
           </button>
 
-          {/* Image */}
-          <img
-            key={lightboxIndex}
-            src={toMediaUrl(filteredMedia[lightboxIndex].filePath)}
-            alt={filteredMedia[lightboxIndex].originalName}
+          {/* Image Container with instant blur-up placeholder */}
+          <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              maxWidth: '88vw', maxHeight: '86vh', objectFit: 'contain',
-              borderRadius: 'var(--radius-sm)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
-              animation: 'scaleIn 0.25s var(--ease-out)',
-              userSelect: 'none',
-              pointerEvents: 'auto',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              maxWidth: '88vw',
+              maxHeight: '86vh',
             }}
-          />
+          >
+            {/* Fast blurred low-res thumbnail backdrop */}
+            {(filteredMedia[lightboxIndex].thumbnailPath || filteredMedia[lightboxIndex].filePath) && (
+              <img
+                src={toMediaUrl(filteredMedia[lightboxIndex].thumbnailPath || filteredMedia[lightboxIndex].filePath)}
+                alt=""
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  filter: 'blur(16px)',
+                  transform: 'scale(0.98)',
+                  opacity: lightboxLoaded ? 0 : 0.75,
+                  transition: 'opacity 0.25s ease-out',
+                  pointerEvents: 'none',
+                }}
+              />
+            )}
+
+            {/* High-res Display Image */}
+            <img
+              key={lightboxIndex}
+              src={toMediaUrl(filteredMedia[lightboxIndex].filePath)}
+              alt={filteredMedia[lightboxIndex].originalName}
+              decoding="async"
+              onLoad={() => setLightboxLoaded(true)}
+              style={{
+                maxWidth: '88vw',
+                maxHeight: '86vh',
+                objectFit: 'contain',
+                borderRadius: 'var(--radius-sm)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
+                animation: 'scaleIn 0.25s var(--ease-out)',
+                userSelect: 'none',
+                pointerEvents: 'auto',
+                opacity: lightboxLoaded ? 1 : 0.85,
+                transition: 'opacity 0.2s ease-in',
+              }}
+            />
+          </div>
 
           {/* Next - 64x64px touch target */}
           <button

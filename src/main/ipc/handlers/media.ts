@@ -104,13 +104,22 @@ export class MediaHandlers {
       })
     }
 
-    // 3. Process Image Thumbnails (using sharp to downscale previews)
-    if (['EXTERIOR', 'INTERIOR', 'LANDSCAPE', 'FLOOR_PLAN'].includes(category) || ['.jpg', '.jpeg', '.png', '.webp'].includes(fileExt)) {
+    // 3. Process Image Thumbnails & Display Optimization (using sharp)
+    if (['EXTERIOR', 'INTERIOR', 'LANDSCAPE', 'FLOOR_PLAN', 'GALLERY'].includes(category) || ['.jpg', '.jpeg', '.png', '.webp'].includes(fileExt)) {
       thumbnailPath = path.join(this.mediaDir, `${uniqueName}_thumb.webp`)
       await sharp(finalFilePath)
         .resize(320, 240, { fit: 'cover' })
         .toFormat('webp')
         .toFile(thumbnailPath)
+        .catch(err => console.warn('Thumbnail generation failed:', err.message))
+
+      // Also generate 2560px WebP for lightning-fast full-screen presentation
+      const displayPath = path.join(this.mediaDir, `${uniqueName}_display.webp`)
+      await sharp(finalFilePath)
+        .resize(2560, 1440, { fit: 'inside', withoutEnlargement: true })
+        .toFormat('webp', { quality: 85 })
+        .toFile(displayPath)
+        .catch(err => console.warn('Display optimization failed:', err.message))
     }
 
     // 4. Save metadata record to db
