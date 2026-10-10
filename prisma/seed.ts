@@ -250,6 +250,59 @@ async function main() {
     ],
   })
 
+  // Project 5 — Aurelia (Atishay - Shivalay)
+  const p5 = await db.project.create({
+    data: {
+      name: 'Aurelia',
+      developer: 'Atishay - Shivalay',
+      reraNumber: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/RAA13145/190324/311227',
+      location: 'GIFT City - PDPU Road near GNLU Campus, Koba, Gandhinagar',
+      description: 'The Golden Era of Luxury. Exclusive 4 BHK lifestyle residences across three 19-storey towers with skydeck duplex penthouses, 31+ sports & recreation amenities, double-height squash & badminton courts, and instant access to GIFT City and Metro.',
+      type: 'RESIDENTIAL',
+      status: 'ACTIVE',
+      possessionStatus: 'UNDER_CONSTRUCTION',
+      possessionDate: 'December 2027',
+      priceRangeMin: 22500000,
+      priceRangeMax: 45000000,
+      themeAccentColor: '#C5A059',
+      themeFontPairing: 'Outfit',
+      isFeatured: true,
+    },
+  })
+
+  await db.projectModule.createMany({
+    data: [
+      { projectId: p5.id, moduleType: 'OVERVIEW', sortOrder: 0, config: '{"heroHeadline":"The Golden Era of Luxury","subHeadline":"Exclusive 4 BHK Lifestyle Residences & Skydeck Duplex Penthouses","stats":["4 BHK Luxury Homes","19 Storeys • 3 Towers","31+ Sports & Lifestyle Amenities","Double Height Penthouses","5 Mins from GIFT City","RERA Approved"],"ctaLabel":"Explore 4 BHK Units"}' },
+      { projectId: p5.id, moduleType: 'USP_SPOTLIGHT', sortOrder: 1, config: '{"headline":"A Grandeur That Shines On You","subtext":"Step into the realm of opulence where timeless sophistication meets outdoor vitality."}' },
+      { projectId: p5.id, moduleType: 'GALLERY', sortOrder: 2, config: '{}' },
+      { projectId: p5.id, moduleType: 'SPORTS_CAROUSEL', sortOrder: 3, config: '{"headline":"A Sport Sanctuary Like Never Before","subtext":"Aurelia is home for luxurious living incorporated with outdoor vitality, offering sports excellence as a way of life."}' },
+      { projectId: p5.id, moduleType: 'AMENITIES', sortOrder: 4, config: '{"headline":"31+ Curated Lifestyle Amenities","subtext":"Indulgence knows no bounds at Aurelia — crafted for wellness, leisure, and family joy."}' },
+      { projectId: p5.id, moduleType: 'LOCATION', sortOrder: 5, config: '{"addressLine":"GIFT City - PDPU Road near GNLU Campus, Koba, Gandhinagar, Gujarat"}' },
+      { projectId: p5.id, moduleType: 'MASTER_PLAN', sortOrder: 6, config: '{"description":"Campus Master Layout featuring 3 Grand Towers (19 Storeys), Central Park Lawn, 31 Numbered Amenities, Sports Sanctuary, and Double Basement Parking."}' },
+      { projectId: p5.id, moduleType: 'PRICING', sortOrder: 7, config: '{"headline":"Transparent Luxury Pricing, No Hidden Charges"}' },
+      { projectId: p5.id, moduleType: 'COMPARE_UNITS', sortOrder: 8, config: '{}' },
+      { projectId: p5.id, moduleType: 'CALCULATORS', sortOrder: 9, config: '{"defaultLoanAmount":20000000,"defaultTenure":20,"defaultRate":8.5,"maxLoanAmount":50000000}' },
+      { projectId: p5.id, moduleType: 'COMMUNITY_LIFESTYLE', sortOrder: 10, config: '{"headline":"Curated Opulence & Luxe Lifestyle","subtext":"Discover hidden pockets of tranquillity amidst lush gardens, where the fragrance of blossoms meets chic social living."}' },
+      { projectId: p5.id, moduleType: 'RERA_TRUST', sortOrder: 11, config: '{"reraNo":"PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/RAA13145/190324/311227","validityDate":"December 2027","approvedBy":"GUJRERA (Gujarat Real Estate Regulatory Authority)"}' },
+      { projectId: p5.id, moduleType: 'BROCHURE', sortOrder: 12, config: '{"buttonLabel":"Download Aurelia Official Brochure"}' },
+    ],
+  })
+
+  const tower5A = await db.tower.create({ data: { projectId: p5.id, name: 'Block A' } })
+  const tower5B = await db.tower.create({ data: { projectId: p5.id, name: 'Block B' } })
+  const tower5C = await db.tower.create({ data: { projectId: p5.id, name: 'Block C' } })
+
+  await db.unit.createMany({
+    data: [
+      { towerId: tower5A.id, floor: 2, unitNumber: 'A-202', configuration: '4BHK', carpetArea: 2450, builtUpArea: 3375, price: 26500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: '500 sqyd • Personal Foyer • Servant Room' },
+      { towerId: tower5A.id, floor: 18, unitNumber: 'A-1801', configuration: '4BHK Duplex', carpetArea: 4100, builtUpArea: 5500, price: 42500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'North-East', notes: 'Skydeck Duplex Penthouse • Double Height Living' },
+      { towerId: tower5B.id, floor: 2, unitNumber: 'B-201', configuration: '4BHK', carpetArea: 2200, builtUpArea: 3037, price: 22800000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'North', notes: '450 sqyd • 3 Allotted Car Parkings' },
+      { towerId: tower5B.id, floor: 19, unitNumber: 'B-1901', configuration: '4BHK Duplex', carpetArea: 3950, builtUpArea: 5350, price: 41000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'North-East', notes: 'Skydeck Duplex Penthouse • Private Terrace' },
+      { towerId: tower5C.id, floor: 2, unitNumber: 'C-201', configuration: '4BHK', carpetArea: 2200, builtUpArea: 3037, price: 22500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: '450 sqyd • 3 Allotted Parkings' },
+      { towerId: tower5C.id, floor: 18, unitNumber: 'C-1803', configuration: '4BHK Duplex', carpetArea: 4050, builtUpArea: 5450, price: 42000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'East', notes: 'Skydeck Duplex Penthouse • Double Height Living' },
+    ],
+  })
+
   // Settings singleton
   await db.settings.upsert({
     where: { id: 1 },
