@@ -24,6 +24,12 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [lightboxLoaded, setLightboxLoaded] = useState<boolean>(false)
 
+  const categories = ['ALL', ...Array.from(new Set(media.map((m) => m.category.toUpperCase())))]
+
+  const filteredMedia = activeTab === 'ALL'
+    ? media
+    : media.filter((m) => m.category.toUpperCase() === activeTab)
+
   // Reset loaded state on slide change
   useEffect(() => {
     setLightboxLoaded(false)
@@ -72,12 +78,6 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
       })
       .catch(console.error)
   }, [projectId])
-
-  const categories = ['ALL', ...Array.from(new Set(media.map((m) => m.category.toUpperCase())))]
-
-  const filteredMedia = activeTab === 'ALL'
-    ? media
-    : media.filter((m) => m.category.toUpperCase() === activeTab)
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation()
