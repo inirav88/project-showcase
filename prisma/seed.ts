@@ -116,14 +116,96 @@ async function main() {
     ],
   })
 
-  const tower3A = await db.tower.create({ data: { projectId: p3.id, name: 'Tower A' } })
-  const tower3B = await db.tower.create({ data: { projectId: p3.id, name: 'Tower B' } })
+  const tower3A = await db.tower.create({ data: { projectId: p3.id, name: 'Block A' } })
+  const tower3B = await db.tower.create({ data: { projectId: p3.id, name: 'Block B' } })
 
+  // Kumbh Avyanna Inventory: Block A (34 Units: 28 Available, 6 Booked/Sold)
   await db.unit.createMany({
     data: [
-      { towerId: tower3A.id, floor: 5, unitNumber: 'A-501', configuration: '4BHK', carpetArea: 2450, builtUpArea: 4050, price: 16500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
-      { towerId: tower3A.id, floor: 12, unitNumber: 'A-1201', configuration: '4BHK', carpetArea: 2500, builtUpArea: 4100, price: 17200000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
-      { towerId: tower3B.id, floor: 8, unitNumber: 'B-802', configuration: '4BHK', carpetArea: 2450, builtUpArea: 4050, price: 16800000, priceLabel: 'OFFICIAL', status: 'AVAILABLE' },
+      // 01 series (Floors 2 to 18)
+      { towerId: tower3A.id, floor: 2, unitNumber: 'A-201', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14350000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 3, unitNumber: 'A-301', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14350000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 4, unitNumber: 'A-401', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14350000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 5, unitNumber: 'A-501', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14350000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 6, unitNumber: 'A-601', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15050000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 7, unitNumber: 'A-701', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15050000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 8, unitNumber: 'A-801', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15050000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 9, unitNumber: 'A-901', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15050000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 10, unitNumber: 'A-1001', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15050000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 11, unitNumber: 'A-1101', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15750000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 12, unitNumber: 'A-1201', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15750000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 13, unitNumber: 'A-1301', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15750000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 14, unitNumber: 'A-1401', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15750000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 15, unitNumber: 'A-1501', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 15750000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 16, unitNumber: 'A-1601', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 16450000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 17, unitNumber: 'A-1701', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 16450000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 18, unitNumber: 'A-1801', configuration: '4BHK', carpetArea: 6138, builtUpArea: 6138, price: 22437800, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '682 sqyd' },
+
+      // 02 series (Floors 2 to 18)
+      { towerId: tower3A.id, floor: 2, unitNumber: 'A-202', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13300000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 3, unitNumber: 'A-302', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13300000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 4, unitNumber: 'A-402', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13300000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 5, unitNumber: 'A-502', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13300000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 6, unitNumber: 'A-602', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13650000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 7, unitNumber: 'A-702', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13650000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 8, unitNumber: 'A-802', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13650000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 9, unitNumber: 'A-902', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13650000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 10, unitNumber: 'A-1002', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 13650000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 11, unitNumber: 'A-1102', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 12, unitNumber: 'A-1202', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 13, unitNumber: 'A-1302', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 14, unitNumber: 'A-1402', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 15, unitNumber: 'A-1502', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 16, unitNumber: 'A-1602', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14350000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 17, unitNumber: 'A-1702', configuration: '4BHK', carpetArea: 4500, builtUpArea: 4500, price: 14350000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '500 sqyd' },
+      { towerId: tower3A.id, floor: 18, unitNumber: 'A-1802', configuration: '4BHK', carpetArea: 6138, builtUpArea: 6138, price: 21960400, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '682 sqyd' },
+    ],
+  })
+
+  // Kumbh Avyanna Inventory: Block B (38 Units: 26 Available, 12 Booked/Sold)
+  await db.unit.createMany({
+    data: [
+      // 01 series (Floors 1 to 19)
+      { towerId: tower3B.id, floor: 1, unitNumber: 'B-101', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 11970000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 2, unitNumber: 'B-201', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 11970000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 3, unitNumber: 'B-301', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 11970000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 4, unitNumber: 'B-401', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 11970000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 5, unitNumber: 'B-501', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 11970000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 6, unitNumber: 'B-601', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 7, unitNumber: 'B-701', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 8, unitNumber: 'B-801', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 9, unitNumber: 'B-901', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 10, unitNumber: 'B-1001', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 11, unitNumber: 'B-1101', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 12, unitNumber: 'B-1201', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 13, unitNumber: 'B-1301', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 14, unitNumber: 'B-1401', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 15, unitNumber: 'B-1501', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 16, unitNumber: 'B-1601', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 17, unitNumber: 'B-1701', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 18, unitNumber: 'B-1801', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 19, unitNumber: 'B-1901', configuration: '4BHK', carpetArea: 6399, builtUpArea: 6399, price: 20405700, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '711 sqyd' },
+
+      // 02 series (Floors 1 to 19)
+      { towerId: tower3B.id, floor: 1, unitNumber: 'B-102', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 2, unitNumber: 'B-202', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 3, unitNumber: 'B-302', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 4, unitNumber: 'B-402', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 5, unitNumber: 'B-502', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12285000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 6, unitNumber: 'B-602', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 7, unitNumber: 'B-702', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 8, unitNumber: 'B-802', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 9, unitNumber: 'B-902', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 10, unitNumber: 'B-1002', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12600000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 11, unitNumber: 'B-1102', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 12, unitNumber: 'B-1202', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 13, unitNumber: 'B-1302', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 14, unitNumber: 'B-1402', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 15, unitNumber: 'B-1502', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 12915000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 16, unitNumber: 'B-1602', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 13230000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 17, unitNumber: 'B-1702', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 13230000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 18, unitNumber: 'B-1802', configuration: '4BHK', carpetArea: 4050, builtUpArea: 4050, price: 13230000, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '450 sqyd' },
+      { towerId: tower3B.id, floor: 19, unitNumber: 'B-1902', configuration: '4BHK', carpetArea: 6399, builtUpArea: 6399, price: 20903400, priceLabel: 'OFFICIAL', status: 'SOLD', notes: '711 sqyd' },
     ],
   })
 
