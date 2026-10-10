@@ -303,6 +303,61 @@ async function main() {
     ],
   })
 
+  // Project 6 — Embrace The Wind (Sripad - Shashwat Group)
+  const p6 = await db.project.create({
+    data: {
+      name: 'Embrace The Wind',
+      developer: 'Sripad - Shashwat Group',
+      reraNumber: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14756/310125/311230',
+      location: "Sargasan Cross Road, Behind McDonald's, S.G. Highway, Gandhinagar - 382421",
+      description: "Landmark residential and commercial marvel rising 20 floors high along prominent S.G. Highway in Sargasan, Gandhinagar. Features 352 bespoke 3 & 4 BHK residences with private foyers and personal patios, 76 retail showrooms, 5 magnificent towers surrounding the largest landscaped central podium garden in Sargasan with 54 world-class amenities and two swimming pools.",
+      type: 'RESIDENTIAL',
+      status: 'ACTIVE',
+      possessionStatus: 'UNDER_CONSTRUCTION',
+      possessionDate: 'December 2030',
+      priceRangeMin: 9500000,
+      priceRangeMax: 24000000,
+      themeAccentColor: '#B89735',
+      themeFontPairing: 'Outfit',
+      isFeatured: true,
+    },
+  })
+
+  await db.projectModule.createMany({
+    data: [
+      { projectId: p6.id, moduleType: 'OVERVIEW', sortOrder: 0, config: '{"heroHeadline":"Redefining Life Above All","subHeadline":"Ultra-Luxury 3 & 4 BHK Residences & Signature Duplex Penthouses on S.G. Highway","stats":["20 Storeys • 5 Iconic Towers","352 Palatial Residences","76 Commercial Showrooms","Biggest Garden in Sargasan","54 Curated Lifestyle Amenities","2 Swimming Pools (Podium + Indoor)"],"ctaLabel":"Explore 3 & 4 BHK Residences"}' },
+      { projectId: p6.id, moduleType: 'USP_SPOTLIGHT', sortOrder: 1, config: '{"headline":"Unrivaled Grandeur on S.G. Highway","subtext":"Carefully conceived by Sripad Group & Shashwat Group to elevate every facet of contemporary living."}' },
+      { projectId: p6.id, moduleType: 'GALLERY', sortOrder: 2, config: '{}' },
+      { projectId: p6.id, moduleType: 'AMENITIES', sortOrder: 3, config: '{"headline":"54 Curated Lifestyle Amenities","subtext":"A holistic realm of fitness, tranquility, leisure, and social grandeur designed for every age group."}' },
+      { projectId: p6.id, moduleType: 'MASTER_PLAN', sortOrder: 4, config: '{"headline":"Master Layout & Podium Amenities","subtext":"Thoughtfully planned vehicle-free central park surrounded by 5 majestic 20-storey towers and retail arcade."}' },
+      { projectId: p6.id, moduleType: 'LOCATION', sortOrder: 5, config: '{"headline":"Connected to Everything That Matters","address":"Embrace The Wind, Behind McDonald\'s, S.G. Highway, Sargasan Cross Road, Gandhinagar - 382421"}' },
+      { projectId: p6.id, moduleType: 'PRICING', sortOrder: 6, config: '{"headline":"Transparent Value Proposition","startingPrice":"₹95 Lakhs*","priceRange":"₹95L - ₹2.40 Cr"}' },
+      { projectId: p6.id, moduleType: 'COMPARE_UNITS', sortOrder: 7, config: '{}' },
+      { projectId: p6.id, moduleType: 'CALCULATORS', sortOrder: 8, config: '{"defaultInterestRate":8.5,"defaultTenureYears":20}' },
+      { projectId: p6.id, moduleType: 'COMMUNITY_LIFESTYLE', sortOrder: 9, config: '{"headline":"Life Beyond Four Walls","subtext":"A vibrant community combining nature, health, and social celebration in an inspiring sanctuary."}' },
+      { projectId: p6.id, moduleType: 'RERA_TRUST', sortOrder: 10, config: '{"reraNumber":"PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14756/310125/311230","possessionTarget":"December 2030","developerInfo":"Sripad Group & Shashwat Group"}' },
+      { projectId: p6.id, moduleType: 'BROCHURE', sortOrder: 11, config: '{"headline":"Official Embrace The Wind Brochure","pdfFileName":"Embrace_The_Wind_Brochure.pdf","pageCount":36}' },
+    ],
+  })
+
+  const tower6A = await db.tower.create({ data: { projectId: p6.id, name: 'Tower A' } })
+  const tower6B = await db.tower.create({ data: { projectId: p6.id, name: 'Tower B' } })
+  const tower6C = await db.tower.create({ data: { projectId: p6.id, name: 'Tower C' } })
+  const tower6D = await db.tower.create({ data: { projectId: p6.id, name: 'Tower D' } })
+  const tower6E = await db.tower.create({ data: { projectId: p6.id, name: 'Tower E' } })
+
+  await db.unit.createMany({
+    data: [
+      { towerId: tower6A.id, floor: 3, unitNumber: 'A-301', configuration: '4 BHK', carpetArea: 2030, builtUpArea: 2450, superBuiltUpArea: 3250, price: 16500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: 'Personal Foyer • Private Lift • 4 En-suite Bedrooms' },
+      { towerId: tower6A.id, floor: 18, unitNumber: 'A-1801 (Duplex Penthouse)', configuration: '4 BHK Penthouse', carpetArea: 3600, builtUpArea: 4500, superBuiltUpArea: 5760, price: 24000000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: 'Skydeck Duplex Penthouse with private terrace' },
+      { towerId: tower6B.id, floor: 5, unitNumber: 'B-501', configuration: '3 BHK', carpetArea: 1450, builtUpArea: 1780, superBuiltUpArea: 2350, price: 11650000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'NORTH-EAST', notes: '16 ft Living Balcony • Personal Foyer 15\' x 9\'' },
+      { towerId: tower6B.id, floor: 18, unitNumber: 'B-1801 (Duplex Penthouse)', configuration: '4 BHK Penthouse', carpetArea: 2950, builtUpArea: 3687, superBuiltUpArea: 4720, price: 19500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'NORTH-EAST', notes: 'Duplex Penthouse with panoramic skyline views' },
+      { towerId: tower6C.id, floor: 4, unitNumber: 'C-401', configuration: '3 BHK', carpetArea: 1380, builtUpArea: 1700, superBuiltUpArea: 2250, price: 11100000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: 'Spacious Living & Dining with central garden views' },
+      { towerId: tower6D.id, floor: 7, unitNumber: 'D-701', configuration: '3 BHK', carpetArea: 1380, builtUpArea: 1700, superBuiltUpArea: 2250, price: 11250000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'NORTH-EAST', notes: 'Garden facing 3 BHK with personal foyer' },
+      { towerId: tower6E.id, floor: 2, unitNumber: 'E-201', configuration: '3 BHK', carpetArea: 1093, builtUpArea: 1350, superBuiltUpArea: 1800, price: 9500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: 'Efficient 3 BHK home on S.G. Highway corridor' },
+    ],
+  })
+
   // Settings singleton
   await db.settings.upsert({
     where: { id: 1 },
