@@ -114,70 +114,50 @@ export default function PricingModule({ projectId }: { config: Record<string, an
         <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600 }}>Pricing & Inventory</h3>
         
         {/* Filters bar */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>Tower</label>
+            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Tower</label>
             <select
               value={selectedTower}
               onChange={(e) => setSelectedTower(e.target.value)}
-              style={{
-                background: 'var(--color-surface-raised)',
-                border: '1px solid var(--color-border)',
-                color: 'var(--color-text-primary)',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 'var(--font-size-xs)'
-              }}
+              className="luxury-select"
             >
               {towersList.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>Config</label>
+            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Config</label>
             <select
               value={selectedConfig}
               onChange={(e) => setSelectedConfig(e.target.value)}
-              style={{
-                background: 'var(--color-surface-raised)',
-                border: '1px solid var(--color-border)',
-                color: 'var(--color-text-primary)',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 'var(--font-size-xs)'
-              }}
+              className="luxury-select"
             >
               {configsList.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>Status</label>
+            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status</label>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              style={{
-                background: 'var(--color-surface-raised)',
-                border: '1px solid var(--color-border)',
-                color: 'var(--color-text-primary)',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 'var(--font-size-xs)'
-              }}
+              className="luxury-select"
             >
-              {statusList.map((s) => <option key={s} value={s}>{s.toLowerCase()}</option>)}
+              {statusList.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>Area Mode</label>
-            <div style={{ display: 'flex', background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '2px' }}>
+            <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Area Units</label>
+            <div style={{ display: 'flex', background: 'var(--color-surface-raised)', border: '1.5px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '3px', minHeight: 44, boxSizing: 'border-box' }}>
               <button
                 type="button"
                 onClick={() => setAreaDisplayMode('SQFT')}
                 style={{
-                  padding: '4px 8px', fontSize: '11px', fontWeight: areaDisplayMode === 'SQFT' ? 600 : 400,
-                  borderRadius: '3px', border: 'none',
+                  padding: '8px 14px', fontSize: '12px', fontWeight: areaDisplayMode === 'SQFT' ? 700 : 500,
+                  borderRadius: 'var(--radius-sm)', border: 'none',
                   backgroundColor: areaDisplayMode === 'SQFT' ? 'var(--color-accent)' : 'transparent',
-                  color: areaDisplayMode === 'SQFT' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                  color: areaDisplayMode === 'SQFT' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer',
+                  transition: 'all var(--transition-fast)',
                 }}
               >
                 Sq. Ft.
@@ -186,10 +166,11 @@ export default function PricingModule({ projectId }: { config: Record<string, an
                 type="button"
                 onClick={() => setAreaDisplayMode('SQYD')}
                 style={{
-                  padding: '4px 8px', fontSize: '11px', fontWeight: areaDisplayMode === 'SQYD' ? 600 : 400,
-                  borderRadius: '3px', border: 'none',
+                  padding: '8px 14px', fontSize: '12px', fontWeight: areaDisplayMode === 'SQYD' ? 700 : 500,
+                  borderRadius: 'var(--radius-sm)', border: 'none',
                   backgroundColor: areaDisplayMode === 'SQYD' ? 'var(--color-accent)' : 'transparent',
-                  color: areaDisplayMode === 'SQYD' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                  color: areaDisplayMode === 'SQYD' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer',
+                  transition: 'all var(--transition-fast)',
                 }}
               >
                 Sq. Yd.
@@ -198,10 +179,11 @@ export default function PricingModule({ projectId }: { config: Record<string, an
                 type="button"
                 onClick={() => setAreaDisplayMode('DUAL')}
                 style={{
-                  padding: '4px 8px', fontSize: '11px', fontWeight: areaDisplayMode === 'DUAL' ? 600 : 400,
-                  borderRadius: '3px', border: 'none',
+                  padding: '8px 14px', fontSize: '12px', fontWeight: areaDisplayMode === 'DUAL' ? 700 : 500,
+                  borderRadius: 'var(--radius-sm)', border: 'none',
                   backgroundColor: areaDisplayMode === 'DUAL' ? 'var(--color-accent)' : 'transparent',
-                  color: areaDisplayMode === 'DUAL' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer'
+                  color: areaDisplayMode === 'DUAL' ? '#fff' : 'var(--color-text-muted)', cursor: 'pointer',
+                  transition: 'all var(--transition-fast)',
                 }}
               >
                 Dual
@@ -219,15 +201,15 @@ export default function PricingModule({ projectId }: { config: Record<string, an
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 'var(--font-size-sm)' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
-                <th style={{ padding: '12px 8px' }}>Tower</th>
-                <th style={{ padding: '12px 8px' }}>Unit</th>
-                <th style={{ padding: '12px 8px' }}>Floor</th>
-                <th style={{ padding: '12px 8px' }}>Config</th>
-                <th style={{ padding: '12px 8px' }}>Carpet Area</th>
-                <th style={{ padding: '12px 8px' }}>Price</th>
-                <th style={{ padding: '12px 8px' }}>Status</th>
-                <th style={{ padding: '12px 8px', textAlign: 'center' }}>Shortlist</th>
+              <tr style={{ borderBottom: '1.5px solid var(--color-border)', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.05em' }}>
+                <th style={{ padding: '14px 12px' }}>Tower</th>
+                <th style={{ padding: '14px 12px' }}>Unit</th>
+                <th style={{ padding: '14px 12px' }}>Floor</th>
+                <th style={{ padding: '14px 12px' }}>Config</th>
+                <th style={{ padding: '14px 12px' }}>Carpet Area</th>
+                <th style={{ padding: '14px 12px' }}>Price</th>
+                <th style={{ padding: '14px 12px' }}>Status</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center' }}>Shortlist</th>
               </tr>
             </thead>
             <tbody>
@@ -240,43 +222,49 @@ export default function PricingModule({ projectId }: { config: Record<string, an
                   ? `${u.carpetArea} sqft (${(u.carpetArea / 9).toFixed(1)} sqyd)`
                   : `${u.carpetArea} sqft`
                 return (
-                  <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)', transition: 'background-color var(--transition-fast)' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}>
-                    <td style={{ padding: '12px 8px', fontWeight: 500 }}>{u.towerName}</td>
-                    <td style={{ padding: '12px 8px' }}>{u.unitNumber}</td>
-                    <td style={{ padding: '12px 8px' }}>{u.floor}</td>
-                    <td style={{ padding: '12px 8px' }}>{u.configuration}</td>
-                    <td style={{ padding: '12px 8px' }}>{displayArea}</td>
-                    <td style={{ padding: '12px 8px', fontWeight: 600 }}>{formatPrice(u.price)}</td>
-                    <td style={{ padding: '12px 8px' }}>
+                  <tr key={u.id} className="table-row-interactive">
+                    <td style={{ padding: '14px 12px', fontWeight: 600 }}>{u.towerName}</td>
+                    <td style={{ padding: '14px 12px' }}>{u.unitNumber}</td>
+                    <td style={{ padding: '14px 12px' }}>{u.floor}</td>
+                    <td style={{ padding: '14px 12px' }}>{u.configuration}</td>
+                    <td style={{ padding: '14px 12px' }}>{displayArea}</td>
+                    <td style={{ padding: '14px 12px', fontWeight: 700, color: 'var(--color-accent)' }}>{formatPrice(u.price)}</td>
+                    <td style={{ padding: '14px 12px' }}>
                       <span style={{
                         display: 'inline-block',
-                        padding: '2px 8px',
+                        padding: '4px 10px',
                         borderRadius: '99px',
-                        backgroundColor: `${statusColor}15`,
+                        backgroundColor: `${statusColor}18`,
                         color: statusColor,
-                        border: `1px solid ${statusColor}35`,
+                        border: `1px solid ${statusColor}40`,
                         fontSize: '11px',
-                        fontWeight: 600,
-                        textTransform: 'uppercase'
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em'
                       }}>
-                        {u.status.toLowerCase()}
+                        {u.status}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                    <td style={{ padding: '14px 12px', textAlign: 'center' }}>
                       <button
                         onClick={() => toggleShortlist(u)}
                         disabled={u.status === 'SOLD'}
+                        aria-label={isSaved ? `Remove Unit ${u.unitNumber} from shortlist` : `Add Unit ${u.unitNumber} to shortlist`}
                         style={{
-                          background: 'none',
-                          border: 'none',
-                          color: isSaved ? '#f87171' : 'var(--color-text-muted)',
-                          fontSize: '18px',
+                          background: isSaved ? 'rgba(239, 68, 68, 0.12)' : 'var(--color-surface-raised)',
+                          border: `1px solid ${isSaved ? 'rgba(239, 68, 68, 0.3)' : 'var(--color-border)'}`,
+                          borderRadius: '50%',
+                          width: 38,
+                          height: 38,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                           cursor: u.status === 'SOLD' ? 'not-allowed' : 'pointer',
-                          outline: 'none',
-                          transition: 'color var(--transition-fast)'
+                          opacity: u.status === 'SOLD' ? 0.4 : 1,
+                          transition: 'all var(--transition-fast)'
                         }}
                       >
-                        <HeartIcon size={18} isFilled={isSaved} color={isSaved ? '#ef4444' : 'var(--color-text-muted)'} />
+                        <HeartIcon size={18} isFilled={isSaved} color={isSaved ? '#ef4444' : 'var(--color-text-secondary)'} />
                       </button>
                     </td>
                   </tr>

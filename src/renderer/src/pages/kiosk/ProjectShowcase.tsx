@@ -8,6 +8,7 @@ import { IntroVideoOverlay } from '../../components/IntroVideoOverlay'
 import { PersonaSelector, type Persona } from '../../components/PersonaSelector'
 import { useAmbientAudio } from '../../hooks/useAmbientAudio'
 import { AccessibilityToggle } from '../../components/AccessibilityToggle'
+import { ThemeToggle } from '../../components/ThemeToggle'
 import { SecurityPinModal } from './components/SecurityPinModal'
 import { ShortlistDrawer } from './components/ShortlistDrawer'
 import { LeadCaptureModal } from './components/LeadCaptureModal'
@@ -19,6 +20,7 @@ import {
   VolumeUpIcon,
   VolumeMuteIcon,
   ArrowLeftIcon,
+  HeartIcon,
 } from '../../components/common/Icons'
 
 interface Project {
@@ -353,7 +355,7 @@ export default function ProjectShowcase(): JSX.Element {
 
       {/* Header */}
       <header className="showcase-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
           <button
             className="back-btn"
             onClick={handleBack}
@@ -362,32 +364,16 @@ export default function ProjectShowcase(): JSX.Element {
               handleBack()
             }}
             aria-label="Go back to project selection"
-            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            <ArrowLeftIcon size={16} />
+            <ArrowLeftIcon size={18} />
             <span>Back</span>
           </button>
           <button
             onClick={() => setShowEndSessionModal(true)}
-            className="btn-hover-effect"
-            style={{
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '12px 20px',
-              minHeight: 56,
-              borderRadius: 'var(--radius-md)',
-              border: '1.5px solid rgba(239, 68, 68, 0.4)',
-              background: 'rgba(239, 68, 68, 0.08)',
-              color: '#ef4444',
-              fontSize: 'var(--font-size-base)',
-              fontWeight: 700,
-              touchAction: 'manipulation',
-            }}
+            className="luxury-btn luxury-btn-danger"
             aria-label="End presentation session"
           >
-            <StopIcon size={16} color="#ef4444" />
+            <StopIcon size={16} color="var(--color-error)" />
             <span>End Presentation</span>
           </button>
         </div>
@@ -411,54 +397,41 @@ export default function ProjectShowcase(): JSX.Element {
           </div>
         </div>
 
-        {/* Shortlist counter button - 56px touch target */}
-        <button
-          onClick={() => setShowShortlist(true)}
-          style={{
-            all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
-            padding: '12px 22px', minHeight: 56, boxSizing: 'border-box',
-            background: shortlistItems.length > 0 ? 'var(--color-accent-dim)' : 'var(--color-surface-raised)',
-            border: `1.5px solid ${shortlistItems.length > 0 ? 'var(--color-accent-border)' : 'var(--color-border)'}`,
-            borderRadius: 'var(--radius-md)', fontSize: 'var(--font-size-base)', fontWeight: 600,
-            color: shortlistItems.length > 0 ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-            transition: 'all var(--transition-fast)', whiteSpace: 'nowrap' as const,
-            touchAction: 'manipulation',
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill={shortlistItems.length > 0 ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-          Shortlist
-          {shortlistItems.length > 0 && (
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)',
-              color: 'var(--color-bg)', fontSize: 11, fontWeight: 800
-            }}>
-              {shortlistItems.length}
-            </span>
-          )}
-        </button>
-        {/* Ambient audio mute button */}
-        {hasAudio && (
+        {/* Action Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          {/* Shortlist button */}
           <button
-            onClick={toggleMute}
-            title={muted ? "Unmute ambient audio" : "Mute ambient audio"}
-            aria-label={muted ? "Unmute ambient audio" : "Mute ambient audio"}
-            className="btn-hover-effect"
-            style={{
-              cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
-              padding: "10px 14px", borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--color-border)",
-              fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)",
-            }}
+            onClick={() => setShowShortlist(true)}
+            className={`luxury-btn${shortlistItems.length > 0 ? ' luxury-btn-primary' : ''}`}
+            aria-label={`View Shortlisted Units (${shortlistItems.length})`}
           >
-            {muted ? <VolumeMuteIcon size={18} color="var(--color-text-muted)" /> : <VolumeUpIcon size={18} color="var(--color-accent)" />}
+            <HeartIcon size={18} color={shortlistItems.length > 0 ? '#fff' : 'currentColor'} isFilled={shortlistItems.length > 0} />
+            <span>Shortlist</span>
+            {shortlistItems.length > 0 && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 22, height: 22, borderRadius: '50%',
+                background: shortlistItems.length > 0 ? 'rgba(0,0,0,0.25)' : 'var(--color-accent)',
+                color: '#fff', fontSize: 11, fontWeight: 800
+              }}>
+                {shortlistItems.length}
+              </span>
+            )}
           </button>
-        )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 12 }}>
-          <AccessibilityToggle />
+          {/* Ambient audio mute button */}
+          {hasAudio && (
+            <button
+              onClick={toggleMute}
+              title={muted ? "Unmute ambient audio" : "Mute ambient audio"}
+              aria-label={muted ? "Unmute ambient audio" : "Mute ambient audio"}
+              className="luxury-btn"
+            >
+              {muted ? <VolumeMuteIcon size={18} color="var(--color-text-muted)" /> : <VolumeUpIcon size={18} color="var(--color-accent)" />}
+            </button>
+          )}
+
+          {/* Voice Narration Toggle */}
           <button
             onClick={() => {
               const nextVal = !narrationMuted
@@ -467,21 +440,20 @@ export default function ProjectShowcase(): JSX.Element {
             }}
             title={narrationMuted ? 'Unmute voice narration' : 'Mute voice narration'}
             aria-label={narrationMuted ? 'Unmute voice narration' : 'Mute voice narration'}
-            className="btn-hover-effect"
-            style={{
-              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-              padding: '10px 14px', borderRadius: 'var(--radius-sm)',
-              border: '1px solid var(--color-border)',
-              fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)',
-            }}
+            className="luxury-btn"
           >
             {narrationMuted ? <VolumeMuteIcon size={17} color="var(--color-text-muted)" /> : <VolumeUpIcon size={17} color="var(--color-accent)" />}
             <span>Narration</span>
           </button>
+
+          <AccessibilityToggle />
+          <ThemeToggle />
+
+          {/* Exit Kiosk Button */}
           {(settings?.showExitButton ?? true) && (
             <button
               onClick={() => {
-                if (settings.exitRequiresPin) {
+                if (settings?.exitRequiresPin) {
                   setPinPurpose('exit')
                   setShowPinModal(true)
                 } else {
@@ -490,21 +462,7 @@ export default function ProjectShowcase(): JSX.Element {
               }}
               title="Exit Application"
               aria-label="Exit Application"
-              className="btn-hover-effect"
-              style={{
-                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                padding: '10px 14px', borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--color-border)',
-                fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-error, #ef4444)'
-                e.currentTarget.style.borderColor = 'var(--color-error, #ef4444)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-secondary)'
-                e.currentTarget.style.borderColor = 'var(--color-border)'
-              }}
+              className="luxury-btn luxury-btn-danger"
             >
               <PowerIcon size={16} />
               <span>Exit</span>

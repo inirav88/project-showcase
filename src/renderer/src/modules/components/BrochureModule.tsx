@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import QRCode from 'qrcode'
 import { toMediaUrl } from '../../utils/media'
 import { IPC_CHANNELS } from '../../../../main/ipc/channels'
+import { ShareIcon, DownloadIcon, CloseIcon } from '../../components/common/Icons'
 
 interface BrochureProps {
   config: Record<string, any>
@@ -280,22 +281,9 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
           <button
             type="button"
             onClick={() => setFullscreen(!fullscreen)}
-            style={{
-              padding: '10px 18px',
-              borderRadius: 8,
-              border: '1px solid var(--color-border)',
-              backgroundColor: 'var(--color-surface-raised)',
-              color: 'var(--color-text-primary)',
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.2s ease',
-            }}
+            className="luxury-btn"
           >
-            <span>{fullscreen ? '📉 Exit Fullscreen' : '⛶ Fullscreen View'}</span>
+            <span>{fullscreen ? 'Exit Fullscreen' : 'Fullscreen View'}</span>
           </button>
 
           {/* WhatsApp Share Button */}
@@ -303,23 +291,17 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
             <button
               type="button"
               onClick={handleOpenShareModal}
+              className="luxury-btn"
               style={{
-                padding: '10px 18px',
-                borderRadius: 8,
-                border: 'none',
                 backgroundColor: '#25D366',
                 color: '#ffffff',
+                border: 'none',
                 fontWeight: 700,
-                fontSize: 13,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)',
-                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)',
               }}
             >
-              <span>📱 Send on WhatsApp</span>
+              <ShareIcon size={16} color="#fff" />
+              <span>Send on WhatsApp</span>
             </button>
           )}
 
@@ -328,22 +310,10 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
             download
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              padding: '10px 20px',
-              borderRadius: 8,
-              backgroundColor: 'var(--color-accent)',
-              color: '#ffffff',
-              fontWeight: 700,
-              fontSize: 13,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              transition: 'transform 0.15s ease',
-            }}
+            className="luxury-btn luxury-btn-primary"
           >
-            <span>📥 {buttonLabel}</span>
+            <DownloadIcon size={16} color="#fff" />
+            <span>{buttonLabel}</span>
           </a>
         </div>
       </div>
@@ -352,11 +322,12 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
       <div
         style={{
           width: '100%',
-          height: fullscreen ? '90vh' : '650px',
-          borderRadius: 12,
+          flex: 1,
+          minHeight: fullscreen ? '90vh' : 'calc(100vh - 280px)',
+          borderRadius: 'var(--radius-lg)',
           overflow: 'hidden',
-          backgroundColor: '#1e293b',
-          border: '1px solid var(--color-border)',
+          backgroundColor: 'var(--color-surface-raised)',
+          border: '1.5px solid var(--color-border)',
           position: fullscreen ? 'fixed' : 'relative',
           inset: fullscreen ? 0 : undefined,
           zIndex: fullscreen ? 99999 : 1,
@@ -368,21 +339,16 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
           <button
             type="button"
             onClick={() => setFullscreen(false)}
+            className="luxury-btn luxury-btn-danger"
             style={{
               position: 'absolute',
               top: 36,
               right: 36,
               zIndex: 100000,
-              padding: '10px 16px',
-              borderRadius: 8,
-              backgroundColor: '#ef4444',
-              color: '#fff',
-              border: 'none',
-              fontWeight: 700,
-              cursor: 'pointer',
             }}
           >
-            Close Fullscreen ×
+            <CloseIcon size={16} />
+            <span>Close Fullscreen</span>
           </button>
         )}
         <iframe
@@ -401,14 +367,15 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
         }}>
           <div style={{
             background: 'var(--color-surface)', borderRadius: 20,
-            border: '1px solid var(--color-border)', width: 440, maxWidth: '95vw',
+            border: '1.5px solid var(--color-border)', width: 440, maxWidth: '95vw',
             padding: 28, display: 'flex', flexDirection: 'column', gap: 16,
             boxShadow: 'var(--shadow-xl)', animation: 'scaleIn 0.25s ease'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  📱 Send Brochure on WhatsApp
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <ShareIcon size={18} color="#25D366" />
+                  <span>Send Brochure on WhatsApp</span>
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2 }}>
                   {project?.name ? `Project: ${project.name}` : 'Share digital brochure with client'}
@@ -416,9 +383,14 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
               </div>
               <button
                 onClick={() => setShowShareModal(false)}
-                style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--color-text-muted)' }}
+                aria-label="Close modal"
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center',
+                  padding: 8, borderRadius: '50%'
+                }}
               >
-                ×
+                <CloseIcon size={18} />
               </button>
             </div>
 

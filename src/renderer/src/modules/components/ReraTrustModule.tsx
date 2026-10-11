@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toMediaUrl } from '../../utils/media'
+import { ShieldCheckIcon, FileTextIcon, CheckIcon } from '../../components/common/Icons'
 
 interface ReraDoc {
   title: string
@@ -42,7 +43,7 @@ export default function ReraTrustModule({ config, projectId }: { config: Record<
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-6)', alignItems: 'stretch' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-6)', alignItems: 'stretch' }}>
         {/* Compliance Details Card */}
         <div style={{
           background: 'var(--color-surface)',
@@ -56,7 +57,19 @@ export default function ReraTrustModule({ config, projectId }: { config: Record<
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'var(--space-4)' }}>
-              <span style={{ fontSize: 24 }}>🛡️</span>
+              <div style={{
+                width: 40,
+                height: 40,
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(16, 185, 129, 0.1)',
+                color: '#10b981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <ShieldCheckIcon size={22} color="#10b981" />
+              </div>
               <div style={{
                 background: 'rgba(16,185,129,0.08)',
                 color: '#10b981',
@@ -64,25 +77,29 @@ export default function ReraTrustModule({ config, projectId }: { config: Record<
                 borderRadius: 'var(--radius-full)',
                 fontSize: 11,
                 fontWeight: 700,
-                border: '1px solid rgba(16,185,129,0.2)',
+                border: '1px solid rgba(16,185,129,0.25)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.04em'
+                letterSpacing: '0.04em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6
               }}>
-                100% Verified
+                <CheckIcon size={12} color="#10b981" />
+                <span>100% Verified Title</span>
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>RERA Registration No.</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4, wordBreak: 'break-all' }}>{reraNo}</div>
+                <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>RERA Registration No.</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4, overflowWrap: 'break-word' }}>{reraNo}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Approved By Authority</div>
+                <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Approved By Authority</div>
                 <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)', marginTop: 4 }}>{approvedBy}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>RERA Registration Validity</div>
+                <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>RERA Registration Validity</div>
                 <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)', marginTop: 4 }}>Valid until {validityDate}</div>
               </div>
             </div>
@@ -111,6 +128,7 @@ export default function ReraTrustModule({ config, projectId }: { config: Record<
             {documents.map((doc, idx) => (
               <div
                 key={idx}
+                className="interactive-card"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -119,13 +137,12 @@ export default function ReraTrustModule({ config, projectId }: { config: Record<
                   background: 'var(--color-surface-raised)',
                   border: '1px solid var(--color-border)',
                   borderRadius: 'var(--radius-md)',
-                  transition: 'all var(--transition-fast)'
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-accent-border)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 20 }}>📄</span>
+                  <div style={{ color: 'var(--color-accent)', display: 'flex', alignItems: 'center' }}>
+                    <FileTextIcon size={18} color="var(--color-accent)" />
+                  </div>
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>{doc.title}</span>
                 </div>
                 {doc.filePath ? (
@@ -133,13 +150,14 @@ export default function ReraTrustModule({ config, projectId }: { config: Record<
                     href={toMediaUrl(doc.filePath)}
                     target="_blank"
                     rel="noreferrer"
+                    className="luxury-btn"
                     style={{
                       background: 'var(--color-accent-dim)',
                       color: 'var(--color-accent)',
-                      border: 'none',
-                      borderRadius: 'var(--radius-sm)',
-                      padding: '4px 10px',
-                      fontSize: 11,
+                      border: '1px solid var(--color-accent-border)',
+                      minHeight: 36,
+                      padding: '4px 12px',
+                      fontSize: 12,
                       fontWeight: 600,
                       textDecoration: 'none'
                     }}
@@ -147,7 +165,9 @@ export default function ReraTrustModule({ config, projectId }: { config: Record<
                     View PDF
                   </a>
                 ) : (
-                  <span style={{ fontSize: 11, color: 'var(--color-text-disabled)', fontWeight: 500 }}>Certificate Approved</span>
+                  <span style={{ fontSize: 11, color: 'var(--color-text-disabled)', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <CheckIcon size={12} /> Approved
+                  </span>
                 )}
               </div>
             ))}

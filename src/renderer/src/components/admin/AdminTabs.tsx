@@ -119,15 +119,12 @@ export function StaffTab() {
                       aria-label={`System role for ${s.name}`}
                       value={s.role || 'AGENT'}
                       onChange={(e) => handleUpdateRole(s, e.target.value)}
+                      className="luxury-select"
                       style={{
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        border: '1px solid var(--color-border)',
-                        backgroundColor: 'var(--color-bg)',
-                        color: 'var(--color-text-primary)',
+                        padding: '6px 32px 6px 12px',
                         fontSize: '12px',
                         fontWeight: 600,
-                        cursor: 'pointer'
+                        minHeight: 36
                       }}
                     >
                       <option value="SUPERADMIN">👑 SUPERADMIN</option>
@@ -205,7 +202,7 @@ export function StaffTab() {
           </div>
           <div>
             <label htmlFor="createUserRoleSelect" style={{ display: 'block', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>User Role *</label>
-            <select id="createUserRoleSelect" aria-label="User Role" value={newRole} onChange={(e) => setNewRole(e.target.value as any)} style={inputStyle}>
+            <select id="createUserRoleSelect" aria-label="User Role" value={newRole} onChange={(e) => setNewRole(e.target.value as any)} className="luxury-select" style={{ ...inputStyle, minHeight: 44 }}>
               <option value="SUPERADMIN">👑 SUPERADMIN (Full Access + VPS Push)</option>
               <option value="ADMIN">🛡️ ADMIN (Catalog & Inventory Edit)</option>
               <option value="AGENT">👤 AGENT / STAFF (Presentation Only)</option>

@@ -10,6 +10,14 @@ import { IdleOverlay } from '../../components/IdleOverlay'
 import { useIdleTimer } from '../../hooks/useIdleTimer'
 import { useKioskExit } from '../../hooks/useKioskExit'
 import SalesStudioLogo from '../../components/common/SalesStudioLogo'
+import {
+  SparklesIcon,
+  ScaleIcon,
+  CheckIcon,
+  CloseIcon,
+  PowerIcon,
+  SearchIcon,
+} from '../../components/common/Icons'
 
 interface Unit { id: string; status: string }
 interface Tower { id: string; units: Unit[] }
@@ -348,55 +356,44 @@ export default function ProjectLauncher(): JSX.Element {
           )}
           <p>Offline Real Estate Presentation Kiosk</p>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
           {/* Matchmaker button */}
           <button
             onClick={() => { setMatchScores(null); setShowMatchmaker(true) }}
-            style={{
-              padding: '8px 16px', borderRadius: 8, border: '1px solid var(--color-border)',
-              background: matchScores ? 'var(--color-accent-dim)' : 'var(--color-surface-raised)',
-              color: matchScores ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-              fontWeight: 600, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-sans)',
-              transition: 'all 0.15s',
-            }}
+            className={`luxury-btn${matchScores ? ' luxury-btn-primary' : ''}`}
+            aria-label="Find best matching project"
           >
-            {matchScores ? String.fromCharCode(10003) + ' Matched' : String.fromCodePoint(128269) + ' Find Match'}
+            {matchScores ? <CheckIcon size={16} /> : <SparklesIcon size={16} color="var(--color-accent)" />}
+            <span>{matchScores ? 'Matched' : 'Find Match'}</span>
           </button>
           {matchScores && (
             <button
               onClick={() => setMatchScores(null)}
-              style={{
-                padding: '8px 12px', borderRadius: 8, border: '1px solid var(--color-border)',
-                background: 'transparent', color: 'var(--color-text-muted)',
-                fontWeight: 600, fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-sans)',
-              }}
+              className="luxury-btn"
+              style={{ padding: '8px 12px', minHeight: 44 }}
+              aria-label="Clear match filter"
             >
-              {String.fromCharCode(10005)} Clear
+              <CloseIcon size={14} />
+              <span>Clear</span>
             </button>
           )}
           {/* Compare button */}
           <button
             onClick={() => { setCompareMode((m) => !m); setCompareSelected([]) }}
-            style={{
-              padding: '8px 16px', borderRadius: 8, border: '1px solid var(--color-border)',
-              background: compareMode ? 'var(--color-accent-dim)' : 'var(--color-surface-raised)',
-              color: compareMode ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-              fontWeight: 600, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-sans)',
-              transition: 'all 0.15s',
-            }}
+            className={`luxury-btn${compareMode ? ' luxury-btn-primary' : ''}`}
+            aria-label="Compare projects side by side"
           >
-            {String.fromCodePoint(9878)} {compareMode ? 'Cancel Compare' : 'Compare'}
+            <ScaleIcon size={16} />
+            <span>{compareMode ? 'Cancel Compare' : 'Compare'}</span>
           </button>
           {compareMode && compareSelected.length === 2 && (
             <button
               onClick={() => setShowComparison(true)}
-              style={{
-                padding: '8px 18px', borderRadius: 8, border: 'none',
-                background: 'var(--color-accent)', color: '#fff',
-                fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-sans)',
-              }}
+              className="luxury-btn luxury-btn-primary"
+              aria-label="Compare selected projects now"
             >
-              Compare Now {String.fromCharCode(8594)}
+              <span>Compare Now</span>
+              <span style={{ fontSize: 16 }}>→</span>
             </button>
           )}
           <AccessibilityToggle />
@@ -412,22 +409,11 @@ export default function ProjectLauncher(): JSX.Element {
                 }
               }}
               title="Exit Application"
-              style={{
-                padding: '8px 14px', borderRadius: 8, border: '1px solid var(--color-border)',
-                background: 'var(--color-surface-raised)', color: 'var(--color-text-secondary)',
-                fontWeight: 600, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-sans)',
-                display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-error, #ef4444)'
-                e.currentTarget.style.borderColor = 'var(--color-error, #ef4444)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-secondary)'
-                e.currentTarget.style.borderColor = 'var(--color-border)'
-              }}
+              aria-label="Exit Application"
+              className="luxury-btn luxury-btn-danger"
             >
-              <span style={{ fontSize: 14 }}>⏻</span> Exit
+              <PowerIcon size={16} />
+              <span>Exit</span>
             </button>
           )}
           <div className="launcher-status-pill">
@@ -477,11 +463,12 @@ export default function ProjectLauncher(): JSX.Element {
       {/* Compare mode banner */}
       {compareMode && (
         <div style={{
-          background: 'var(--color-accent-dim)', borderBottom: '1px solid var(--color-accent-border)',
-          padding: '10px 32px', fontSize: 13, color: 'var(--color-accent)', fontWeight: 600,
+          background: 'var(--color-surface)', borderBottom: '1px solid var(--color-accent-border)',
+          padding: '12px 32px', fontSize: 13, color: 'var(--color-accent)', fontWeight: 600,
           display: 'flex', alignItems: 'center', gap: 12,
         }}>
-          <span>{String.fromCodePoint(9878)} Compare Mode: Select 2 projects to compare</span>
+          <ScaleIcon size={18} color="var(--color-accent)" />
+          <span>Compare Mode: Select 2 projects to compare side-by-side</span>
           <span style={{ opacity: 0.7 }}>({compareSelected.length}/2 selected)</span>
         </div>
       )}
@@ -506,7 +493,14 @@ export default function ProjectLauncher(): JSX.Element {
       {/* Project Grid */}
       {displayed.length === 0 ? (
         <div className="empty-state" style={{ flex: 1 }}>
-          <span className="empty-state-icon">{String.fromCodePoint(128194)}</span>
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%',
+            background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--color-accent)', boxShadow: 'var(--shadow-md)',
+          }}>
+            <SearchIcon size={32} />
+          </div>
           <h3>No Projects Found</h3>
           <p>Try adjusting your search or filter criteria, or add a new project from the Admin Panel.</p>
         </div>

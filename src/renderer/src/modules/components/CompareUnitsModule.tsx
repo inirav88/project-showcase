@@ -89,19 +89,10 @@ export default function CompareUnitsModule({ config: _config, projectId }: { con
         <select 
           value={slotValue} 
           onChange={(e) => setSlot(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '12px',
-            background: 'var(--color-surface-raised)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--color-text-primary)',
-            fontSize: 'var(--font-size-base)',
-            outline: 'none',
-            cursor: 'pointer'
-          }}
+          className="luxury-select"
+          style={{ width: '100%' }}
         >
-          <option value="">Select a unit...</option>
+          <option value="">Select a unit to compare...</option>
           {units.map(unit => (
             <option key={unit.id} value={unit.id} disabled={[slot1, slot2, slot3].includes(unit.id) && slotValue !== unit.id}>
               {unit.towerName} - {unit.unitNumber} ({unit.configuration})
@@ -111,12 +102,8 @@ export default function CompareUnitsModule({ config: _config, projectId }: { con
 
         {/* Data Card */}
         {u ? (
-          <div style={{ 
-            background: 'var(--color-surface)', 
-            border: '1px solid var(--color-border)', 
-            borderRadius: 'var(--radius-lg)', 
+          <div className="interactive-card" style={{ 
             padding: 'var(--space-6)',
-            boxShadow: 'var(--shadow-md)',
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--space-4)',

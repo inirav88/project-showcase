@@ -472,7 +472,7 @@ export default function MasterPlanModule({ config, projectId }: { config: Record
                 <div style={{ background: 'var(--color-surface)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--color-border)' }}>
                   <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Availability</span>
                   <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-available, #22c55e)', marginTop: 2 }}>
-                    {availableUnits} Units
+                    {availableUnits} / {totalUnits} Units
                   </div>
                 </div>
                 <div style={{ background: 'var(--color-surface)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--color-border)' }}>

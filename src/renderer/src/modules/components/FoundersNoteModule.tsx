@@ -1,4 +1,5 @@
 import { toMediaUrl } from '../../utils/media'
+import { UserIcon } from '../../components/common/Icons'
 
 export default function FoundersNoteModule({ config }: { config: Record<string, any>; projectId: string }): JSX.Element {
   const founderName = config.founderName || 'Sanjay Kumbhani'
@@ -15,7 +16,7 @@ export default function FoundersNoteModule({ config }: { config: Record<string, 
         borderRadius: 'var(--radius-lg)',
         padding: 'var(--space-8)',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: 'var(--space-8)',
         alignItems: 'center',
         boxShadow: 'var(--shadow-sm)'
@@ -28,31 +29,43 @@ export default function FoundersNoteModule({ config }: { config: Record<string, 
               alt={founderName}
               style={{
                 width: '100%',
-                maxHeight: 340,
+                maxHeight: 360,
                 objectFit: 'cover',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border)'
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--color-border)',
+                boxShadow: 'var(--shadow-md)'
               }}
             />
           ) : (
             <div style={{
               width: '100%',
               aspectRatio: '3/4',
-              maxHeight: 340,
+              maxHeight: 360,
               background: 'linear-gradient(135deg, var(--color-surface-raised) 0%, var(--color-bg) 100%)',
-              borderRadius: 'var(--radius-md)',
+              borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--color-border)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 12,
+              gap: 14,
               color: 'var(--color-text-muted)',
               padding: 24,
               textAlign: 'center'
             }}>
-              <span style={{ fontSize: 48 }}>👤</span>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>Upload Founder Portrait in Admin Settings</span>
+              <div style={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <UserIcon size={36} color="var(--color-accent)" />
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>Founder Portrait</span>
             </div>
           )}
         </div>

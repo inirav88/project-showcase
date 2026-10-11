@@ -68,10 +68,8 @@ beforeAll(() => {
 
 describe('MasterPlanModule 3-Tier Drill-Down', () => {
   it('renders Level 1 Master Plan and navigates through Tower, Floor, and Unit levels', async () => {
-    let container: HTMLElement
     await act(async () => {
-      const rendered = render(<MasterPlanModule config={{}} projectId="proj-123" />)
-      container = rendered.container
+      render(<MasterPlanModule config={{}} projectId="proj-123" />)
     })
 
     // Level 1: Verify Towers are rendered on Master Plan

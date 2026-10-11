@@ -155,42 +155,37 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
       {/* Gallery Grid */}
       {filteredMedia.length === 0 ? (
         <div className="empty-state">
-          <span className="empty-state-icon">{String.fromCodePoint(128507)}</span>
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%',
+            background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--color-accent)', boxShadow: 'var(--shadow-md)',
+          }}>
+            <TouchGestureIcon size={32} />
+          </div>
           <h3>No Images Yet</h3>
           <p>Add images to this project's gallery from the Admin Panel.</p>
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gridAutoRows: '180px',
-          gap: 'var(--space-3)',
-        }}>
+        <div className="gallery-grid">
           {filteredMedia.map((item, idx) => (
             <div
               key={item.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`View image: ${item.originalName || item.category}`}
+              className="gallery-item"
               onClick={() => setLightboxIndex(idx)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setLightboxIndex(idx)
+                }
+              }}
               style={{
-                position: 'relative',
-                borderRadius: 'var(--radius-md)',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface-raised)',
-                // Larger items for variety
                 gridColumn: idx === 0 ? 'span 2' : 'span 1',
                 gridRow: idx === 0 ? 'span 2' : 'span 1',
-                animation: `tileEntrance 0.4s ${0.05 * Math.min(idx, 10)}s var(--ease-out) both`,
-              }}
-              onMouseEnter={(e) => {
-                const img = e.currentTarget.querySelector('img')
-                if (img) img.style.transform = 'scale(1.07)'
-                e.currentTarget.style.borderColor = 'var(--color-accent-border)'
-              }}
-              onMouseLeave={(e) => {
-                const img = e.currentTarget.querySelector('img')
-                if (img) img.style.transform = 'scale(1)'
-                e.currentTarget.style.borderColor = 'var(--color-border)'
+                animation: `tileEntrance 0.4s ${0.04 * Math.min(idx, 10)}s var(--ease-out) both`,
               }}
             >
               <img
@@ -198,32 +193,16 @@ export default function GalleryModule({ projectId }: { config: Record<string, an
                 alt={item.originalName}
                 loading={idx < 8 ? 'eager' : 'lazy'}
                 decoding="async"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 400ms var(--ease-out)' }}
               />
               {/* Overlay */}
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 50%)',
-                display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-                padding: 'var(--space-3)',
-                opacity: 0,
-                transition: 'opacity var(--transition-fast)',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0')}
-              >
-                <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.9)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <div className="gallery-item-overlay">
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.95)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   {item.category}
                 </span>
-                <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
-                  Click to expand
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                  Tap to view full resolution
                 </span>
               </div>
-
-              {/* Always-visible hover overlay using CSS sibling trick */}
-              <style>{`
-                [data-gallery-item]:hover > [data-overlay] { opacity: 1 !important; }
-              `}</style>
             </div>
           ))}
         </div>

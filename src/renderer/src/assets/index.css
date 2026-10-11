@@ -697,7 +697,7 @@ input, textarea, select, [contenteditable="true"] {
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  padding: var(--space-4) var(--space-8);
+  padding: var(--space-4) var(--space-8) var(--space-4) calc(var(--space-8) + 48px);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
@@ -721,9 +721,9 @@ input, textarea, select, [contenteditable="true"] {
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 14px 24px;
-  min-height: 56px;
-  min-width: 56px;
+  padding: 12px 22px;
+  min-height: 52px;
+  min-width: 52px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
@@ -739,7 +739,6 @@ input, textarea, select, [contenteditable="true"] {
   -webkit-tap-highlight-color: transparent;
   position: relative;
   z-index: 100;
-  margin-left: 80px;
 }
 
 .back-btn:active {
@@ -878,6 +877,9 @@ input, textarea, select, [contenteditable="true"] {
   overflow-y: auto;
   padding: var(--space-8);
   animation: fadeIn 0.3s var(--ease-out);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* ─── Module Section Cards ───────────────────────────────────────────────────── */
@@ -948,7 +950,8 @@ input, textarea, select, [contenteditable="true"] {
   font-weight: 600;
   color: var(--color-text-primary);
   line-height: 1.3;
-  word-break: break-all;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .stat-value.accent { color: var(--color-accent); }
@@ -1404,6 +1407,192 @@ input, textarea, select, [contenteditable="true"] {
   font-size: var(--font-size-sm);
   max-width: 340px;
   line-height: 1.6;
+}
+
+/* ─── Luxury Component System & Utilities ────────────────────────────────────── */
+
+/* Luxury Buttons */
+.luxury-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.luxury-btn:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent-border);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.luxury-btn:active {
+  transform: scale(0.98);
+}
+
+.luxury-btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm), 0 0 16px var(--color-accent-glow);
+}
+
+.luxury-btn-primary:hover {
+  background: var(--color-gold-light, var(--color-accent));
+  color: #000;
+  border-color: var(--color-gold-light, var(--color-accent));
+}
+
+.luxury-btn-danger {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--color-error);
+  font-weight: 700;
+}
+
+.luxury-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: var(--color-error);
+  color: #fff;
+}
+
+/* Luxury Touch-first Select Dropdown */
+.luxury-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--color-surface-raised);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c9a84c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  padding: 10px 40px 10px 16px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.luxury-select:hover {
+  border-color: var(--color-accent-border);
+}
+
+.luxury-select:focus-visible {
+  border-color: var(--color-accent);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-accent-dim);
+}
+
+/* Luxury Interactive Card */
+.interactive-card {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+  touch-action: manipulation;
+}
+
+.interactive-card:hover {
+  border-color: var(--color-accent-border);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md), 0 0 24px var(--color-accent-dim);
+}
+
+/* Luxury Touch Slider */
+.luxury-slider {
+  width: 100%;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-surface-raised);
+  padding: 14px 0;
+  margin: 0;
+  box-sizing: content-box;
+  touch-action: pan-y;
+}
+
+/* Luxury Gallery */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 190px;
+  gap: var(--space-4);
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface-raised);
+  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.gallery-item:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: var(--color-accent-border);
+  box-shadow: var(--shadow-lg), 0 0 30px var(--color-accent-dim);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 500ms var(--ease-out);
+}
+
+.gallery-item:hover img {
+  transform: scale(1.08);
+}
+
+.gallery-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justifyContent: flex-end;
+  padding: var(--space-4);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.gallery-item:hover .gallery-item-overlay {
+  opacity: 1;
+}
+
+/* Table Interactive Row */
+.table-row-interactive {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+}
+
+.table-row-interactive:hover {
+  background-color: var(--color-surface-hover);
 }
 
 

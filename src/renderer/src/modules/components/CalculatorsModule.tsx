@@ -34,7 +34,8 @@ function SliderRow({ label, value, formatted, min, max, step, onChange }: {
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: '100%', accentColor: 'var(--color-accent)', cursor: 'pointer', height: 6 }}
+        className="luxury-slider"
+        aria-label={label}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--color-text-disabled)' }}>
         <span>{min >= 100000 ? formatINRShort(min) : min}</span>
@@ -120,7 +121,7 @@ export default function CalculatorsModule(): JSX.Element {
 
             {/* Principal vs Interest bar */}
             <div>
-              <div style={{ height: 10, borderRadius: 5, overflow: 'hidden', background: 'rgba(255,255,255,0.06)', display: 'flex' }}>
+              <div style={{ height: 12, borderRadius: 6, overflow: 'hidden', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', display: 'flex' }}>
                 <div style={{ width: `${principalPct}%`, background: 'var(--color-available)', transition: 'width 0.4s var(--ease-out)' }} />
                 <div style={{ width: `${interestPct}%`, background: 'var(--color-held)', transition: 'width 0.4s var(--ease-out)' }} />
               </div>

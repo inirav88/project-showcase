@@ -33,22 +33,10 @@ export default function SustainabilityModule({ config }: { config: Record<string
         {initiatives.map((f, idx) => (
           <div
             key={idx}
+            className="interactive-card"
             style={{
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-lg)',
               padding: 'var(--space-6)',
-              boxShadow: 'var(--shadow-sm)',
-              transition: 'all var(--transition-fast)',
               animation: `tileEntrance 0.4s ${idx * 0.06}s var(--ease-out) both`
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-accent-border)'
-              e.currentTarget.style.transform = 'translateY(-3px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border)'
-              e.currentTarget.style.transform = 'translateY(0)'
             }}
           >
             <div style={{

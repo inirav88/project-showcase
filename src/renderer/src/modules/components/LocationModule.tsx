@@ -72,21 +72,20 @@ export default function LocationModule({ config, projectId }: { config: Record<s
         </div>
 
         {/* Categories filters */}
-        <div style={{ display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveTab(cat)}
+              className="luxury-btn"
               style={{
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: 'none',
-                backgroundColor: activeTab === cat ? 'var(--project-accent)' : 'var(--color-surface-raised)',
-                color: 'var(--color-text-primary)',
-                cursor: 'pointer',
-                fontSize: '11px',
-                fontWeight: 500,
-                textTransform: 'uppercase'
+                backgroundColor: activeTab === cat ? 'var(--color-accent)' : 'var(--color-surface-raised)',
+                color: activeTab === cat ? '#fff' : 'var(--color-text-secondary)',
+                borderColor: activeTab === cat ? 'var(--color-accent)' : 'var(--color-border)',
+                fontWeight: activeTab === cat ? 700 : 500,
+                textTransform: 'uppercase',
+                fontSize: '12px',
+                padding: '8px 16px',
               }}
             >
               {cat}
@@ -98,26 +97,38 @@ export default function LocationModule({ config, projectId }: { config: Record<s
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: 'var(--space-3)',
-        marginTop: 'var(--space-2)'
+        gap: 'var(--space-4)',
+        marginTop: 'var(--space-4)'
       }}>
         {filteredLandmarks.map((lm, idx) => (
           <div
             key={idx}
+            className="interactive-card"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              backgroundColor: 'var(--color-surface-raised)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-4)'
+              gap: '14px',
+              padding: 'var(--space-5)',
+              background: 'var(--color-surface-raised)',
             }}
           >
-            <div style={{ fontSize: '24px' }}>{getCategoryIcon(lm.category)}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
-              <span style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{lm.name}</span>
-              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{lm.distance}</span>
+            <div style={{
+              width: 48,
+              height: 48,
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '22px',
+              flexShrink: 0
+            }}>
+              {getCategoryIcon(lm.category)}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+              <span style={{ fontWeight: 700, fontSize: 'var(--font-size-base)', color: 'var(--color-text-primary)' }}>{lm.name}</span>
+              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontWeight: 500 }}>{lm.distance}</span>
             </div>
           </div>
         ))}

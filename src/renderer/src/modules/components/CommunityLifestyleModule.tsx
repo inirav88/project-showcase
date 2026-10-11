@@ -34,12 +34,9 @@ export default function CommunityLifestyleModule({ config }: { config: Record<st
         {activities.map((act, idx) => (
           <div
             key={idx}
+            className="interactive-card"
             style={{
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-lg)',
               overflow: 'hidden',
-              boxShadow: 'var(--shadow-sm)',
               animation: `tileEntrance 0.4s ${idx * 0.08}s var(--ease-out) both`
             }}
           >

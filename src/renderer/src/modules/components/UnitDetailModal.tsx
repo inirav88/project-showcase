@@ -1,5 +1,5 @@
 import React from 'react'
-import { HeartIcon, BlueprintIcon } from '../../components/common/Icons'
+import { HeartIcon, BlueprintIcon, CloseIcon } from '../../components/common/Icons'
 
 export interface UnitDetailProps {
   unit: {
@@ -54,8 +54,8 @@ export default function UnitDetailModal({
         position: 'fixed',
         inset: 0,
         zIndex: 1000,
-        backgroundColor: 'rgba(5, 10, 20, 0.85)',
-        backdropFilter: 'blur(12px)',
+        backgroundColor: 'var(--backdrop-modal)',
+        backdropFilter: 'blur(16px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -185,25 +185,10 @@ export default function UnitDetailModal({
               </div>
               <button
                 onClick={onClose}
-                aria-label="Close"
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: '50%',
-                  border: '1px solid var(--color-border)',
-                  background: 'var(--color-surface-raised)',
-                  color: 'var(--color-text-secondary)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all var(--transition-fast)',
-                }}
+                aria-label="Close unit details"
+                className="close-btn-accessible"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
+                <CloseIcon size={20} />
               </button>
             </div>
 

@@ -1,7 +1,6 @@
 import { ipcMain } from 'electron'
 import type { PrismaClient } from '@prisma/client/showcase-client'
 import { IPC_CHANNELS } from '../channels'
-import crypto from 'crypto'
 import { PinRateLimiter, timingSafeHashVerify, hashPin } from '../../security/authGuard'
 import { encryptSecret, decryptSecret } from '../../security/cryptoStorage'
 
