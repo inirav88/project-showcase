@@ -417,6 +417,222 @@ async function main() {
     ],
   })
 
+  // Project 7 — The Stately (Roman-Themed Neoclassical Residences)
+  const p7 = await db.project.create({
+    data: {
+      name: 'The Stately',
+      developer: 'Samved Group',
+      reraNumber: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14924/100325/311230',
+      location: 'Kudasan, Near PDPU Crossroads & NH-147, Gandhinagar - 382421',
+      description: "Gandhinagar's first Roman-themed neoclassical residences by Samved Group, situated in prime Kudasan near PDPU crossroads & NH-147. Features 55% open space, 3-side open well-ventilated layouts, 2 allotted car parkings per home, 24-foot panoramic balconies, grand sculpture entrance foyer, 750+ sq.m central gardens, and 30 curated royal lifestyle amenities across 3 iconic 14-storey towers with boutique ground-level commercial arcades.",
+      type: 'MIXED_USE',
+      status: 'ACTIVE',
+      possessionStatus: 'UNDER_CONSTRUCTION',
+      possessionDate: 'December 2030',
+      priceRangeMin: 12100000,
+      priceRangeMax: 26500000,
+      themeAccentColor: '#8B263E',
+      themeFontPairing: 'Lora',
+      isFeatured: true,
+    },
+  })
+
+  await db.projectModule.createMany({
+    data: [
+      {
+        projectId: p7.id,
+        moduleType: 'OVERVIEW',
+        sortOrder: 0,
+        config: JSON.stringify({
+          heroHeadline: 'Live a Noble Life at The Stately',
+          subHeadline: "Gandhinagar's First Roman-Themed 3 & 4 BHK Luxury Residences in Kudasan Near PDPU Crossroads",
+          stats: [
+            'First Roman-Themed Residences',
+            '55% Open Space & Central Park',
+            '2 Allotted Car Parkings per Home',
+            '3-Side Open Cross-Ventilated Homes',
+            '24 Ft Long Panoramic Balconies',
+            '3 BHK (146-156 sq.yd) • 4 BHK (191 sq.yd)',
+            'Starting ₹1.21 Cr* Onwards',
+            'RERA: MAA14924/100325/311230'
+          ],
+          ctaLabel: 'Explore Residences & Floor Plans',
+          websiteUrl: 'https://thestately.co.in/'
+        })
+      },
+      {
+        projectId: p7.id,
+        moduleType: 'USP_SPOTLIGHT',
+        sortOrder: 1,
+        config: JSON.stringify({
+          headline: 'Neoclassical Roman Grandeur Meets Contemporary Luxury',
+          subtext: 'Designed with Roman columns, triangular pediments, and royal floral landscapes for an uncompromising luxury lifestyle.',
+          highlights: [
+            {
+              title: 'First Roman-Themed Residences in Gandhinagar',
+              description: 'Majestic arched elevations, classical pediments, Corinthian colonnades, and double-height entrance gate with royal carriage motif.',
+              badge: 'Neoclassical Icon'
+            },
+            {
+              title: '2 Allotted Car Parking for Every Home',
+              description: 'Dedicated double parking bays allocated for every residence across basement and stilt levels, ensuring zero parking hassles.',
+              badge: 'Rare Luxury Standard'
+            },
+            {
+              title: '55% Open Space & 750+ sq.m Central Park',
+              description: 'Over 55% open space with vehicle-free central gardens, water cascades, gazebo lounge, and outdoor leisure courts.',
+              badge: '55% Open Space'
+            },
+            {
+              title: '3-Side Open Homes with 24ft Panoramic Balcony',
+              description: 'Maximized daylight and cross-ventilation with 3-side open residences and an expansive 24-foot private balcony lounge.',
+              badge: 'Signature Living'
+            }
+          ]
+        })
+      },
+      { projectId: p7.id, moduleType: 'GALLERY', sortOrder: 2, config: '{}' },
+      {
+        projectId: p7.id,
+        moduleType: 'AMENITIES',
+        sortOrder: 3,
+        config: JSON.stringify({
+          headline: '30 Curated Royal Lifestyle & Wellbeing Amenities',
+          subtext: 'Thoughtfully divided into Wellbeing Essentials and Recreation Pleasures for every generation of your family.'
+        })
+      },
+      {
+        projectId: p7.id,
+        moduleType: 'MASTER_PLAN',
+        sortOrder: 4,
+        config: JSON.stringify({
+          description: 'Master layout spanning three 14-storey residential blocks (Block A: 4 BHK, Block B & C: 3 BHK), 24 ground-level commercial showrooms, 55% open space with 750+ sq.m central vehicle-free garden, 2 allotted car parking bays per residence, and dual-level parking.'
+        })
+      },
+      {
+        projectId: p7.id,
+        moduleType: 'LOCATION',
+        sortOrder: 5,
+        config: JSON.stringify({
+          mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667.9728887206384!2d72.63104127509652!3d23.171189579069857!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395c2b964e68381b%3A0x35c17c502030dce6!2sThe%20Stately%20by%20Samved!5e0!3m2!1sen!2sin!4v1776929965372!5m2!1sen!2sin',
+          addressLine: 'The Stately, Kudasan, Near PDPU Crossroads & NH-147, Gandhinagar - 382421',
+          landmarks: [
+            { name: 'PDPU Crossroads', distance: '5 Mins', category: 'transit' },
+            { name: 'NH-147 Highway Corridor', distance: '2 Mins', category: 'transit' },
+            { name: 'TCS Garima Park', distance: '10 Mins', category: 'transit' },
+            { name: 'GIFT City Financial Hub', distance: '10 Mins', category: 'transit' },
+            { name: 'Raysan / Randesan Metro Station', distance: '3 Mins', category: 'transit' },
+            { name: 'Ahmedabad International Airport', distance: '15 Mins', category: 'transit' },
+            { name: 'Achiever School', distance: '2 Mins', category: 'education' },
+            { name: 'PDPU / PDEU University Campus', distance: '5 Mins', category: 'education' },
+            { name: 'GNLU (Gujarat National Law University)', distance: '6 Mins', category: 'education' },
+            { name: 'DA-IICT & NID / NIFT', distance: '6 Mins', category: 'education' },
+            { name: 'Jamnabai Narsee International School', distance: '6 Mins', category: 'education' },
+            { name: 'SCAI Multispeciality Hospital', distance: '3 Mins', category: 'healthcare' },
+            { name: 'Vachhani Hospital', distance: '5 Mins', category: 'healthcare' },
+            { name: 'SMVS Swaminarayan Hospital', distance: '4 Mins', category: 'healthcare' },
+            { name: 'The Landmark Mall', distance: '4 Mins', category: 'retail' },
+            { name: 'Pramukh Orbit Mall', distance: '5 Mins', category: 'retail' },
+            { name: 'Swagat Holiday Mall', distance: '10 Mins', category: 'retail' },
+            { name: 'D-Mart Kudasan', distance: '3 Mins', category: 'retail' }
+          ]
+        })
+      },
+      {
+        projectId: p7.id,
+        moduleType: 'PRICING',
+        sortOrder: 6,
+        config: JSON.stringify({
+          headline: 'Official Pricing & Value Proposition',
+          subtext: 'Official website pricing starting at ₹1.21 Cr* onwards with 2 dedicated car parkings included for every residence.',
+          pricingTiers: [
+            {
+              configuration: '3 BHK Luxury Residences (146 - 156 sq.yd)',
+              priceFrom: 12100000,
+              priceTo: 13500000,
+              note: '1,314 - 1,404 sq.ft Carpet (146 - 156 sq.yd) • 2,080 - 2,150 sq.ft Built-up • Starting ₹1.21 Cr* Onwards • 2 Allotted Parkings • 3-Side Open'
+            },
+            {
+              configuration: '4 BHK Palatial Residences (191 sq.yd)',
+              priceFrom: 17100000,
+              priceTo: 19500000,
+              note: '1,719 sq.ft Carpet (191 sq.yd) • 2,750 sq.ft Built-up • Price on Request (Starting ~₹1.71 Cr) • 2 Allotted Parkings • 24\'10" Balcony • Private Foyer'
+            },
+            {
+              configuration: '3 BHK Skydeck Penthouse (Block B & C)',
+              priceFrom: 18500000,
+              priceTo: 21000000,
+              note: '2,600 sq.ft Built-up • 650 sq.ft Personal Open-Air Sky Terrace • Top 13th Floor'
+            },
+            {
+              configuration: '4 BHK Palatial Skydeck Penthouse (Block A)',
+              priceFrom: 24500000,
+              priceTo: 26500000,
+              note: '3,850 sq.ft Built-up • Massive 1,950 sq.ft Personal Skydeck (34\'6" x 56\'10") • Top 13th Floor'
+            }
+          ]
+        })
+      },
+      { projectId: p7.id, moduleType: 'COMPARE_UNITS', sortOrder: 7, config: '{}' },
+      {
+        projectId: p7.id,
+        moduleType: 'CALCULATORS',
+        sortOrder: 8,
+        config: JSON.stringify({
+          defaultLoanAmount: 12100000,
+          defaultTenure: 20,
+          defaultRate: 8.5
+        })
+      },
+      {
+        projectId: p7.id,
+        moduleType: 'COMMUNITY_LIFESTYLE',
+        sortOrder: 9,
+        config: JSON.stringify({
+          headline: 'A Harmonious Life Beyond Four Walls',
+          subtext: 'Where timeless classical aesthetics blend with modern community camaraderie and wellness.'
+        })
+      },
+      {
+        projectId: p7.id,
+        moduleType: 'RERA_TRUST',
+        sortOrder: 10,
+        config: JSON.stringify({
+          reraNo: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14924/100325/311230',
+          validityDate: 'December 2030',
+          approvedBy: 'GUJRERA (Gujarat Real Estate Regulatory Authority)',
+          detailsText: 'The Stately is fully registered and approved by GUJRERA. Developed by Samved Group and Mahadev Buildcon. Lead Marketing Agency: Aurum Analytica Private Limited. Official Website: https://thestately.co.in/.'
+        })
+      },
+      {
+        projectId: p7.id,
+        moduleType: 'BROCHURE',
+        sortOrder: 11,
+        config: JSON.stringify({
+          buttonLabel: 'Download The Stately Official Brochure (PDF)',
+          pageCount: 44,
+          webUrl: 'https://thestately.co.in/',
+          publicUrl: 'https://thestately.co.in/'
+        })
+      }
+    ]
+  })
+
+  const tower7A = await db.tower.create({ data: { projectId: p7.id, name: 'Block A (4 BHK Residences)' } })
+  const tower7B = await db.tower.create({ data: { projectId: p7.id, name: 'Block B (3 BHK Residences)' } })
+  const tower7C = await db.tower.create({ data: { projectId: p7.id, name: 'Block C (3 BHK Residences)' } })
+
+  await db.unit.createMany({
+    data: [
+      { towerId: tower7A.id, floor: 5, unitNumber: 'A-501', configuration: '4 BHK', carpetArea: 1719, builtUpArea: 2750, superBuiltUpArea: 3500, price: 17850000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: '191 sq.yd carpet • 2 Allotted Parkings • 24\'10" Balcony • Personal Foyer' },
+      { towerId: tower7A.id, floor: 13, unitNumber: 'A-1301', configuration: '4 BHK Penthouse', carpetArea: 2650, builtUpArea: 3850, superBuiltUpArea: 4800, price: 26500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: 'Palatial Skydeck Penthouse • Massive 1,950 sq.ft Personal Skydeck' },
+      { towerId: tower7B.id, floor: 4, unitNumber: 'B-401', configuration: '3 BHK', carpetArea: 1404, builtUpArea: 2150, superBuiltUpArea: 2720, price: 12800000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'NORTH', notes: '156 sq.yd carpet • 2 Allotted Parkings • 24\'10" Balcony • Corner Layout' },
+      { towerId: tower7B.id, floor: 1, unitNumber: 'B-102', configuration: '3 BHK', carpetArea: 1314, builtUpArea: 2080, superBuiltUpArea: 2650, price: 12200000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: '146 sq.yd carpet • Starting ₹1.21 Cr* • 2 Allotted Parkings • Garden Facing' },
+      { towerId: tower7C.id, floor: 8, unitNumber: 'C-801', configuration: '3 BHK', carpetArea: 1404, builtUpArea: 2150, superBuiltUpArea: 2720, price: 13200000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: '156 sq.yd carpet • 2 Allotted Parkings • 24\'10" Balcony • Corner Layout' },
+      { towerId: tower7C.id, floor: 13, unitNumber: 'C-1301', configuration: '3 BHK Penthouse', carpetArea: 1850, builtUpArea: 2600, superBuiltUpArea: 3300, price: 18500000, priceLabel: 'OFFICIAL', status: 'AVAILABLE', facing: 'EAST', notes: 'Exclusive 3 BHK Skydeck Penthouse with 600 sq.ft Open-Air Terrace' },
+    ]
+  })
+
   // Settings singleton
   await db.settings.upsert({
     where: { id: 1 },
