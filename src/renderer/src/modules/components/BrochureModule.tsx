@@ -8,8 +8,31 @@ interface BrochureProps {
   projectId: string
 }
 
+export function isDocumentUrl(url?: string): boolean {
+  if (!url || typeof url !== 'string') return false
+  const clean = url.trim().toLowerCase()
+  if (!/^https?:\/\//i.test(clean)) return false
+  if (/\.(pdf|doc|docx|ppt|pptx)($|\?|#)/i.test(clean)) return true
+  if (
+    clean.includes('drive.google.com') ||
+    clean.includes('docs.google.com') ||
+    clean.includes('dropbox.com') ||
+    clean.includes('onedrive.live.com') ||
+    clean.includes('1drv.ms') ||
+    clean.includes('s3.') ||
+    clean.includes('amazonaws.com') ||
+    clean.includes('/media/') ||
+    clean.includes('/brochure') ||
+    clean.includes('/downloads/') ||
+    clean.includes('/documents/')
+  ) {
+    return true
+  }
+  return false
+}
+
 export default function BrochureModule({ config, projectId }: BrochureProps): JSX.Element {
-  const filePath = config.brochurePath || config.filePath || config.url || ''
+  const filePath = config.brochurePath || config.filePath || config.url || config.pdfUrl || ''
   const buttonLabel = config.buttonLabel || 'Download Project Brochure'
   const fileUrl = filePath ? toMediaUrl(filePath) : ''
   const [fullscreen, setFullscreen] = useState(false)
@@ -23,6 +46,8 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
   const [clientName, setClientName] = useState('')
   const [clientPhone, setClientPhone] = useState('')
   const [qrUrl, setQrUrl] = useState('')
+  const [qrMode, setQrMode] = useState<'DIRECT_PDF' | 'WHATSAPP'>('DIRECT_PDF')
+  const [copiedLink, setCopiedLink] = useState(false)
   const [sendingApi, setSendingApi] = useState(false)
   const [apiFeedback, setApiFeedback] = useState('')
   const [activeTabMode, setActiveTabMode] = useState<'DEEP_LINK' | 'QR_CODE' | 'API_SEND'>('DEEP_LINK')
@@ -39,24 +64,66 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
     }
   }, [projectId])
 
-  // Helper to resolve a public web URL for mobile phone viewing (avoiding local media:/// paths)
+  // Helper to resolve the actual public brochure PDF URL
   const getPublicBrochureUrl = (): string => {
-    if (config.webUrl && /^https?:\/\//i.test(config.webUrl)) return config.webUrl
-    if (config.publicUrl && /^https?:\/\//i.test(config.publicUrl)) return config.publicUrl
-    if (filePath && /^https?:\/\//i.test(filePath)) return filePath
+    // 1. Direct explicit document link in config (Google Drive, Dropbox, hosted PDF)
+    if (config.publicBrochureUrl && isDocumentUrl(config.publicBrochureUrl)) return config.publicBrochureUrl
+    if (config.brochureUrl && isDocumentUrl(config.brochureUrl)) return config.brochureUrl
+    if (config.publicUrl && isDocumentUrl(config.publicUrl)) return config.publicUrl
+    if (config.webUrl && isDocumentUrl(config.webUrl)) return config.webUrl
+    if (filePath && isDocumentUrl(filePath)) return filePath
 
-    if (settings?.vpsBaseUrl && /^https?:\/\//i.test(settings.vpsBaseUrl) && filePath) {
+    // 2. Cloud VPS hosted media file for physical local brochure file
+    const vps = settings?.vpsBaseUrl || 'https://showcase.salesstudio.in'
+    if (vps && /^https?:\/\//i.test(vps) && filePath) {
       const fileName = filePath.split(/[/\\]/).pop() || ''
       if (fileName) {
-        return `${settings.vpsBaseUrl.replace(/\/$/, '')}/media/${encodeURIComponent(fileName)}`
+        return `${vps.replace(/\/$/, '')}/media/${encodeURIComponent(fileName)}`
       }
     }
 
-    if (settings?.firmWebsite && /^https?:\/\//i.test(settings.firmWebsite)) {
-      return settings.firmWebsite
-    }
+    // 3. Fallback to any public document link if present
+    if (config.publicUrl && isDocumentUrl(config.publicUrl)) return config.publicUrl
+    if (config.webUrl && isDocumentUrl(config.webUrl)) return config.webUrl
 
     return ''
+  }
+
+  // Helper to resolve project website URL (for marketing context alongside the brochure)
+  const getProjectWebsiteUrl = (): string => {
+    if (config.projectWebUrl && /^https?:\/\//i.test(config.projectWebUrl)) return config.projectWebUrl
+    if (config.webUrl && !isDocumentUrl(config.webUrl) && /^https?:\/\//i.test(config.webUrl)) return config.webUrl
+    if (config.publicUrl && !isDocumentUrl(config.publicUrl) && /^https?:\/\//i.test(config.publicUrl)) return config.publicUrl
+    if (settings?.firmWebsite && /^https?:\/\//i.test(settings.firmWebsite)) return settings.firmWebsite
+    return ''
+  }
+
+  // Constructs a complete brochure sharing message with PDF link & website
+  const buildBrochureMessage = (clientNameStr: string): string => {
+    const publicBrochureUrl = getPublicBrochureUrl()
+    const websiteUrl = getProjectWebsiteUrl()
+    const name = clientNameStr || 'Valued Client'
+    const projName = project?.name || 'Project'
+
+    if (publicBrochureUrl) {
+      const baseMsg = settings?.whatsappMessageTemplate
+        ? settings.whatsappMessageTemplate
+            .replace(/{clientName}/g, name)
+            .replace(/{projectName}/g, projName)
+            .replace(/{brochureUrl}/g, publicBrochureUrl)
+        : `Hi ${name}, here is the official brochure for ${projName}: ${publicBrochureUrl}`
+
+      if (websiteUrl && websiteUrl !== publicBrochureUrl && !baseMsg.includes(websiteUrl)) {
+        return `${baseMsg}\n🌐 Official Website: ${websiteUrl}`
+      }
+      return baseMsg
+    }
+
+    if (websiteUrl) {
+      return `Hi ${name}, here is the official information for ${projName}:\n🌐 Website: ${websiteUrl}`
+    }
+
+    return `Hi ${name}, interested in ${projName}. Please send me the official project brochure.`
   }
 
   // Generate QR Code when QR mode or client info changes
@@ -68,26 +135,25 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
     const publicBrochureUrl = getPublicBrochureUrl()
 
     let text = ''
-    if (clientPhone) {
-      const cleanClientPhone = clientPhone.replace(/\D/g, '')
-      const msgTemplate = settings?.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'
-      const msg = publicBrochureUrl
-        ? msgTemplate
-            .replace(/{clientName}/g, clientName || 'Valued Client')
-            .replace(/{projectName}/g, project.name || 'Project')
-            .replace(/{brochureUrl}/g, publicBrochureUrl)
-        : `Hi ${clientName || 'Valued Client'}, interested in ${project.name}. Please send me the project brochure.`
-
-      text = `https://wa.me/${cleanClientPhone.length === 10 ? '91' + cleanClientPhone : cleanClientPhone}?text=${encodeURIComponent(msg)}`
+    if (qrMode === 'DIRECT_PDF' && publicBrochureUrl) {
+      // Direct QR code to the actual brochure PDF!
+      text = publicBrochureUrl
     } else {
-      const msg = `Hi, please send me the official brochure for ${project.name}`
-      text = `https://wa.me/${salesPhone}?text=${encodeURIComponent(msg)}`
+      // WhatsApp message QR code
+      const cleanClientPhone = clientPhone.replace(/\D/g, '')
+      const msg = buildBrochureMessage(clientName)
+      if (cleanClientPhone) {
+        text = `https://wa.me/${cleanClientPhone.length === 10 ? '91' + cleanClientPhone : cleanClientPhone}?text=${encodeURIComponent(msg)}`
+      } else {
+        const deskMsg = `Hi, please send me the official brochure for ${project.name}`
+        text = `https://wa.me/${salesPhone}?text=${encodeURIComponent(deskMsg)}`
+      }
     }
 
-    QRCode.toDataURL(text, { width: 160, margin: 1 })
+    QRCode.toDataURL(text, { width: 180, margin: 1 })
       .then(setQrUrl)
       .catch(console.error)
-  }, [showShareModal, clientPhone, clientName, project, settings, filePath, config])
+  }, [showShareModal, clientPhone, clientName, project, settings, filePath, config, qrMode])
 
   const handleOpenShareModal = () => {
     const allowDeepLink = settings?.whatsappAllowDeepLink ?? true
@@ -107,15 +173,7 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
       return
     }
     const cleanPhone = clientPhone.replace(/\D/g, '')
-    const publicBrochureUrl = getPublicBrochureUrl()
-    const msgTemplate = settings?.whatsappMessageTemplate || 'Hi {clientName}, here is the official brochure for {projectName}: {brochureUrl}'
-    const msg = publicBrochureUrl
-      ? msgTemplate
-          .replace(/{clientName}/g, clientName || 'Valued Client')
-          .replace(/{projectName}/g, project?.name || 'Project')
-          .replace(/{brochureUrl}/g, publicBrochureUrl)
-      : `Hi ${clientName || 'Valued Client'}, interested in ${project?.name || 'Project'}. Please send me the project brochure.`
-
+    const msg = buildBrochureMessage(clientName)
     const url = `https://wa.me/${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}?text=${encodeURIComponent(msg)}`
     window.open(url, '_blank')
     setShowShareModal(false)
@@ -463,17 +521,82 @@ export default function BrochureModule({ config, projectId }: BrochureProps): JS
             )}
 
             {activeTabMode === 'QR_CODE' && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
+                {/* QR Target Sub-selector */}
+                <div style={{ display: 'flex', gap: 6, background: 'var(--color-bg)', padding: 3, borderRadius: 8, width: '100%' }}>
+                  <button
+                    type="button"
+                    onClick={() => setQrMode('DIRECT_PDF')}
+                    style={{
+                      flex: 1, padding: '7px 8px', fontSize: 11, fontWeight: 700, borderRadius: 6, border: 'none', cursor: 'pointer',
+                      background: qrMode === 'DIRECT_PDF' ? 'var(--color-accent)' : 'transparent',
+                      color: qrMode === 'DIRECT_PDF' ? '#fff' : 'var(--color-text-muted)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    📄 Direct PDF Download
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQrMode('WHATSAPP')}
+                    style={{
+                      flex: 1, padding: '7px 8px', fontSize: 11, fontWeight: 700, borderRadius: 6, border: 'none', cursor: 'pointer',
+                      background: qrMode === 'WHATSAPP' ? '#25D366' : 'transparent',
+                      color: qrMode === 'WHATSAPP' ? '#fff' : 'var(--color-text-muted)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    💬 WhatsApp Chat
+                  </button>
+                </div>
+
                 {qrUrl ? (
-                  <div style={{ background: '#fff', padding: 10, borderRadius: 12, boxShadow: 'var(--shadow-sm)' }}>
-                    <img src={qrUrl} alt="WhatsApp QR Code" style={{ width: 140, height: 140 }} />
+                  <div style={{ background: '#fff', padding: 12, borderRadius: 12, boxShadow: 'var(--shadow-sm)' }}>
+                    <img src={qrUrl} alt="Brochure QR Code" style={{ width: 160, height: 160, display: 'block' }} />
                   </div>
                 ) : (
-                  <div style={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Generating QR...</div>
+                  <div style={{ height: 184, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Generating QR...</div>
                 )}
-                <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-                  Ask the client to scan this QR code using their phone camera to instantly receive the brochure message on WhatsApp.
+
+                <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', maxWidth: 360, lineHeight: 1.4 }}>
+                  {qrMode === 'DIRECT_PDF' ? (
+                    <span>
+                      📸 <strong>Scan with Phone Camera:</strong> Instantly opens and downloads the official brochure PDF directly on the client's phone.
+                    </span>
+                  ) : (
+                    <span>
+                      💬 <strong>Scan with Phone Camera:</strong> Opens WhatsApp with the official brochure download link and project details.
+                    </span>
+                  )}
                 </div>
+
+                {/* Display destination brochure URL & Copy Button */}
+                {getPublicBrochureUrl() && (
+                  <div style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px',
+                    borderRadius: 8, background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)',
+                    fontSize: 11, color: 'var(--color-text-secondary)'
+                  }}>
+                    <span style={{ flex: 1, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={getPublicBrochureUrl()}>
+                      📄 {getPublicBrochureUrl()}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard?.writeText(getPublicBrochureUrl())
+                        setCopiedLink(true)
+                        setTimeout(() => setCopiedLink(false), 2000)
+                      }}
+                      style={{
+                        padding: '4px 8px', borderRadius: 4, border: '1px solid var(--color-border)',
+                        background: 'var(--color-surface)', color: 'var(--color-text-primary)',
+                        fontSize: 11, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {copiedLink ? '✓ Copied' : 'Copy Link'}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 

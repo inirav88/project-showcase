@@ -395,7 +395,7 @@ async function main() {
       { projectId: p6.id, moduleType: 'CALCULATORS', sortOrder: 8, config: '{"defaultInterestRate":8.5,"defaultTenureYears":20}' },
       { projectId: p6.id, moduleType: 'COMMUNITY_LIFESTYLE', sortOrder: 9, config: '{"headline":"Life Beyond Four Walls","subtext":"A vibrant community combining nature, health, and social celebration in an inspiring sanctuary."}' },
       { projectId: p6.id, moduleType: 'RERA_TRUST', sortOrder: 10, config: '{"reraNumber":"PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/MAA14756/310125/311230","possessionTarget":"December 2030","developerInfo":"Sripad Group & Shashwat Group"}' },
-      { projectId: p6.id, moduleType: 'BROCHURE', sortOrder: 11, config: '{"headline":"Official Embrace The Wind Brochure","pdfFileName":"Embrace_The_Wind_Brochure.pdf","pageCount":36}' },
+      { projectId: p6.id, moduleType: 'BROCHURE', sortOrder: 11, config: '{"headline":"Official Embrace The Wind Brochure","pdfFileName":"Embrace_The_Wind_Brochure.pdf","pageCount":36,"publicUrl":"https://showcase.salesstudio.in/media/cmt77gqdq0000oyixta32c8gt_DOCUMENT_Embrace_The_Wind_Brochure.pdf","publicBrochureUrl":"https://showcase.salesstudio.in/media/cmt77gqdq0000oyixta32c8gt_DOCUMENT_Embrace_The_Wind_Brochure.pdf"}' },
     ],
   })
 
@@ -611,8 +611,9 @@ async function main() {
         config: JSON.stringify({
           buttonLabel: 'Download The Stately Official Brochure (PDF)',
           pageCount: 44,
-          webUrl: 'https://thestately.co.in/',
-          publicUrl: 'https://thestately.co.in/'
+          publicUrl: 'https://showcase.salesstudio.in/media/cmst2st3m000w7tgjuphz8820_DOCUMENT_The_Stately_Brochure.pdf',
+          publicBrochureUrl: 'https://showcase.salesstudio.in/media/cmst2st3m000w7tgjuphz8820_DOCUMENT_The_Stately_Brochure.pdf',
+          projectWebUrl: 'https://thestately.co.in/'
         })
       }
     ]

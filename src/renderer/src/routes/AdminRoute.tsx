@@ -516,13 +516,20 @@ function ModuleConfigEditor({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={fieldStyle}>
           <label style={labelStyle}>PDF Brochure File (Local Kiosk File)</label>
-          <FilePicker projectId={projectId} value={cfg.brochurePath || cfg.filePath || ''} onChange={v => { set('brochurePath', v); set('filePath', v) }} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file..." />
+          <FilePicker projectId={projectId} value={cfg.brochurePath || cfg.filePath || cfg.pdfUrl || ''} onChange={v => { set('brochurePath', v); set('filePath', v); set('pdfUrl', v) }} accept="pdf" label="Project Brochure PDF" placeholder="Select a PDF brochure file..." />
         </div>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Online / Public Brochure Link (for WhatsApp Sharing)</label>
-          <input style={inputStyle} value={cfg.webUrl || cfg.publicUrl || ''} onChange={e => { set('webUrl', e.target.value); set('publicUrl', e.target.value) }} placeholder="e.g. https://yourdomain.com/brochures/avyanna.pdf or Google Drive link" />
+          <label style={labelStyle}>Online / Public Brochure Link (Direct PDF or Google Drive Link)</label>
+          <input style={inputStyle} value={cfg.publicUrl || cfg.publicBrochureUrl || ''} onChange={e => { set('publicUrl', e.target.value); set('publicBrochureUrl', e.target.value) }} placeholder="e.g. https://showcase.salesstudio.in/media/...pdf or Google Drive link" />
           <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-            Enter a public web link so clients can open/download the brochure directly on their mobile phones when scanning the WhatsApp QR code.
+            Auto-resolved from Cloud VPS when local brochure file exists. Clients will download this actual PDF document when scanning the QR code or on WhatsApp.
+          </span>
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Official Project Website (Optional)</label>
+          <input style={inputStyle} value={cfg.projectWebUrl || ''} onChange={e => set('projectWebUrl', e.target.value)} placeholder="e.g. https://thestately.co.in/" />
+          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+            Shared alongside the brochure PDF link for marketing context.
           </span>
         </div>
         <div style={fieldStyle}>
