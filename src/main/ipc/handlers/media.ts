@@ -87,9 +87,8 @@ export class MediaHandlers {
     }
 
     // Resolve final file size
-    // Resolve final file size
     const finalFilePath = targetFilePath
-    const sizeBytes = fs.statSync(finalFilePath).size
+    const sizeBytes = Number(fs.statSync(finalFilePath).size) || 0
 
     // 2. Process Video Duration Metadata Extraction
     if (['VIDEO', 'INTRO_VIDEO'].includes(category) || ['.mp4', '.mov', '.mkv'].includes(fileExt)) {

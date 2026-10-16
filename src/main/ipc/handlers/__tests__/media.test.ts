@@ -97,4 +97,36 @@ describe('MediaHandlers Pipeline', () => {
     // Cleanup test file
     fs.unlinkSync(externalFile)
   })
+
+  it('successfully handles video uploads exceeding 32-bit integer size (e.g. 4.48 GB)', async () => {
+    const dummyVideo = path.join(testTmpDir, 'large_walkthrough.mp4')
+    fs.writeFileSync(dummyVideo, 'MP4 STUB')
+
+    const statSyncSpy = vi.spyOn(fs, 'statSync').mockImplementation((p: any, opts?: any) => {
+      const orig = vi.importActual('fs') as any
+      if (typeof p === 'string' && p.endsWith('.mp4')) {
+        return { size: 4479731273 } as any
+      }
+      return fs.statSync(p, opts)
+    })
+
+    const result = await handlers.upload({
+      projectId: 'p1',
+      category: 'VIDEO',
+      filePath: dummyVideo,
+    })
+
+    expect(result.originalName).toBe('large_walkthrough.mp4')
+    expect(result.sizeBytes).toBe(4479731273)
+    expect(mockDb.media.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          sizeBytes: 4479731273,
+        }),
+      })
+    )
+
+    statSyncSpy.mockRestore()
+    if (fs.existsSync(dummyVideo)) fs.unlinkSync(dummyVideo)
+  })
 })
