@@ -92,15 +92,15 @@ async function main() {
       name: 'Avyanna',
       developer: 'Kumbh Infrastructure',
       reraNumber: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/RAA13022/A1R/081024/311226',
-      location: 'Koba, Gandhinagar',
-      description: 'Luxury 4 BHK apartments strategically located near PDPU - K Raheja 80-meter road, opposite Koba Metro Station. Offers G+18 and G+19 residential towers with premium high-speed lifts and 3 allotted parkings per unit.',
+      location: 'Opp. GNLU Metro Station, 80 Mtr Road, Koba, Gandhinagar',
+      description: 'Exclusive 4 BHK supersized residences across two 20-storey towers with only 2 residences per floor, 3 allotted car parkings per unit, designer swimming pool, state-of-the-art gymnasium, private cinema theatre, and 25+ curated lifestyle amenities strategically located directly opposite GNLU Metro Station on 80-meter PDPU Road in Koba, Gandhinagar.',
       type: 'RESIDENTIAL',
       status: 'ACTIVE',
       possessionStatus: 'UNDER_CONSTRUCTION',
       possessionDate: 'December 2026',
-      priceRangeMin: 16200000,
-      priceRangeMax: 18200000,
-      themeAccentColor: '#8B5CF6',
+      priceRangeMin: 11970000,
+      priceRangeMax: 22437800,
+      themeAccentColor: '#0F4C5C',
       themeFontPairing: 'Outfit',
       isFeatured: true,
     },
@@ -108,11 +108,363 @@ async function main() {
 
   await db.projectModule.createMany({
     data: [
-      { projectId: p3.id, moduleType: 'OVERVIEW',       sortOrder: 0, config: '{"heroHeadline":"Luxury 4 BHK Residences in Gandhinagar"}' },
-      { projectId: p3.id, moduleType: 'USP_SPOTLIGHT',   sortOrder: 1, config: '{"headline":"Super Premium 4 BHK Living","body":"Opposite Koba Metro Station, Koba Gandhinagar"}' },
-      { projectId: p3.id, moduleType: 'GALLERY',          sortOrder: 2, config: '{}' },
-      { projectId: p3.id, moduleType: 'AMENITIES',        sortOrder: 3, config: '{}' },
-      { projectId: p3.id, moduleType: 'PRICING',          sortOrder: 4, config: '{}' },
+      {
+        projectId: p3.id,
+        moduleType: 'OVERVIEW',
+        sortOrder: 0,
+        config: JSON.stringify({
+          heroHeadline: 'Your Place for More — 4 BHK Supersized Living',
+          subHeadline: "At New Gandhinagar's Most Coveted Neighbourhood • Opp. GNLU Metro Station, Koba",
+          stats: [
+            '20 Storeys • 2 Iconic Towers',
+            'Only 72 Supersized Residences',
+            '02 Units Per Floor Privacy',
+            '3 High-Speed Lifts Per Block',
+            '3 Allotted Parkings Per Home',
+            'Opp. GNLU Metro Station',
+            'RERA: RAA13022'
+          ],
+          ctaLabel: 'Explore Supersized Residences'
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'USP_SPOTLIGHT',
+        sortOrder: 1,
+        config: JSON.stringify({
+          headline: 'Uncompromised Luxury, Unmatched Exclusivity',
+          subtext: 'Conceived by Kumbh Infrastructure, Avyanna sets a new benchmark in Koba, Gandhinagar with expansive 4 BHK supersized layouts, rare low-density living with only 2 residences per floor, and seamless metro connectivity.',
+          highlights: [
+            'Only 2 homes per floor ensuring absolute acoustic and visual seclusion',
+            'All 4 bedrooms designed as master suites with en-suite bathrooms and powder room',
+            'Strategic 80-meter road location opposite GNLU Metro and 5 minutes to GIFT City',
+            '3 high-speed automatic elevators per tower with ARD safety and utility stretcher access',
+            'Over 25+ curated outdoor and clubhouse lifestyle amenities for all age groups'
+          ]
+        })
+      },
+      { projectId: p3.id, moduleType: 'GALLERY', sortOrder: 2, config: '{}' },
+      {
+        projectId: p3.id,
+        moduleType: 'AMENITIES',
+        sortOrder: 3,
+        config: JSON.stringify({
+          headline: '25+ Curated Luxury & Wellness Amenities',
+          subtext: 'A balanced realm of fitness, recreation, leisure, and family joy spanning ground floor greens and the 1st floor clubhouse.'
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'MASTER_PLAN',
+        sortOrder: 4,
+        config: JSON.stringify({
+          headline: 'Ground Layout & Campus Master Plan',
+          subtext: '20-storey twin towers on an 80-meter road corridor with dual basement ramps, 26ft driveway, central green courtyard, and ground amenities.',
+          description: 'Master campus layout featuring 80-meter road frontage, visitor parking, ramp-in to basement 1, ramp-out to ground, 26-foot internal driveway, separate grand entrance foyers for Block A and Block B, central pedestrian plaza, swimming pool deck, multipurpose hall, and outdoor sports arena.'
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'LOCATION',
+        sortOrder: 5,
+        config: JSON.stringify({
+          headline: "At New Gandhinagar's Most Coveted Address",
+          subtext: 'Situated on the prominent 80-meter PDPU - K Raheja road corridor directly opposite GNLU Metro Station, connecting Koba, GIFT City, and Ahmedabad seamlessly.',
+          addressLine: 'Avyanna, Opp. GNLU Metro Station, 80 Mtr Road, Koba, Gandhinagar - 382007',
+          mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3668.618174577823!2d72.63738097509575!3d23.14760457908757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e839e5572a1f1%3A0x6d9f0dfb72049e61!2sGNLU%20Metro%20Station!5e0!3m2!1sen!2sin!4v1776930000000!5m2!1sen!2sin',
+          landmarks: [
+            { name: 'GNLU Metro Station', distance: 'Opposite (1 Min Walk)', category: 'transit' },
+            { name: '80-Meter PDPU Road', distance: 'Front Facing (0 Min)', category: 'transit' },
+            { name: 'Koba Circle & NH-147 Corridor', distance: '3 Mins', category: 'transit' },
+            { name: 'GIFT City Financial Central', distance: '5 Mins', category: 'transit' },
+            { name: 'SVPI Ahmedabad International Airport', distance: '12 Mins', category: 'transit' },
+            { name: 'Ahmedabad-Gandhinagar Highway', distance: '2 Mins', category: 'transit' },
+            { name: 'GNLU (Gujarat National Law University)', distance: '2 Mins', category: 'education' },
+            { name: 'PDPU / PDEU University Campus', distance: '3 Mins', category: 'education' },
+            { name: 'IIHM Ahmedabad', distance: '4 Mins', category: 'education' },
+            { name: 'IAR (Institute of Advanced Research)', distance: '4 Mins', category: 'education' },
+            { name: 'K Raheja IT Park & Mindspace', distance: '2 Mins', category: 'transit' },
+            { name: 'SMVS Swaminarayan Hospital', distance: '5 Mins', category: 'healthcare' },
+            { name: 'Proposed Sabarmati Riverfront Phase 2', distance: '3 Mins', category: 'other' },
+            { name: 'Happiness Circle & Kudasan Retail', distance: '4 Mins', category: 'retail' },
+            { name: 'Indroda Nature Park', distance: '6 Mins', category: 'other' },
+            { name: 'Kumbheshwar Mahadev Temple', distance: '2 Mins', category: 'other' }
+          ]
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'PRICING',
+        sortOrder: 6,
+        config: JSON.stringify({
+          headline: 'Official Value Proposition & Supersized Floor Plans',
+          subtext: 'Official website pricing starting from ₹1.19 Cr* onwards with 3 dedicated car parking slots included for every residence.',
+          pricingTiers: [
+            {
+              configuration: 'Block B — 4 BHK Supersized (450 sq.yd / ~4,050 sq.ft)',
+              priceFrom: 11970000,
+              priceTo: 13230000,
+              note: '450 sq.yd built-up • 4 En-suite Bedrooms • 27\'2" Wide Balcony • Puja Room • Store Room • 3 Allotted Parkings • Starting ₹1.19 Cr*'
+            },
+            {
+              configuration: 'Block A — 4 BHK Palatial (500 sq.yd / ~4,500 sq.ft)',
+              priceFrom: 14350000,
+              priceTo: 16450000,
+              note: '500 sq.yd built-up • 4 Master Bedrooms with Attached Baths • Powder Room • 16x16 Multifunctional Space with Puja & Study • 2 Balconies with Jhula • 3 Allotted Parkings • Starting ₹1.43 Cr*'
+            },
+            {
+              configuration: 'Block B — 4 BHK Skydeck Penthouse (711 sq.yd / ~6,399 sq.ft)',
+              priceFrom: 20405700,
+              priceTo: 20903400,
+              note: '711 sq.yd built-up • Top 19th Floor Penthouse • Expansive Sky Terrace • Panoramic Views • 3 Allotted Parkings'
+            },
+            {
+              configuration: 'Block A — 4 BHK Skydeck Penthouse (682 sq.yd / ~6,138 sq.ft)',
+              priceFrom: 21960400,
+              priceTo: 22437800,
+              note: '682 sq.yd built-up • Top 18th Floor Penthouse • Palatial Sky Terrace • Unobstructed Skyline & Greenery Views • 3 Allotted Parkings'
+            }
+          ]
+        })
+      },
+      { projectId: p3.id, moduleType: 'COMPARE_UNITS', sortOrder: 7, config: '{}' },
+      {
+        projectId: p3.id,
+        moduleType: 'CALCULATORS',
+        sortOrder: 8,
+        config: JSON.stringify({
+          defaultLoanAmount: 14000000,
+          defaultTenure: 20,
+          defaultRate: 8.5,
+          maxLoanAmount: 25000000
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'COMMUNITY_LIFESTYLE',
+        sortOrder: 9,
+        config: JSON.stringify({
+          headline: 'A Place For More — Life In Full Bloom',
+          subtext: 'Every space at Avyanna is curated with purpose and personality for families to celebrate, unwind, and flourish.',
+          activities: [
+            {
+              title: 'A Place for More Play',
+              description: 'Outdoor children adventure playground with shock-absorbent turf, giant floor chess, outdoor ludo arena, and indoor games lounge.'
+            },
+            {
+              title: 'A Place for More Blue',
+              description: 'Shimmering designer swimming pool with cascading waterfall spouts, poolside sun loungers, and lush green pergola deck.'
+            },
+            {
+              title: 'A Place for More Strength & Stories',
+              description: 'Fully equipped modern gymnasium with cardio and free weights, paired with a private acoustic cinema theatre for family movie screenings.'
+            },
+            {
+              title: 'A Place for More Green',
+              description: 'Central vehicle-free green courtyard with landscaped lawns, shaded tree-lined avenues, and illuminated nighttime stone paving.'
+            },
+            {
+              title: 'A Place for More First Impressions',
+              description: 'Double-height grand entrance foyers with Italian marble medallions, plush designer guest salons, and floor-to-ceiling glass facades.'
+            },
+            {
+              title: 'A Place for More Harmony',
+              description: 'Every residence strictly aligns with Vastu principles ensuring natural cross-ventilation, abundant sunlight, and positive family energy.'
+            }
+          ]
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'SPORTS_CAROUSEL',
+        sortOrder: 10,
+        config: JSON.stringify({
+          headline: 'Fitness & Sports Sanctuary',
+          subtext: 'Stay active, energized, and healthy with comprehensive outdoor and indoor sports facilities.',
+          facilities: [
+            {
+              name: 'Designer Swimming Pool & Sun Deck',
+              description: 'Temperature-optimized lap pool with waterfall spouts, poolside loungers, and pergola canopy.'
+            },
+            {
+              name: 'State-of-the-Art Gymnasium',
+              description: 'Full cardio suite with treadmills, water rowers, elliptical trainers, and multi-station strength equipment.'
+            },
+            {
+              name: 'Billiards & Indoor Games Lounge',
+              description: 'Full-size tournament pool table, table tennis, carrom board, and indoor chess table.'
+            },
+            {
+              name: 'Basketball & Multi-Sports Half Court',
+              description: 'Outdoor court with all-weather anti-skid polyurethane sports surfacing and perimeter floodlighting.'
+            },
+            {
+              name: 'Outdoor Giant Floor Chess & Ludo Arena',
+              description: 'Vibrant giant life-size floor board games for interactive outdoor fun for kids and seniors.'
+            }
+          ]
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'SMART_HOME',
+        sortOrder: 11,
+        config: JSON.stringify({
+          headline: 'Modern Infrastructure & Smart Provisions',
+          subtext: 'Cutting-edge electrical, climate, and security specifications for seamless modern living.',
+          features: [
+            {
+              title: 'VRV / VRF Air Conditioning Provision',
+              description: 'Pre-installed refrigerant copper conduits and electrical circuits for energy-efficient centralized VRV/VRF AC.',
+              icon: '❄️'
+            },
+            {
+              title: 'Video Door Phone & Intercom',
+              description: 'Direct video intercom connecting every apartment to the security guard station and entrance foyers.',
+              icon: '📹'
+            },
+            {
+              title: '3-Phase Concealed ISI Copper Wiring',
+              description: 'Heavy-duty 3-phase electrical cabling by Polycab / RR Kabel with modular switches by Schneider / Legrand / Norisys.',
+              icon: '⚡'
+            },
+            {
+              title: 'High-Speed Automatic Lifts with ARD',
+              description: 'Kone / Schindler elevators with automatic rescue device (ARD) to ensure passenger safety during power cuts.',
+              icon: '🛗'
+            },
+            {
+              title: 'DTH & Fiber Internet Conduits',
+              description: 'Centralized distribution box (MDB) with pre-laid conduits for high-speed fiber broadband and multiple satellite TV providers.',
+              icon: '🌐'
+            },
+            {
+              title: 'DGU Sound-Insulated Windows',
+              description: 'Heavy powder-coated aluminum sections with Double Glazed Units (DGU) providing superior acoustic and thermal insulation.',
+              icon: '🪟'
+            }
+          ]
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'SUSTAINABILITY',
+        sortOrder: 12,
+        config: JSON.stringify({
+          headline: 'Responsible Green & Sustainable Engineering',
+          subtext: 'Eco-conscious construction practices and energy-efficient systems designed for low environmental impact.',
+          initiatives: [
+            {
+              title: 'AAC Blocks & Thermal Insulation',
+              description: 'Autoclaved Aerated Concrete blocks and fly ash bricks reducing internal ambient temperature and heat gain.',
+              icon: '🧱'
+            },
+            {
+              title: 'Earthquake Resistant RCC Frame',
+              description: 'Engineered RCC structure complying with stringent seismic Zone III/IV safety codes with UltraTech / Ambuja cement.',
+              icon: '🏗️'
+            },
+            {
+              title: 'Rainwater Harvesting Network',
+              description: 'Percolation wells and recharge pits across campus recharging local groundwater tables.',
+              icon: '🌧️'
+            },
+            {
+              title: 'Lush Central Oxygen Courtyard',
+              description: 'Expansive green central gardens and native tree plantations enhancing micro-climate and air quality.',
+              icon: '🌿'
+            },
+            {
+              title: 'Energy-Efficient LED Common Lighting',
+              description: 'Low-voltage architectural illumination across basements, driveways, and common lobbies.',
+              icon: '💡'
+            }
+          ]
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'RERA_TRUST',
+        sortOrder: 13,
+        config: JSON.stringify({
+          reraNo: 'PR/GJ/GANDHINAGAR/GANDHINAGAR/Gandhinagar Municipal Corporation/RAA13022/A1R/081024/311226',
+          validityDate: 'December 2026',
+          approvedBy: 'GUJRERA (Gujarat Real Estate Regulatory Authority)',
+          detailsText: 'Avyanna is fully approved and registered with GUJRERA. Developed by Kumbh Infrastructure, a trusted developer committed to transparent documentation, clear marketable title, and milestone-linked RERA escrow account compliance.'
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'BROCHURE',
+        sortOrder: 14,
+        config: JSON.stringify({
+          buttonLabel: 'Download Avyanna Official 4 BHK Brochure (PDF)',
+          pdfFileName: 'AVYANNA 4 BHK .pdf',
+          pageCount: 15,
+          publicUrl: 'https://kumbhinfra.in',
+          salesContact: '99 04 8888 03',
+          developerWebsite: 'https://www.kumbhinfra.in'
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'CONSTRUCTION_TIMELINE',
+        sortOrder: 15,
+        config: JSON.stringify({
+          headline: 'Project Milestones & Delivery Schedule',
+          possessionDate: 'December 2026',
+          currentStatus: 'Under Construction - Superstructure & Clubhouse Finishing in Progress'
+        })
+      },
+      {
+        projectId: p3.id,
+        moduleType: 'FOUNDERS_NOTE',
+        sortOrder: 16,
+        config: JSON.stringify({
+          headline: "Crafting Gandhinagar's Finest Supersized Residences",
+          body: 'At Kumbh Infrastructure, we envisioned Avyanna not merely as residences, but as private sanctuaries of boundless space and tranquility. By dedicating an entire floor to just two homes, each family enjoys absolute privacy, unobstructed panoramic views, and three allotted parkings. We welcome you to experience Gandhinagar\'s most coveted address.',
+          author: 'Kumbh Infrastructure',
+          role: 'Developer & Promoters'
+        })
+      }
+    ],
+  })
+
+  await db.highlightCard.createMany({
+    data: [
+      { projectId: p3.id, icon: '🏛️', shortText: '20 Storeys • Only 2 Units Per Floor', sortOrder: 0 },
+      { projectId: p3.id, icon: '🚇', shortText: 'Opposite GNLU Metro Station, Koba', sortOrder: 1 },
+      { projectId: p3.id, icon: '👑', shortText: 'Supersized 4 BHK Homes (450 - 711 sq.yd)', sortOrder: 2 },
+      { projectId: p3.id, icon: '🏊', shortText: 'Designer Swimming Pool with Waterfall Jets', sortOrder: 3 },
+      { projectId: p3.id, icon: '🎬', shortText: 'Private Mini Cinema Theatre & High-Tech Gym', sortOrder: 4 },
+      { projectId: p3.id, icon: '🚗', shortText: '3 Allotted Covered Parkings Per Residence', sortOrder: 5 },
+    ],
+  })
+
+  await db.amenity.createMany({
+    data: [
+      { projectId: p3.id, name: 'Designer Swimming Pool with Cascade Jets', description: 'Shimmering lap pool with waterfall spouts, poolside sun loungers, and pergola sun canopy.', icon: '🏊', sortOrder: 0 },
+      { projectId: p3.id, name: 'State-of-the-Art Gymnasium', description: 'Complete fitness center with water rowers, treadmills, elliptical trainers, free weights, and stretching zone.', icon: '💪', sortOrder: 1 },
+      { projectId: p3.id, name: 'Private Mini Cinema Theatre', description: 'Acoustically treated private cinema with tiered luxury recliner armchairs and high-definition projector setup.', icon: '🎬', sortOrder: 2 },
+      { projectId: p3.id, name: 'Billiards & Indoor Games Lounge', description: 'Recreational lounge featuring tournament pool table, table tennis, carrom, and board games.', icon: '🎮', sortOrder: 3 },
+      { projectId: p3.id, name: 'Toddlers Playroom & Indoor Creche', description: 'Padded discovery playroom with interactive learning toys and baby-safe soft flooring.', icon: '👶', sortOrder: 4 },
+      { projectId: p3.id, name: 'Children\'s Outdoor Adventure Arena', description: 'Safe outdoor multi-play turf area equipped with fun spring riders, climbing nets, and slides.', icon: '🎡', sortOrder: 5 },
+      { projectId: p3.id, name: 'Basketball & Multi-Sports Half Court', description: 'All-weather anti-skid polyurethane sports court with perimeter floodlighting.', icon: '🏀', sortOrder: 6 },
+      { projectId: p3.id, name: 'Giant Outdoor Floor Chess Arena', description: 'Life-size outdoor chess board on paved terrace garden for strategic fun.', icon: '♟️', sortOrder: 7 },
+      { projectId: p3.id, name: 'Giant Outdoor Ludo Court', description: 'Vibrant, oversized ground ludo court for family and children group games.', icon: '🎲', sortOrder: 8 },
+      { projectId: p3.id, name: 'Grand Double-Lounge Entrance Foyers', description: 'Double-height grand lobbies (Block A: 29\'8" x 16\'0", Block B: 23\'8" x 21\'3") with Italian marble and designer sofas.', icon: '🏛️', sortOrder: 9 },
+      { projectId: p3.id, name: 'Central Landscaped Green Courtyard', description: 'Vehicle-free central garden with manicured lawns, illuminated paving, and flowering trees.', icon: '🌿', sortOrder: 10 },
+      { projectId: p3.id, name: 'Traditional Gujarati Jhula Courts', description: 'Brass-chain swing alcoves situated amidst serene green sit-outs for relaxed evening conversations.', icon: '🛋️', sortOrder: 11 },
+      { projectId: p3.id, name: 'Library & Study Sanctuary', description: 'Quiet sunlit reading lounge (18\'5" x 15\'1") with curated book collections and study desks.', icon: '📚', sortOrder: 12 },
+      { projectId: p3.id, name: 'Multipurpose Banquet & Gathering Hall', description: 'Ground-level spacious hall for resident community celebrations, cultural festivities, and parties.', icon: '🎉', sortOrder: 13 },
+      { projectId: p3.id, name: 'Society Administration & Manager\'s Office', description: 'Dedicated executive office and administrative cabin for facility managers on the ground floor.', icon: '🏢', sortOrder: 14 },
+      { projectId: p3.id, name: '3 High-Speed Elevators Per Tower', description: 'Kone / Schindler elevators (2 passenger + 1 stretcher/utility lift) with ARD automatic rescue device.', icon: '⬆️', sortOrder: 15 },
+      { projectId: p3.id, name: '3 Allotted Covered Parkings Per Residence', description: 'Dedicated numbered parking bays across ground and dual-level basement floors.', icon: '🚗', sortOrder: 16 },
+      { projectId: p3.id, name: '24x7 Security with CCTV Surveillance', description: 'Multi-tier security with round-the-clock security personnel and HD CCTV network.', icon: '🔒', sortOrder: 17 },
+      { projectId: p3.id, name: 'Advanced Fire Alarm & Hydrant Safety', description: 'Comprehensive fire safety network with wet risers, smoke sensors, and hose reels.', icon: '🧯', sortOrder: 18 },
+      { projectId: p3.id, name: 'VRV / VRF Air Conditioning Provision', description: 'Pre-installed refrigerant piping and electrical points for centralized energy-efficient VRV AC.', icon: '❄️', sortOrder: 19 },
+      { projectId: p3.id, name: 'Vastu-Compliant 3-Side Open Homes', description: 'Every residence engineered according to Vastu principles ensuring positive flow, light, and cross-ventilation.', icon: '☀️', sortOrder: 20 },
+      { projectId: p3.id, name: 'Rainwater Harvesting & Ground Recharge', description: 'Eco-conscious percolation wells recharging local groundwater aquifers.', icon: '🌧️', sortOrder: 21 },
     ],
   })
 
