@@ -8,7 +8,18 @@ interface Highlight {
 }
 
 export default function UspSpotlightModule({ config }: { config: Record<string, any>; projectId: string }): JSX.Element {
-  const highlights: Highlight[] = config.highlights || []
+  const rawHighlights = config.highlights || []
+  const highlights: Highlight[] = rawHighlights.map((item: any) => {
+    if (typeof item === 'string') {
+      return {
+        title: item,
+        description: '',
+        imagePath: '',
+        badge: ''
+      }
+    }
+    return item
+  })
   const headline = config.headline || 'What Sets Us Apart'
   const subtext = config.subtext || 'Signature features crafted for those who demand the extraordinary.'
 
@@ -19,7 +30,7 @@ export default function UspSpotlightModule({ config }: { config: Record<string, 
         <h2 style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
           {headline}
         </h2>
-        <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-3)', maxWidth: 540, margin: '12px auto 0' }}>
+        <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-3)', maxWidth: 640, margin: '12px auto 0', lineHeight: 1.6 }}>
           {subtext}
         </p>
       </div>

@@ -135,11 +135,42 @@ async function main() {
           headline: 'Uncompromised Luxury, Unmatched Exclusivity',
           subtext: 'Conceived by Kumbh Infrastructure, Avyanna sets a new benchmark in Koba, Gandhinagar with expansive 4 BHK supersized layouts, rare low-density living with only 2 residences per floor, and seamless metro connectivity.',
           highlights: [
-            'Only 2 homes per floor ensuring absolute acoustic and visual seclusion',
-            'All 4 bedrooms designed as master suites with en-suite bathrooms and powder room',
-            'Strategic 80-meter road location opposite GNLU Metro and 5 minutes to GIFT City',
-            '3 high-speed automatic elevators per tower with ARD safety and utility stretcher access',
-            'Over 25+ curated outdoor and clubhouse lifestyle amenities for all age groups'
+            {
+              title: '20 Storeys, Only 2 Homes Per Floor',
+              description: 'Unprecedented low-density living with only 72 exclusive residences across 20 storeys, ensuring absolute acoustic privacy, triple-side ventilation, and zero common walls.',
+              imagePath: 'C:\\Users\\dazed\\AppData\\Roaming\\showcaseos\\media\\cmst2ssom000j7tgj1e19t3oq_HIGHLIGHT_Elevation_Cropped.png',
+              badge: 'Rare Exclusivity'
+            },
+            {
+              title: 'Opposite GNLU Metro Station',
+              description: 'Strategically positioned directly opposite GNLU Metro Station on Koba\'s prime 80-meter arterial corridor — 0 mins to Metro, 5 mins to Infocity, 10 mins to GIFT City, and 12 mins to Airport.',
+              imagePath: 'C:\\Users\\dazed\\AppData\\Roaming\\showcaseos\\media\\cmst2ssom000j7tgj1e19t3oq_HIGHLIGHT_Metro_Cropped.png',
+              badge: 'Prime Transit Hub'
+            },
+            {
+              title: 'Supersized 4 BHK with 27\'2" Balcony',
+              description: 'Palatial 450 to 711 sq.yd layouts featuring 4 master bedroom suites with en-suite baths, 27\'2" continuous glass viewing balcony, and a 16x16 multifunctional puja/study lounge.',
+              imagePath: 'C:\\Users\\dazed\\AppData\\Roaming\\showcaseos\\media\\cmst2ssom000j7tgj1e19t3oq_HIGHLIGHT_Balcony_Cropped.png',
+              badge: 'Palatial Architecture'
+            },
+            {
+              title: 'Designer Pool & Cascading Water Jets',
+              description: 'Elevated 1st-floor private lap pool featuring architectural water cascade spouts, poolside sun loungers, and an exotic timber pergola sunshade canopy.',
+              imagePath: 'C:\\Users\\dazed\\AppData\\Roaming\\showcaseos\\media\\cmst2ssom000j7tgj1e19t3oq_HIGHLIGHT_Pool_Cropped.png',
+              badge: 'Clubhouse Wellness'
+            },
+            {
+              title: 'Private Cinema Theatre & High-Tech Gym',
+              description: 'Dedicated 44\'3" x 25\'0" private mini-cinema with tiered luxury acoustic recliners, paired with a state-of-the-art cardiovascular and strength training fitness studio.',
+              imagePath: 'C:\\Users\\dazed\\AppData\\Roaming\\showcaseos\\media\\cmst2ssom000j7tgj1e19t3oq_HIGHLIGHT_Cinema_Cropped.png',
+              badge: 'Elite Entertainment'
+            },
+            {
+              title: 'Grand Double-Lounge Entrance Foyers',
+              description: 'Double-height arrival reception lobbies (Block A: 29\'8" x 16\'0", Block B: 23\'8" x 21\'3") adorned with Italian marble floors, designer hospitality seating, and 24x7 security concierge.',
+              imagePath: 'C:\\Users\\dazed\\AppData\\Roaming\\showcaseos\\media\\cmst2ssom000j7tgj1e19t3oq_HIGHLIGHT_Foyer_Cropped.png',
+              badge: 'Stately Arrival'
+            }
           ]
         })
       },
