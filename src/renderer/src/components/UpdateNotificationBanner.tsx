@@ -79,13 +79,19 @@ export const UpdateNotificationBanner: React.FC = () => {
 
   if (dismissed || !updaterState) return null
 
-  const { status, updateInfo, error } = updaterState
+  const { status, updateInfo } = updaterState
 
-  // Only show banner if there's actionable or active update state
+  // Only show banner if there's an actionable or active update state:
+  // - AVAILABLE: Update found and starting background download
+  // - DOWNLOADING: Update in progress with percentage & progress bar
+  // - DOWNLOADED: Ready for the user to restart & install
+  // Passive background states (IDLE, CHECKING, NOT_AVAILABLE) and background check failures
+  // (e.g. net::ERR_NAME_NOT_RESOLVED when offline) are suppressed to preserve a clean kiosk experience.
+  // Full diagnostics remain available in Admin Settings -> System -> Software Update.
   if (
-    status === 'IDLE' ||
-    status === 'CHECKING' ||
-    status === 'NOT_AVAILABLE'
+    status !== 'AVAILABLE' &&
+    status !== 'DOWNLOADING' &&
+    status !== 'DOWNLOADED'
   ) {
     return null
   }
@@ -138,13 +144,6 @@ export const UpdateNotificationBanner: React.FC = () => {
               v{updateInfo?.version}
             </span>{' '}
             has been downloaded and is ready to install!
-          </div>
-        )}
-
-        {status === 'ERROR' && (
-          <div className="text-amber-100">
-            <span className="font-semibold text-white">Update Warning:</span>{' '}
-            {typeof error === 'object' ? ((error as any)?.message || JSON.stringify(error)) : String(error || 'Unable to download update automatically.')}
           </div>
         )}
       </div>

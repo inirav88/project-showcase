@@ -147,7 +147,11 @@ export class UpdaterHandlers {
         this.broadcastState()
       }
     } else {
-      await autoUpdater.checkForUpdates()
+      try {
+        await autoUpdater.checkForUpdates()
+      } catch (err: any) {
+        console.warn('[Updater] Auto update check failed gracefully:', err?.message || err)
+      }
     }
     return this.getStatus()
   }
